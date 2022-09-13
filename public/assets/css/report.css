@@ -1,0 +1,78 @@
+body {
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+
+.text-center {
+    text-align: center;
+}
+
+#judul {
+    width: 85%;
+    font-weight: bold;
+    font-size: 13px;
+    margin: 0 auto;
+}
+
+#judul p:not(:last-child) {
+    margin-bottom: -13px;
+}
+
+.subhead2 {
+    margin: 20 auto 0 auto;
+    font-size: 14px;
+    width: 90%;
+}
+
+#subhead3 {
+    border-collapse: collapse;
+    font-size: 11px !important;
+    width: 100% !important;
+}
+
+#subhead3 td {
+    padding: 2px;
+}
+
+.border-solid {
+    border: 1px solid black;
+}
+
+.border-solid-td td {
+    border: 1px solid black;
+}
+
+#ttd {
+    width: 250px;
+    height: auto;
+    font-size: 11px;
+    margin: 30px auto 0 auto;
+    display: inline-block;
+}
+
+#ttd p {
+    margin: 0px;
+}
+
+#ttd-space {
+    width: 100%;
+    height: 50px;
+}
+
+.page-next {
+    page-break-before: always;
+}
+
+.centang {
+    font-family: DejaVu Sans, sans-serif;
+    display: inline;
+}
+
+.empty-space {
+    width: 25px;
+    height: auto;
+    display: inline-block;
+}
+
+#subhead3 td {
+    vertical-align: middle;
+}

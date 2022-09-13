@@ -1,0 +1,135 @@
+<?php
+$kerja_jam_masukex = explode(':',$jam_kerja->jam_masuk);
+$kerja_jam_keluarex = explode(':',$jam_kerja->jam_keluar);
+
+$kerja_j_masuk_start = $kerja_jam_masukex[0];
+$kerja_menit_masuk_start = $kerja_jam_masukex[1];
+
+$kerja_j_keluar_start = $kerja_jam_keluarex[0];
+$kerja_menit_keluar_start = $kerja_jam_keluarex[1];
+
+$kerjahasil = (intVal($kerja_j_keluar_start) - intVal($kerja_j_masuk_start)) * 60 + (intVal($kerja_menit_keluar_start) - intVal($kerja_menit_masuk_start));
+$kerjahasil = $kerjahasil / 60;
+$kerjahasil = number_format($kerjahasil,2);
+$kerjahasilx = explode(".",$kerjahasil);
+$kerjadepan = sprintf("%02d", $kerjahasilx[0]);
+$kerjagabung = $kerjadepan.":".$kerjahasilx[1];
+?>
+
+<html>
+<title>{{ config('app.name', 'Laravel') }}</title>
+<head>
+    <style>
+		@media print
+		{
+		#ttd {position:fixed;bottom:1cm;}
+		}
+		@font-face {
+			font-family: MyriadPro-Regular;
+			src: url("../font/MyriadPro-Regular.otf");
+
+		}
+		@font-face {
+			font-family: MyriadPro-Cond;
+			src: url("../font/MyriadPro-Cond.otf");
+
+		}
+		#head-title{
+			font-family:MyriadPro-Regular;
+			font-weight:bold;
+		}
+		#head-big{
+			font-family:MyriadPro-Cond;
+			font-weight:bold;
+			font-size:12pt;
+		}
+		#container td{
+			font-family:MyriadPro-Regular;
+		}
+        @page { size: landscape; }
+        @page { size: "A4"; }
+        div.page { page-break-after: always; }
+        .tengah{
+            text-align:center;
+        }
+        .kiri{
+            text-align:left;
+        }
+        .kanan{
+            text-align:right;
+        }
+</style>
+</head>
+
+<div class="page" align="center" id="container">
+    <body leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0">
+        <span><b>Data Presensi Pegawai</b></span><br/>
+        <span><b>Jam Kerja {{$jam_kerja->jam_masuk}} - {{$jam_kerja->jam_keluar}} ( {{$kerjagabung}} jam )</b></span><br/>
+        <br/><hr style="border: 1px solid"/><br/>
+        <br/><hr style="border: 1px solid"/><br/>
+        <table width="100%" border=1 cellspacing=0 cellpadding="3" style="font-size:12pt";>
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nip</th>
+                    <th>Nama</th>
+                    <th>Tanggal</th>
+                    <th>Jam Masuk</th>
+                    <th>Jam Pulang</th>
+                    <th>Durasi Bekerja <br/>(Jam)</th>
+                    <th>Durasi Bekerja <br/>(Menit)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php $no=1;?>
+                @foreach($arrData as $id_sdm=>$dt_sdm)
+                    @foreach($dt_sdm['data_presensi'] as $tanggal=>$presensi)
+                    <?php
+                    $jam_masuk = array_shift($presensi);
+                    $jam_keluar = end($presensi);
+                    if($jam_keluar==null){
+                        $jam_keluar = $jam_masuk;
+                    }
+
+                    $jam_masukex = explode(':',$jam_masuk);
+                    $jam_keluarex = explode(':',$jam_keluar);
+
+                    $j_masuk_start = $jam_masukex[0];
+                    $menit_masuk_start = $jam_masukex[1];
+
+                    $j_keluar_start = $jam_keluarex[0];
+                    $menit_keluar_start = $jam_keluarex[1];
+
+                    $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
+                    $hasil = $hasil / 60;
+                    $hasil = number_format($hasil,2);
+                    $hasilx = explode(".",$hasil);
+                    $depan = sprintf("%02d", $hasilx[0]);
+                    $gabung = $depan.":".$hasilx[1];
+                    $warna = "";
+                    if($gabung < $kerjagabung){
+                        $warna = "background-color: #F78282;";
+                    }
+                    $hari = explode(',',$tanggal);
+                    if($hari[0]=="Minggu" || $hari[0]=="Sabtu"){
+                        $warna = "background-color: #E3CC6D;";
+                    }
+                    $menit = ($gabung*60)+$hasilx[1];
+                    ?>
+                    <tr style="{{$warna}}">
+                        <td>{{$no++}}</td>
+                        <td>{{$dt_sdm['nip']}}</td>
+                        <td>{{$dt_sdm['nm_sdm']}}</td>
+                        <td>{{$tanggal}}</td>
+                        <td align="center">{{$jam_masuk}}</td>
+                        <td align="center">{{$jam_keluar}}</td>
+                        <td align="center">{{$gabung}}</td>
+                        <td align="center">{{$menit}}</td>
+                    </tr>
+                    @endforeach
+                @endforeach
+            </tbody>
+        </table>
+    </body>
+</div>
+</html>
