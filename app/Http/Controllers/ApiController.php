@@ -6,7 +6,7 @@ use App\Repositories\Reporiwayatpresensi;
 use App\Repositories\Repomspegawai;
 use App\Repositories\Repotrrekapskp;
 use App\Repositories\Repotrabsenkehadiran;
-
+use App\Repositories\Repotrprilakupegawai;
 
 use Crypt;
 use Fungsi;
@@ -25,20 +25,30 @@ class ApiController extends Controller
         Reporiwayatpresensi $reporiwayatpresensi,
         Repomspegawai $repomspegawai,
         Repotrabsenkehadiran $repotrabsenkehadiran,
-        Repotrrekapskp $repotrrekapskp
+        Repotrrekapskp $repotrrekapskp,
+        Repotrprilakupegawai $repotrprilakupegawai
     ){
         $this->request = $request;
         $this->reporiwayatpresensi = $reporiwayatpresensi;
         $this->repomspegawai = $repomspegawai;
         $this->repotrabsenkehadiran = $repotrabsenkehadiran;
         $this->repotrrekapskp = $repotrrekapskp;
+        $this->repotrprilakupegawai = $repotrprilakupegawai;
     }
 
     public function rekap_skp($nip,$bulan,$tahun){
         $rsData = $this->repomspegawai->findId("",$nip,"nip");
+
         $rekap_skp = $this->repotrrekapskp->get(['dt_periode'],$rsData->id_sdm, $tahun, $bulan);
-        $arrrekapnilai = array();
+        $data_prilaku = $this->repotrprilakupegawai->getWhereRaw(['dt_periode','dt_prilaku'],$rsData->id_sdm," bulan = '$bulan' and tahun = '$tahun' ");
+        $arrrekapnilai = array();$arrdtprilaku = array();
         $arrNamabulan = Fungsi::nm_bulan();
+        foreach($data_prilaku as $rsx=>$rx){
+            $arrdtprilaku[$rx->id]['nama_komponen'] = $rx->dt_prilaku->nama;
+            $arrdtprilaku[$rx->id]['nilai'] = $rx->nilai;
+            $arrdtprilaku[$rx->id]['keterangan'] = $rx->keterangan;
+        }
+
         foreach($rekap_skp as $rs=>$r){
             $rekap['idperiode'] = $r->idperiode;
             $rekap['nilai_skp'] = $r->nilai_skp;
@@ -50,10 +60,39 @@ class ApiController extends Controller
             $arrrekapnilai[$r->dt_periode->bulan]['tahun'] = $r->dt_periode->tahun;
             $arrrekapnilai[$r->dt_periode->bulan]['kode'] = $r->dt_periode->kode;
             $arrrekapnilai[$r->dt_periode->bulan]['data_rekap_skp'] = $rekap;
+            $arrrekapnilai[$r->dt_periode->bulan]['data_prilaku'] = $arrdtprilaku;
         }
         $json_string = json_encode($arrrekapnilai, JSON_PRETTY_PRINT);
         return $json_string;
+    }
 
+    public function rekap_skp_all($bulan,$tahun){
+        $rsPegawai = $this->repomspegawai->getskp(['nm_atasan','nm_atasan_pendamping','nm_satker'],1,"");
+        $rekap_skp = $this->repotrrekapskp->get(['dt_periode'],"", $tahun, $bulan);
+        $arrrekapnilai = array();$arrDataAll = array();$arrdtprilaku = array();
+        $data_prilaku = $this->repotrprilakupegawai->getWhereRaw(['dt_periode','dt_prilaku'],""," bulan = '$bulan' and tahun = '$tahun' ");
+
+        foreach($data_prilaku as $rsx=>$rx){
+            $arrdtprilaku[$rx->id_sdm][$rx->id]['nama_komponen'] = $rx->dt_prilaku->nama;
+            $arrdtprilaku[$rx->id_sdm][$rx->id]['nilai'] = $rx->nilai;
+            $arrdtprilaku[$rx->id_sdm][$rx->id]['keterangan'] = $rx->keterangan;
+        }
+
+        foreach($rekap_skp as $rs=>$r){
+            $arrrekapnilai[$r->id_sdm]['idperiode'] = $r->idperiode;
+            $arrrekapnilai[$r->id_sdm]['nilai_skp'] = $r->nilai_skp;
+            $arrrekapnilai[$r->id_sdm]['nilai_perilaku'] = $r->nilai_perilaku;
+            $arrrekapnilai[$r->id_sdm]['validasi'] = $r->validasi;
+            $arrrekapnilai[$r->id_sdm]['file_skp'] = $r->file_skp;
+            $arrrekapnilai[$r->id_sdm]['validated_at'] = date('d-m-Y H:i:s',strtotime($r->validated_at));
+        }
+        foreach($rsPegawai as $rsP=>$rp){
+            $arrDataAll[$rp->id_sdm]['nm_sdm'] = $rp->nm_sdm;
+            $arrDataAll[$rp->id_sdm]['nip'] = $rp->nip;
+            $arrDataAll[$rp->id_sdm]['data_rekap_skp'] = $arrrekapnilai[$rp->id_sdm];
+            $arrDataAll[$rp->id_sdm]['data_prilaku'] = $arrdtprilaku[$rp->id_sdm];
+        }
+        dd($arrDataAll);
     }
 
     public function index($nip,$tgl_awal,$tgl_akhir)

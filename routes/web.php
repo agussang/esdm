@@ -283,7 +283,8 @@ Route::group(['prefix' => 'api-rekap'], function () {
         Route::get('/{nip?}/{tgl_awal?}/{tgl_akhir}',[ApiController::class,'index'])->name('api-rekap.presensi');
     });
     Route::group(['prefix' => 'skp'], function () {
-        Route::get('/{nip?}/{bulan?}/{tahun?}',[ApiController::class,'rekap_skp'])->name('api-rekap.rekap-skp');
+        Route::get('/per-pegawai/{nip?}/{bulan?}/{tahun?}',[ApiController::class,'rekap_skp'])->name('api-rekap.rekap-skp');
+        Route::get('/all/{bulan?}/{tahun?}',[ApiController::class,'rekap_skp_all'])->name('api-rekap.rekap-skp-all');
     });
 });
 Route::group(['middleware' => 'role:P_SA_A_PI'], function () {

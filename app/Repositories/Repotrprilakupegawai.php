@@ -24,4 +24,16 @@ class Repotrprilakupegawai extends Repository
                 return $query->whereRaw("idperiode = '$id_periode'");
             })->get();
     }
+
+    public function getWhereRaw($with = null,$id_sdm = null,$whereRaw = null)
+    {
+        return $this->model
+            ->when($with, function ($query) use ($with) {
+                return $query->with($with);
+            })->when($id_sdm, function ($query) use ($id_sdm) {
+                return $query->where('id_sdm',$id_sdm);
+            })->whereHas('dt_periode', function ($query) use ($whereRaw) {
+                return $query->whereRaw($whereRaw);
+            })->get();
+    }
 }

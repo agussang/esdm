@@ -17,4 +17,14 @@ class TrPrilakuPegawai extends Model
     public $keyType = 'string';
     
     protected $guarded = [];
+
+    public function dt_periode()
+    {
+        return $this->belongsTo(MsPeriodeSkp::class, 'idperiode', 'id');
+    }
+
+    public function dt_prilaku()
+    {
+        return $this->belongsTo(MsPrilaku::class, 'id_perilaku', 'id');
+    }
 }
