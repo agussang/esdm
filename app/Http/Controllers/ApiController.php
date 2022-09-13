@@ -92,7 +92,8 @@ class ApiController extends Controller
             $arrDataAll[$rp->id_sdm]['data_rekap_skp'] = $arrrekapnilai[$rp->id_sdm];
             $arrDataAll[$rp->id_sdm]['data_prilaku'] = $arrdtprilaku[$rp->id_sdm];
         }
-        dd($arrDataAll);
+        $json_string = json_encode($arrrekapnilai, JSON_PRETTY_PRINT);
+        return $json_string;
     }
 
     public function index($nip,$tgl_awal,$tgl_akhir)
