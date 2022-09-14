@@ -7,6 +7,7 @@ use App\Models\MsStatusAktif;
 use App\Models\TrStatusKepegawaian;
 use App\Models\MsJabatan;
 use App\Models\MsAgama;
+use App\Models\MsPendidikan;
 use App\Models\MsJnsSdm;
 use App\Models\MsStatusKepegawaian;
 use App\Models\SatuanUnitKerja;
@@ -80,6 +81,14 @@ function harikerja($tgl_awal,$tgl_akhir){
 }
 class Fungsi
 {
+    public static function arrPendidikan(){
+        $rsData = MsPendidikan::orderBy('urutan','asc')->get();
+        $arrData = array();
+        foreach($rsData as $rs=>$r){
+            $arrData[$r->id] = $r->namapendidikan;
+        }
+        return $arrData;
+    }
     public static function pilihan_tahun_absen($tahun){
         $rsData = TrAbsenKehadiran::selectRaw(" distinct SUBSTRING(CAST(tgl_awal AS VARCHAR(19)), 0, 5) as tahun")->orderBy('tahun','asc')->get();
         $d = '<option value="">Pilih Tahun Absen</option>';
@@ -453,7 +462,7 @@ class Fungsi
     }
     
     public static function arrjenis_kelamin(){
-        $arrData = array('L'=>"Laki - Laki",'S'=>"Perempuan");
+        $arrData = array('L'=>"Laki - Laki",'P'=>"Perempuan");
         return $arrData;
     }
     public static function pilihan_status_kawin($id = null){

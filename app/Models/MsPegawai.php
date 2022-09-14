@@ -65,4 +65,9 @@ class MsPegawai extends Model
     {
         return $this->belongsTo(MsAgama::class, 'id_agama', 'id');
     }
+
+    public function nm_pendidikan()
+    {
+        return $this->belongsTo(MsPendidikan::class, 'id_pendidikan_terakhir', 'id');
+    }
 }

@@ -63,4 +63,13 @@ class Repomspegawai extends Repository
                 return $query->with($with);
             })->where('id_sdm',$id_sdm)->first();
     }
+
+    public function getdata($with = null, $id_stat_aktif = null){
+        return $this->model
+            ->when($with, function ($query) use ($with) {
+                return $query->with($with);
+            })->when($id_stat_aktif, function ($query) use ($id_stat_aktif) {
+                return $query->where('id_stat_aktif', $id_stat_aktif);
+            })->orderBy('nm_sdm','asc')->get();
+    }
 }
