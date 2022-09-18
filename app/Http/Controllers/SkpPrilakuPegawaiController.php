@@ -74,6 +74,22 @@ class SkpPrilakuPegawaiController extends Controller
         return redirect()->intended('/skp-pegawai/skp/'.$id_sdm);
     }
 
+    public function cari_skp_bawahan(Request $request){
+        $req = $request->except('_token');
+        $id_sdm = Crypt::encrypt($req['id_sdm']);
+        unset($req['id_sdm']);
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->intended('/pegawai-bawahan/skp-pegawai/'.$id_sdm);
+    }
+
+
+
     
     public function create()
     {
@@ -216,10 +232,10 @@ class SkpPrilakuPegawaiController extends Controller
         $cekrekapskp = $this->repotrrekapskp->findWhereRaw(""," idperiode = '$req[idperiode]' and id_sdm = '$req[id_sdm]' ");
         if($cekrekapskp){
             $where['id'] = $cekrekapskp->id;
-            $req['valid'] = 0;
+            $req['validasi'] = 0;
             $this->repotrrekapskp->update($where,$req);
         }else{
-            $req['valid'] = 0;
+            $req['validasi'] = 0;
             $this->repotrrekapskp->store($req);
         }
         $notification = [

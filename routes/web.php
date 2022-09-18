@@ -299,9 +299,27 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
         Route::get('/riwayat-absen/{id?}',[MsPegawaiController::class,'riwayat_absen'])->name('pegawai.riwayat-absen');
         Route::post('/cari/absen',[MsPegawaiController::class,'cari_absen'])->name('pegawai.cari.absen');
 
-        Route::get('/{id?}',[MsPegawaiController::class,'show'])->name('pegawai.detil-data');
+        Route::get('detil/{id?}',[MsPegawaiController::class,'show'])->name('pegawai.detil-data');
         Route::post('/update',[MsPegawaiController::class,'update'])->name('pegawai.update');
+
     });
+
+    Route::group(['prefix' => 'pegawai-bawahan'], function () {
+        Route::get('/detil/{id?}',[MsPegawaiController::class,'show'])->name('pegawai-bawahan.detil_pegawai');
+        Route::get('/pegawai',[MsPegawaiController::class,'bawahan'])->name('pegawai-bawahan.pegawai');
+        Route::post('/cari',[MsPegawaiController::class,'cari_bawahan'])->name('pegawai-bawahan.cari');
+
+        Route::get('/riwayat-apel/{id?}',[MsPegawaiController::class,'riwayat_apel'])->name('pegawai-bawahan.riwayat-apel');
+        Route::post('/cari/apel',[MsPegawaiController::class,'cari_apel_bawahan'])->name('pegawai-bawahan.cari.apel');
+
+        Route::get('/riwayat-kehadiran/{id?}',[MsPegawaiController::class,'riwayat_kehadiran'])->name('pegawai-bawahan.riwayat-kehadiran');
+        Route::post('/cari/kehadiran',[MsPegawaiController::class,'cari_kehadiran_bawahan'])->name('pegawai-bawahan.cari.kehadiran');
+       
+        Route::get('/riwayat-absen/{id?}',[MsPegawaiController::class,'riwayat_absen'])->name('pegawai-bawahan.riwayat-absen');
+        Route::post('/cari/absen',[MsPegawaiController::class,'cari_absen_bawahan'])->name('pegawai-bawahan.cari.absen');
+
+    });
+
     Route::group(['prefix' => 'data-absen'], function () {
         Route::get('/',[DataAbsenController::class,'index'])->name('data-presensi.data-absen.index');
         Route::get('/tambah',[DataAbsenController::class,'create'])->name('data-presensi.data-absen.tambah');

@@ -41,8 +41,10 @@ class MsPegawaiController extends Controller
         // $arrJabatan = Fungsi::jabatan();
         // $arrData = array();
         // foreach($rsData as $rs=>$r){
-        //     if($r->nip){
-        //         $cek = $this->repomspegawai->findId("",$r->nip,"nip");
+        //     $nip = str_replace(" ","",$r->nip);
+        //     $nip = trim($nip);
+        //     if($nip){
+        //         $cek = $this->repomspegawai->findId("",$nip,"nip");
         //         if($cek){
         //             $arrData[$r->nama]['id_sdm'] = $cek->id_sdm;   
         //             $arrData[$r->nama]['tmpt_lahir'] = $cek->tmpt_lahir;   
@@ -74,7 +76,9 @@ class MsPegawaiController extends Controller
         //     $arrData[$r->nama]['nm_sdm'] = $r->nama;
         //     $arrData[$r->nama]['jk'] = $r->jk;
         //     $arrData[$r->nama]['id_stat_kawin'] = $r->status_kawin;
-        //     $arrData[$r->nama]['nip'] = $r->nip;
+        //     $arrData[$r->nama]['nip'] = $nip;
+        //     $arrData[$r->nama]['id_kedinasan'] = $r->kedinasan;
+        //     $arrData[$r->nama]['id_pendidikan_terakhir'] = $r->pendidikan_terakhir;
         //     if($r->tmt_cpns!=null){
         //         $extmptcpns = explode(" ",$r->tmt_cpns);
         //         $tgl_cpns = $extmptcpns[2]."-".$arrBulan[$extmptcpns[1]]."-".$extmptcpns[0];
@@ -126,7 +130,7 @@ class MsPegawaiController extends Controller
 
     public function riwayat_kehadiran($id_sdm){
         $id_sdm = Crypt::decrypt($id_sdm);
-        $rsData = $this->repomspegawai->first(['nm_jns_sdm','stat_kepegawaian','stat_aktif','nm_agama'],$id_sdm);
+        $rsData = $this->repomspegawai->first("",$id_sdm);
         $data['rsData'] = $rsData;
         $bln = "01";
         if(Session::get('bln')!=null){
@@ -234,12 +238,7 @@ class MsPegawaiController extends Controller
                     }
                 }
             }
-        }
-        //rsort($data['tidakmasuk']);
-        //dd($data['telat']);
-        //dd($data);
-
-        
+        }        
         $data['arrAbsen'] = $arrAbsen;
         return view('content.data_pegawai.riwayat.presensi_kehadiran.index',$data);
     }
@@ -251,6 +250,7 @@ class MsPegawaiController extends Controller
         }
         $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
         $id_sdm = Crypt::decrypt($id_sdm);
+        $data['dt_pegawai'] = $this->repomspegawai->first("",$id_sdm);
         $data['rsData'] = $this->repopresensiapel->get(['nm_kegiatan_apel'],"",$id_sdm,$tahun);
         $data['id_sdm'] = $id_sdm;
         return view('content.data_pegawai.riwayat.apel.index',$data);
@@ -264,6 +264,8 @@ class MsPegawaiController extends Controller
         $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
         $data['pilihan_tahun_absen'] = Fungsi::pilihan_tahun_absen($tahun);
         $id_sdm = Crypt::decrypt($id_sdm);
+        $data['dt_pegawai'] = $this->repomspegawai->first("",$id_sdm);
+        $data['id_sdm'] = $id_sdm;
         $data['rsData'] = $this->repotrabsenkehadiran->getpertahun(['alasan'],$tahun,$id_sdm);
         return view('content.data_pegawai.riwayat.absen.index',$data);
     }
@@ -278,6 +280,18 @@ class MsPegawaiController extends Controller
             }
         }
         return redirect()->intended('/pegawai/riwayat-kehadiran/'.Crypt::encrypt($req['id_sdm']));
+    }
+
+    public function cari_absen(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->intended('/pegawai/riwayat-absen/'.Crypt::encrypt($req['id_sdm']));
     }
 
     public function cari_apel(Request $request){
@@ -302,6 +316,42 @@ class MsPegawaiController extends Controller
             }
         }
         return redirect()->route('data-pegawai.master-pegawai.index');
+    }
+
+    public function cari_kehadiran_bawahan(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->intended('/pegawai-bawahan/riwayat-kehadiran/'.Crypt::encrypt($req['id_sdm']));
+    }
+
+    public function cari_absen_bawahan(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->intended('/pegawai-bawahan/riwayat-absen/'.Crypt::encrypt($req['id_sdm']));
+    }
+
+    public function cari_apel_bawahan(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->intended('/pegawai-bawahan/riwayat-apel/'.Crypt::encrypt($req['id_sdm']));
     }
 
     public function create()
@@ -391,7 +441,7 @@ class MsPegawaiController extends Controller
                 'alert-type' => 'error',
             ];
             if(Session::get('level')=="P"){
-                return redirect()->intended('/pegawai/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+                return redirect()->intended('/pegawai/detil/'.Crypt::encrypt($req['id_sdm']))->with($notification);
             }else{
                 return redirect()->intended('/data-pegawai/master-pegawai/detil-data/'.Crypt::encrypt($req['id_sdm']))->with($notification);
             }
@@ -413,7 +463,7 @@ class MsPegawaiController extends Controller
                     'alert-type' => 'success',
                 ];
                 if(Session::get('level')=="P"){
-                    return redirect()->intended('/pegawai/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+                    return redirect()->intended('/pegawai/detil/'.Crypt::encrypt($req['id_sdm']))->with($notification);
                 }else{
                     return redirect()->intended('/data-pegawai/master-pegawai/detil-data/'.Crypt::encrypt($req['id_sdm']))->with($notification);
                 }
@@ -423,12 +473,19 @@ class MsPegawaiController extends Controller
                         'alert-type' => 'error',
                     ];
                 if(Session::get('level')=="P"){
-                return redirect()->intended('/pegawai/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+                return redirect()->intended('/pegawai/detil/'.Crypt::encrypt($req['id_sdm']))->with($notification);
                 }else{
                     return redirect()->intended('/data-pegawai/master-pegawai/detil-data/'.Crypt::encrypt($req['id_sdm']))->with($notification);
                 }
             }            
         }
+    }
+
+    public function bawahan(){
+        $id_sdm = Session::get('id_sdm_pengguna');
+        $rsData = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','nm_jab_struk','nm_jab_fung']," id_stat_aktif = '1' and (id_sdm_atasan = '$id_sdm' or id_sdm_pendamping = '$id_sdm') ","nm_sdm");
+        $data['rsData'] = $rsData;
+        return view('content.hal_pegawai.bawahan.index',$data);
     }
 
     

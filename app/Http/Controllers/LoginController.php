@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\Reposettingapp;
 use App\Repositories\Repouser;
+use App\Repositories\Repomspegawai;
 use Session;
 use Crypt;
 
@@ -13,11 +14,13 @@ class LoginController extends Controller
     public function __construct(
         Request $request,
         Reposettingapp $reposettingapp,
-        Repouser $repouser  
+        Repouser $repouser,
+        Repomspegawai $repomspegawai
     ){
         $this->request = $request;
         $this->reposettingapp = $reposettingapp;
         $this->repouser = $repouser;
+        $this->repomspegawai = $repomspegawai;
     }
 
     public function index(Request $request)
@@ -42,6 +45,12 @@ class LoginController extends Controller
             ];
             if($dtUser->roleuser->kode_role=="P"){
                 $this->request->session()->put('id_sdm',$dtUser->id_sdm);
+                $this->request->session()->put('id_sdm_pengguna',$dtUser->id_sdm);
+                $id_sdm = Session::get('id_sdm');
+                $cek_dt_bawahan = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','stat_aktif']," id_stat_aktif = '1' and (id_sdm_atasan = '$id_sdm' or id_sdm_pendamping = '$id_sdm') ","nm_sdm");
+                if(count($cek_dt_bawahan)>0){
+                    $this->request->session()->put('atasan_penilai',1);
+                }
                 return redirect()->route('beranda')->with($notification);
             }else{
                 return redirect()->route('home')->with($notification);

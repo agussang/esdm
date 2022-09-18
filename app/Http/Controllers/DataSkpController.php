@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\Repotrrekapskp;
 use App\Repositories\Repomspegawai;
+use App\Repositories\Repomsperiodeskp;
 use Session;
 use Crypt;
 use Fungsi;
@@ -14,10 +15,12 @@ class DataSkpController extends Controller
     public function __construct(
         Request $request,
         Repotrrekapskp $repotrrekapskp,
-        Repomspegawai $repomspegawai
+        Repomspegawai $repomspegawai,
+        Repomsperiodeskp $repomsperiodeskp
     ){
         $this->request = $request;
         $this->repotrrekapskp = $repotrrekapskp;
+        $this->repomsperiodeskp = $repomsperiodeskp;
         $this->repomspegawai = $repomspegawai;
     }
 
@@ -31,7 +34,7 @@ class DataSkpController extends Controller
         if($bulan==null){
             $bulan = date('m');
         }
-        $bulan = "01";
+        $data['periode_pilihan'] = $this->repomsperiodeskp->findWhereRaw(""," bulan = '$bulan' and tahun='$tahun'");
         $rekap_skp = $this->repotrrekapskp->get(['dt_periode'],"", $tahun, $bulan);
         $data['pilihan_tahun_skp'] = Fungsi::pilihan_tahun_skp($tahun);
         $data['pilihan_bulan_skp'] = Fungsi::pilihan_bulan_skp($bulan);
@@ -50,6 +53,17 @@ class DataSkpController extends Controller
         return view('content.skp.data_skp.index',$data);
     }
 
+    public function cari(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->route('skp.data-skp.index');
+    }
     
     public function create()
     {

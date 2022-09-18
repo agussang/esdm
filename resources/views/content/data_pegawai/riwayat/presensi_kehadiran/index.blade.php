@@ -1,5 +1,8 @@
 @extends('layouts.layout')
 @section('content')
+<?php
+$induk = explode('/',request()->path());
+?>
 <div class="row">
     <div class="col-md-12">
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
@@ -13,14 +16,22 @@
                             @if(Session::get('level')!="P")
                             <a href="{{URL::to('data-pegawai/master-pegawai/detil-data')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                             @else
-                            <a href="{{URL::to('pegawai')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
+                                @if($induk[0]=="pegawai-bawahan")
+                                    <a href="{{URL::to('pegawai-bawahan/detil')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
+                                @else
+                                     <a href="{{URL::to('pegawai/detil')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
+                                @endif
                             @endif
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-body">
+                @if($induk[0]=="pegawai-bawahan")
+                <form class="form" action="{{route('pegawai-bawahan.cari.kehadiran')}}" method="post">
+                @else
                 <form class="form" action="{{route('pegawai.cari.kehadiran')}}" method="post">
+                @endif
                 {!! csrf_field() !!}
                 <input type="hidden" name="id_sdm" id="id_sdm" value="{{$rsData->id_sdm}}">
                 <div class="row">
@@ -45,7 +56,17 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Nama Pegawai</span>
+                            </div>
+                            <input type="text" readonly="true" value="{{$rsData->nm_sdm}}" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
                     </div>
                 </div>
                 </form>

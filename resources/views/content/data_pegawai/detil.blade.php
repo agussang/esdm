@@ -7,6 +7,7 @@ if(Session::get('level')=="P"){
     $readonly = "readonly=\"true\"";
     $disabled = "disabled = \"true\"";
 }
+$induk = explode('/',request()->path());
 ?>
 @if(Session::get('level')!="P")
 <form class="form" action="{{route('data-pegawai.master-pegawai.update')}}" method="post">
@@ -26,7 +27,10 @@ if(Session::get('level')=="P"){
                         </div>
                         <div class="col-md-3">
                             @if(Session::get('level')!="P")
-                            <a href="{{route('data-pegawai.master-pegawai.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
+                                <a href="{{route('data-pegawai.master-pegawai.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
+                            @endif
+                            @if($induk[0]=="pegawai-bawahan")
+                            <a href="{{route('pegawai-bawahan.pegawai')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                             @endif
                         </div>
                     </div>
@@ -45,6 +49,18 @@ if(Session::get('level')=="P"){
                     <div class="col-md-2">
                     </div>
                     @endif
+
+                    @if($induk[0]=="pegawai-bawahan")
+                    <div class="col-md-2">
+                        <center><a href="{{URL::to('pegawai-bawahan/riwayat-apel')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-purple">Riwayat Peserta Apel</a></center>
+                    </div>
+                    <div class="col-md-2">
+                        <center><a href="{{URL::to('pegawai-bawahan/riwayat-kehadiran')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-primary">Riwayat Presensi</a></center>
+                    </div>
+                    <div class="col-md-2">
+                        <center><a href="{{URL::to('pegawai-bawahan/riwayat-absen')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-success">Riwayat Data Absen</a></center>
+                    </div>
+                    @else
                     <div class="col-md-2">
                         <center><a href="{{URL::to('pegawai/riwayat-apel')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-purple">Riwayat Peserta Apel</a></center>
                     </div>
@@ -54,88 +70,112 @@ if(Session::get('level')=="P"){
                     <div class="col-md-2">
                         <center><a href="{{URL::to('pegawai/riwayat-absen')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-success">Riwayat Data Absen</a></center>
                     </div>
+                    @endif
                 </div><hr/>
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Nama Pegawai</span>
-                            </div>
-                            <input type="text" class="form-control" name="nm_sdm" id="nm_sdm" required value="{{ $rsData->nm_sdm }}" {{$readonly}}>
-                        </div>
+                    <div class="col-md-3">
+                        <img src="{{URL::to('assets/images/page-img/10.jpg')}}" class="img-thumbnail w-100 img-fluid rounded" alt="Responsive image">
                     </div>
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Tempat Lahir</span>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Nama Pegawai</span>
+                                    </div>
+                                    <input type="text" class="form-control" name="nm_sdm" id="nm_sdm" required value="{{ $rsData->nm_sdm }}" {{$readonly}}>
+                                </div>
                             </div>
-                            <input type="text" class="form-control" name="tmpt_lahir" id="tmpt_lahir" required value="{{ $rsData->tmpt_lahir }}" {{$readonly}}>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Tanggal Lahir</span>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Tempat Lahir</span>
+                                    </div>
+                                    <input type="text" class="form-control" name="tmpt_lahir" id="tmpt_lahir" required value="{{ $rsData->tmpt_lahir }}" {{$readonly}}>
+                                </div>
                             </div>
-                            <input type="date" class="form-control" name="tgl_lahir" id="tgl_lahir" required value="{{ $rsData->tgl_lahir }}" {{$readonly}}>
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Tanggal Lahir</span>
+                                    </div>
+                                    <input type="date" class="form-control" name="tgl_lahir" id="tgl_lahir" required value="{{ $rsData->tgl_lahir }}" {{$readonly}}>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Jenis Kelamin</span>
+                                    </div>
+                                    <select class="form-control" name="jk" id="jk" required {{$disabled}}>
+                                        {!!$pilihan_jenis_kelamin!!}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Jenis Kelamin</span>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">NIK</span>
+                                    </div>
+                                    <input type="text" class="form-control" name="nik" id="nik" required minlength="16" maxlength="16" onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->nik }}">
+                                </div>
                             </div>
-                            <select class="form-control" name="jk" id="jk" required {{$disabled}}>
-                                {!!$pilihan_jenis_kelamin!!}
-                            </select>
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">No Hp</span>
+                                    </div>
+                                    <input type="text" class="form-control" name="no_hp" id="no_hp" minlength="11" maxlength="13" required onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->no_hp }}">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Email</span>
+                                    </div>
+                                    <input type="text" class="form-control" name="email" id="email" required value="{{ $rsData->email }}">
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">NIK</span>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Status Perkawinan</span>
+                                    </div>
+                                    <select class="form-control" name="id_stat_kawin" id="id_stat_kawin" required>
+                                        {!!$pilihan_status_kawin!!}
+                                    </select>
+                                </div>
                             </div>
-                            <input type="text" class="form-control" name="nik" id="nik" required minlength="16" maxlength="16" onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->nik }}">
+                            <div class="col-md-4">
+                                <div class="input-group mb-4">
+                                    <div class="input-group-prepend">
+                                    <span class="input-group-text" id="inputGroup-sizing-default">Agama</span>
+                                    </div>
+                                    <select class="form-control" name="id_agama" id="id_agama" required>
+                                        {!!$pilihan_agama!!}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">No Hp</span>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="custom-file">
+                                    <label class="custom-file-label" for="inputGroupFile03">Foto Pegawai</label>
+                                    <input type="file" class="custom-file-input" id="inputGroupFile03" accept="application/jpg" name="file_foto_pegawai" required>
+                                </div>
+                                <br/><br/>
+                                <span>Ketentuan Upload Foto :</span>
+                                <ul>
+                                    <li>Format foto .jpg</li>
+                                    <li>Ukuran File 2 MB.</li>
+                                </ul>
                             </div>
-                            <input type="text" class="form-control" name="no_hp" id="no_hp" minlength="11" maxlength="13" required onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->no_hp }}">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Email</span>
-                            </div>
-                            <input type="text" class="form-control" name="email" id="email" required value="{{ $rsData->email }}">
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Status Perkawinan</span>
-                            </div>
-                            <select class="form-control" name="id_stat_kawin" id="id_stat_kawin" required>
-                                {!!$pilihan_status_kawin!!}
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Agama</span>
-                            </div>
-                            <select class="form-control" name="id_agama" id="id_agama" required>
-                                {!!$pilihan_agama!!}
-                            </select>
                         </div>
                     </div>
                 </div>
@@ -427,11 +467,15 @@ if(Session::get('level')=="P"){
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-md-12">
-        <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Update Data</button>
+@if(Session::get('atasan_penilai')==null)
+    @if($induk[0]!="pegawai-bawahan")
+    <div class="row">
+        <div class="col-md-12">
+            <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Update Data</button>
+        </div>
     </div>
-</div>
+    @endif
+@endif
 </form>
 <br/><br/><br/><br/><br/>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>

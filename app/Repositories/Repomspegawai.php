@@ -53,7 +53,7 @@ class Repomspegawai extends Repository
             })->when($id_stat_aktif, function ($query) use ($id_stat_aktif) {
                 return $query->where('id_stat_aktif', $id_stat_aktif);
             })->when($text_cari, function ($query) use ($text_cari) {
-                 return $query->whereRaw(" trim(lower(nm_sdm)) like '%$text_cari%' ");
+                 return $query->whereRaw(" ( trim(lower(nm_sdm)) like '%$text_cari%' or trim(lower(nip)) like '%$text_cari%')  ");
             })->orderBy('nm_sdm','asc')->get();
     }
 

@@ -62,14 +62,13 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
+                                <th rowspan="2">No</th>
                                 <th rowspan="2">Nip / Nama</th>
-                                <th colspan="2"><center>Atasan</center></th>
+                                <th rowspan="2"><center>Atasan Langsung</center></th>
                                 <th colspan="4"><center>SKP Dan Prilaku</center></th>
                                 <th rowspan="2">Aksi</th>
                             </tr>
                             <tr>
-                                <th>Pendamping</th>
-                                <th>Langsung</th>
                                 <th>Skp</th>
                                 <th>Prilaku</th>
                                 <th>Disetujui</th>
@@ -77,17 +76,18 @@
                             </tr>
                         </thead>
                         <tbody>
+                            <?php $no=1;?>
                             @foreach($rsData as $rs=>$r)
                             <?php
                             $dtnilai_skp = $arrrekapnilai[$r->id_sdm];
                             ?>
                             <tr>
+                                <td>{{$no++}}</td>
                                 <td>
                                     <b>{{$r->nm_sdm}}</b><br/>
                                     {{$r->nip}}
                                 </td>
                                 <td>{{$r->nm_atasan->nm_sdm}}</td>
-                                <td>{{$r->nm_atasan_pendamping->nm_sdm}}</td>
                                 <td>{{$dtnilai_skp['nilai_skp']}}</td>
                                 <td>{{$dtnilai_skp['nilai_perilaku']}}</td>
                                 <td align="center">
@@ -108,7 +108,9 @@
                                     @endif
                                 </td>
                                 <td>
+                                    @if($dtnilai_skp)
                                     <a href="{{URL::to('skp-pegawai/skp/detil-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> Lihat</a>
+                                    @endif
                                 </td>
                             </tr>
                             @endforeach
