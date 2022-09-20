@@ -91,7 +91,7 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <span><b><center>Grafik Jumlah Pegawai Berdasarkan Massa Kerja</center></b></span><hr/>
+                <span><b><center>Grafik Jumlah Pegawai Berdasarkan Massa Kerja (Proses Maintenance)</center></b></span><hr/>
                 <div class="row">
                     <div class="col-md-12">
                         <div id="by_massa_kerja"></div>
