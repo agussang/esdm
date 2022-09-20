@@ -193,9 +193,11 @@ if($induk[0]=="setting"){
         <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
     </a>
     <ul id="setting" class="iq-submenu collapse {{$collapse5}}" data-parent="#iq-sidebar-toggle">
+        @if(Session::get('id_pengguna')=="30065b84-9afb-4c24-b565-12bfef2dde76")
         <li class="{{ $induk[1]=="app" ? 'active' : '' }}">
             <a href="{{route('setting.app.index')}}">  <i class="fa fa-list-alt"></i><span> Setting App</span> </a>
         </li>
+        @endif
         <li class="{{ $induk[1]=="manajemen-user" ? 'active' : '' }}">
             <a href="{{route('setting.manajemen-user.index')}}"> <i class="fa fa-users"></i><span> Manajemen User</span> </a>
         </li>
