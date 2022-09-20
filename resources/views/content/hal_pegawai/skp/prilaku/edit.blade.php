@@ -9,6 +9,10 @@ if($rekap_skp){
         $readonly = "readonly=\"true\"";
     }
 }
+if(Session::get('atasan_penilai')==null){
+    $readonly = "readonly=\"true\"";
+}
+
 $induk = explode('/',request()->path());
 ?>
 <div class="row">
@@ -36,7 +40,7 @@ $induk = explode('/',request()->path());
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Nama Pegawai</span>
@@ -44,15 +48,7 @@ $induk = explode('/',request()->path());
                             <input type="text" class="form-control" aria-label="Default" readonly="true" value="{{$dtpegawai->nm_sdm}}" aria-describedby="inputGroup-sizing-default" required>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Atasan Pendamping</span>
-                            </div>
-                            <input type="text" class="form-control" aria-label="Default" readonly="true" value="{{$dtpegawai->nm_atasan_pendamping->nm_sdm}}" aria-describedby="inputGroup-sizing-default" required>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
+                    <div class="col-md-6">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Atasan Langsung</span>
@@ -228,17 +224,19 @@ $induk = explode('/',request()->path());
                                 </div>
                                 <br/>
                                 @if($rekap_skp->validasi!=1)
-                                <div class="row">
-                                    <div class="col-md-12">
-                                        <center>
-                                            <div class="checkbox d-inline-block mr-3 rtl-mr-0">
-                                                <input type="checkbox" class="checkbox-input" id="checkbox1" name="valid" required>
-                                                <label for="checkbox1">Data skp atas nama <b>{{$rsData->nm_sdm}} pada bulan {{$arrBulan[$periodeaktif->bulan]}} tahun {{$periodeaktif->tahun}} sudah saya nilai dan saya nyatakan valid.</b></label>
-                                            </div><br/>
-                                            <button class="btn btn-primary text-white"><i class="fas fa-save"></i> Simpan</button>
-                                        </center>
-                                    </div>
-                                </div>                                
+                                    @if(Session::get('atasan_penilai')!=null)
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <center>
+                                                <div class="checkbox d-inline-block mr-3 rtl-mr-0">
+                                                    <input type="checkbox" class="checkbox-input" id="checkbox1" name="valid" required>
+                                                    <label for="checkbox1">Data skp atas nama <b>{{$rsData->nm_sdm}} pada bulan {{$arrBulan[$periodeaktif->bulan]}} tahun {{$periodeaktif->tahun}} sudah saya nilai dan saya nyatakan valid.</b></label>
+                                                </div><br/>
+                                                <button class="btn btn-primary text-white"><i class="fas fa-save"></i> Simpan</button>
+                                            </center>
+                                        </div>
+                                    </div>    
+                                    @endif                            
                                 @endif
                             </div>
                         </div>

@@ -8,11 +8,17 @@ if(Session::get('level')=="P"){
     $disabled = "disabled = \"true\"";
 }
 $induk = explode('/',request()->path());
+$path = public_path().'/assets/foto_pegawai/'.$rsData->file_foto;
+if($rsData->file_foto){
+    $file_photo = "/assets/foto_pegawai/".$rsData->file_foto;
+}else{
+    $file_photo = "assets/foto_tidak_ada.png";
+}
 ?>
 @if(Session::get('level')!="P")
-<form class="form" action="{{route('data-pegawai.master-pegawai.update')}}" method="post">
+<form class="form" action="{{route('data-pegawai.master-pegawai.update')}}" method="post" enctype="multipart/form-data">
 @else
-<form class="form" action="{{route('pegawai.update')}}" method="post">
+<form class="form" action="{{route('pegawai.update')}}" method="post" enctype="multipart/form-data">
 @endif
 {!! csrf_field() !!}
 <input type="hidden" name="id_sdm" id="id_sdm" value="{{$rsData->id_sdm}}">
@@ -74,7 +80,7 @@ $induk = explode('/',request()->path());
                 </div><hr/>
                 <div class="row">
                     <div class="col-md-3">
-                        <img src="{{URL::to('assets/images/page-img/10.jpg')}}" class="img-thumbnail w-100 img-fluid rounded" alt="Responsive image">
+                        <img src="{{URL::to($file_photo)}}" class="img-thumbnail w-60 img-fluid rounded" alt="Responsive image">
                     </div>
                     <div class="col-md-9">
                         <div class="row">
@@ -167,7 +173,7 @@ $induk = explode('/',request()->path());
                             <div class="col-md-8">
                                 <div class="custom-file">
                                     <label class="custom-file-label" for="inputGroupFile03">Foto Pegawai</label>
-                                    <input type="file" class="custom-file-input" id="inputGroupFile03" accept="application/jpg" name="file_foto_pegawai" required>
+                                    <input type="file" class="custom-file-input" id="inputGroupFile03" accept="application/jpg" name="foto_pegawai">
                                 </div>
                                 <br/><br/>
                                 <span>Ketentuan Upload Foto :</span>
@@ -467,14 +473,12 @@ $induk = explode('/',request()->path());
         </div>
     </div>
 </div>
-@if(Session::get('atasan_penilai')==null)
-    @if($induk[0]!="pegawai-bawahan")
-    <div class="row">
-        <div class="col-md-12">
-            <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Update Data</button>
-        </div>
+@if($induk[0]!="pegawai-bawahan")
+<div class="row">
+    <div class="col-md-12">
+        <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Update Data</button>
     </div>
-    @endif
+</div>
 @endif
 </form>
 <br/><br/><br/><br/><br/>

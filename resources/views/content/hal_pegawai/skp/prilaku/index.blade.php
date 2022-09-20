@@ -95,14 +95,6 @@
                     <div class="col-md-6">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Atasan Pendamping</span>
-                            </div>
-                            <input type="text" class="form-control" aria-label="Default" readonly="true" value="{{$dtpegawai->nm_atasan_pendamping->nm_sdm}}" aria-describedby="inputGroup-sizing-default" required>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="input-group mb-4">
-                            <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Atasan Langsung</span>
                             </div>
                             <input type="text" class="form-control" aria-label="Default" readonly="true" value="{{$dtpegawai->nm_atasan->nm_sdm}}" aria-describedby="inputGroup-sizing-default" required>

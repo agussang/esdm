@@ -430,7 +430,6 @@ class MsPegawaiController extends Controller
         //
     }
 
-    
     public function update(Request $request)
     {
         $req = $request->except('_token');
@@ -456,6 +455,37 @@ class MsPegawaiController extends Controller
                 }
             }
             if($bisa==1){
+                $file = $request->file('foto_pegawai');
+                if($file){
+                    $tipe = $file->getClientOriginalExtension();
+                    $size = $file->getSize();
+                    if ($tipe != 'jpg' && $tipe != 'jpeg' && $tipe != 'png') {
+                        $notification = [
+                                'message' => 'File harus berformat jpg / jpeg / png',
+                                'alert-type' => 'error',
+                                ];
+                        if(Session::get('level')=="P"){
+                            return redirect()->intended('/pegawai/detil/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+                        }else{
+                            return redirect()->intended('/data-pegawai/master-pegawai/detil-data/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+                        }
+                    } elseif ($size > 2000000) {
+                        $notification = [
+                                'message' => 'Ukuran File lebih dari 2MB',
+                                'alert-type' => 'error',
+                                ];
+                        if(Session::get('level')=="P"){
+                            return redirect()->intended('/pegawai/detil/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+                        }else{
+                            return redirect()->intended('/data-pegawai/master-pegawai/detil-data/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+                        }
+                    }
+                    unset($req['foto_pegawai']);
+                    $name = md5($req['id_sdm']);
+                    $req['file_foto'] = $name.".jpg";
+                    $destinationPath = 'assets/foto_pegawai/';
+                    $file->move($destinationPath, $req['file_foto']);
+                }
                 $where['id_sdm'] = $req['id_sdm'];
                 $save = $this->repomspegawai->update($where,$req);
                 $notification = [

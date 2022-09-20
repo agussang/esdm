@@ -142,6 +142,8 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
             Route::post('/simpan',[MsPegawaiController::class,'store'])->name('data-pegawai.master-pegawai.simpan');
             Route::post('/cari',[MsPegawaiController::class,'cari'])->name('data-pegawai.master-pegawai.cari');
             Route::post('/update',[MsPegawaiController::class,'update'])->name('data-pegawai.master-pegawai.update');
+
+            Route::post('/update-foto',[MsPegawaiController::class,'update_foto'])->name('data-pegawai.master-pegawai.update-foto');
         });
         Route::group(['prefix' => 'riwayat'], function () {
             Route::group(['prefix' => 'jabatan'], function () {

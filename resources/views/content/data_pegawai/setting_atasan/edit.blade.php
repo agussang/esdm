@@ -26,7 +26,7 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-6">
+    {{--  <div class="col-md-6">
         <div class="input-group mb-4">
             <div class="input-group-prepend">
             <span class="input-group-text" id="inputGroup-sizing-default">Atasan Pendamping</span>
@@ -35,13 +35,13 @@
                 {!!$pilihan_sdm_pendamping!!}
             </select>
         </div>
-    </div>
+    </div>  --}}
     <div class="col-md-6">
         <div class="input-group mb-4">
             <div class="input-group-prepend">
             <span class="input-group-text" id="inputGroup-sizing-default">Atasan Langsung</span>
             </div>
-            <select class="form-control" id="id_sdm_atasan" name="id_sdm_atasan">
+            <select class="form-control" id="id_sdm_atasan" name="id_sdm_atasan" required>
                 {!!$pilihan_sdm_atasan!!}
             </select>
         </div>

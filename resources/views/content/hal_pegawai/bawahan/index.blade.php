@@ -75,7 +75,6 @@
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                                     <a class="dropdown-item" href="{{URL::to('/pegawai-bawahan/detil')}}/{{Crypt::encrypt($r->id_sdm)}}"><i class="fas fa-eye"></i> Lihat Detil</a>
                                                     <a class="dropdown-item" href="#">Justifikasi Kehadiran</a>
-                                                    <a class="dropdown-item" href="{{URL::to('/pegawai-bawahan/skp-pegawai')}}/{{Crypt::encrypt($r->id_sdm)}}"><i class="fas fa-user-edit"></i> Nilai Skp</a>
                                                 </div>
                                             </div>
                                         </td>

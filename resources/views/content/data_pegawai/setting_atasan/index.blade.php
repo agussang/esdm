@@ -23,12 +23,8 @@
                                         <th rowspan="2">Golongan</th>
                                         <th rowspan="2"><center>Unit Kerja</center></th>
                                         <th rowspan="2"><center>Status <br/>Kepegawaian</center></th>
-                                        <th colspan="2"><center>Atasan</center></th>
+                                        <th rowspan="2"><center>Atasan Langsung</center></th>
                                         <th rowspan="2">Aksi</th>
-                                    </tr>
-                                    <tr>
-                                        <th>Atasan Pendamping</th>
-                                        <th>Atasan Langsung</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -38,7 +34,6 @@
                                         <td>{{$r->nm_golongan->kode_golongan}}</td>
                                         <td>{{$r->nm_satker->nm_lemb}}</td>
                                         <td>{{$r->stat_kepegawaian->namastatuspegawai}}</td>
-                                        <td>{{$r->nm_atasan_pendamping->nm_sdm}}</td>
                                         <td>{{$r->nm_atasan->nm_sdm}}</td>
                                         <td>
                                             <a class="btn btn-primary text-white" onclick="edit('<?php echo $r->id_sdm;?>');" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-pencil-ruler text-white"></i> Edit</a>
