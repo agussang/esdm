@@ -10,7 +10,7 @@
                             <h5 class="card-label"><i class="fa fa-plus"></i> Form Edit Data Absen Kehadiran Pegawai </h5>
                         </div>
                         <div class="col-md-3">
-                            @if(Session::get('level')=="P")
+                            @if(Session::get('level')=="P" && Session::get('id_sdm_atasan')==Session::get('id_sdm'))
                             <a href="{{route('data-presensi.data-absen.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                             @else
                             <a href="{{route('data-pegawai.data-presensi.data-absen.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="card-body">
-                @if(Session::get('level')=="P")
+                @if(Session::get('level')=="P" && Session::get('id_sdm_atasan')==Session::get('id_sdm'))
                 <form class="form" action="{{route('data-presensi.data-absen.update')}}" method="post" enctype="multipart/form-data">
                 @else
                 <form class="form" action="{{route('data-pegawai.data-presensi.data-absen.update')}}" method="post" enctype="multipart/form-data">

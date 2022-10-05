@@ -45,15 +45,17 @@ class Repomspegawai extends Repository
             })->orderBy('nm_sdm','asc')->get();
     }
 
-    public function getskp($with = null,$id_stat_aktif = null,$text_cari = null)
+    public function getskp($with = null,$id_stat_aktif = null,$text_cari = null,$id_sdm_atasan = null)
     {
         return $this->model
             ->when($with, function ($query) use ($with) {
                 return $query->with($with);
             })->when($id_stat_aktif, function ($query) use ($id_stat_aktif) {
                 return $query->where('id_stat_aktif', $id_stat_aktif);
-            })->when($text_cari, function ($query) use ($text_cari) {
-                 return $query->whereRaw(" ( trim(lower(nm_sdm)) like '%$text_cari%' or trim(lower(nip)) like '%$text_cari%')  ");
+            })->when($id_stat_aktif, function ($query) use ($id_stat_aktif) {
+                return $query->where('id_stat_aktif', $id_stat_aktif);
+            })->when($id_sdm_atasan, function ($query) use ($id_sdm_atasan) {
+                 return $query->where('id_sdm_atasan',$id_sdm_atasan);
             })->orderBy('nm_sdm','asc')->get();
     }
 

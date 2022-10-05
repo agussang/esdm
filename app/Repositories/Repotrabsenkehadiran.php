@@ -13,7 +13,7 @@ class Repotrabsenkehadiran extends Repository
         $this->model = $model;
     }
 
-    public function paginate($with = null,$id_sdm = null,$tgl_awal = null,$tgl_akhir = null,$id_alasan = null)
+    public function paginate($with = null,$id_sdm = null,$tgl_awal = null,$tgl_akhir = null,$id_alasan = null,$arrIdSdm = null)
     {
         return $this->model
             ->when($with, function ($query) use ($with) {
@@ -24,6 +24,8 @@ class Repotrabsenkehadiran extends Repository
                 return $query->whereRaw("tgl_awal>='$tgl_awal' and tgl_akhir <='$tgl_akhir' ");
             })->when($id_alasan, function ($query) use ($id_alasan) {
                 return $query->where('id_alasan',$id_alasan);
+            })->when($arrIdSdm, function ($query) use ($arrIdSdm) {
+                return $query->whereIn('id_sdm',$arrIdSdm);
             })->orderBy('created_at','asc')->paginate(25);
     }
 

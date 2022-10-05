@@ -45,17 +45,27 @@ if($induk[0]=="setting"){
     <a href="{{URL::to('/beranda')}}"> <i class="fa fa-home"></i><span> Home</span> </a>
 </li>
 <li class="{{ $induk[0]=="pegawai" ? 'active' : '' }}">
-    <a href="{{URL::to('/pegawai/detil')}}/{{Crypt::encrypt(Session::get('id_sdm_pengguna'))}}"> <i class="fa fa-user"></i><span> Data Pegawai</span> </a>
+    <a href="{{URL::to('/pegawai/detil')}}/{{Crypt::encrypt(Session::get('id_sdm_pengguna'))}}"> <i class="fa fa-id-card"></i><span> Data Pegawai</span> </a>
 </li>
 <li class="{{ $induk[1]=="skp" ? 'active' : '' }}">
     <a href="{{URL::to('skp-pegawai/skp/')}}/{{Crypt::encrypt(Session::get('id_sdm_pengguna'))}}">
-        <i class="fas fa-user-edit"></i><span>Skp Dan Prilaku</span>
+        <i class="fas fa-user-edit"></i><span>Skp & Prilaku</span>
     </a>
 </li>
 @if(Session::get('atasan_penilai')!=null)
 <li class="{{ $induk[0]=="pegawai-bawahan" ? 'active' : '' }}">
     <a href="{{route('pegawai-bawahan.pegawai')}}">
         <i class="fas fa-users"></i><span>Pegawai Bawahan</span>
+    </a>
+</li>
+<li class="{{ $induk[1]=="data-skp" ? 'active' : '' }}">
+    <a href="{{route('skp.data-skp.index')}}">
+        <i class="las la-edit"></i><span>Penilaian Skp</span>
+    </a>
+</li>
+<li class="{{ $induk[2]=="data-absen" ? 'active' : '' }}">
+    <a href="{{route('data-pegawai.data-presensi.data-absen.index')}}">
+        <i class="las la-keyboard"></i><span>Data Absen</span>
     </a>
 </li>
 @endif

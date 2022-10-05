@@ -36,6 +36,21 @@
                 <div class="col-md-4">
                     <div class="input-group mb-4">
                         <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Tipe</span>
+                        </div>
+                        <select class="form-control" id="tipe" name="tipe" required>
+                            <option value="1">Format Harian 1</option>
+                            <option value="2">Format Harian 2</option>
+                            <option value="3">Harian+Lembur</option>
+                            <option value="4">Bulanan</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
                         <span class="input-group-text" id="inputGroup-sizing-default">Jam Kerja</span>
                         </div>
                         <select class="form-control" id="id_jam_kerja" name="id_jam_kerja" required>
@@ -62,21 +77,6 @@
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="input-group mb-4">
-                        <div class="input-group-prepend">
-                        <span class="input-group-text" id="inputGroup-sizing-default">Tipe</span>
-                        </div>
-                        <select class="form-control" id="tipe" name="tipe" required>
-                            <option value="1">Format Harian 1</option>
-                            <option value="2">Format Harian 2</option>
-                            <option value="3">Harian+Lembur</option>
-                            <option value="4">Bulanan</option>
-                        </select>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-12">
                     <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
                 </div>
             </div>

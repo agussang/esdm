@@ -1,23 +1,5 @@
-<?php
-$kerja_jam_masukex = explode(':',$jam_kerja->jam_masuk);
-$kerja_jam_keluarex = explode(':',$jam_kerja->jam_keluar);
-
-$kerja_j_masuk_start = $kerja_jam_masukex[0];
-$kerja_menit_masuk_start = $kerja_jam_masukex[1];
-
-$kerja_j_keluar_start = $kerja_jam_keluarex[0];
-$kerja_menit_keluar_start = $kerja_jam_keluarex[1];
-
-$kerjahasil = (intVal($kerja_j_keluar_start) - intVal($kerja_j_masuk_start)) * 60 + (intVal($kerja_menit_keluar_start) - intVal($kerja_menit_masuk_start));
-$kerjahasil = $kerjahasil / 60;
-$kerjahasil = number_format($kerjahasil,2);
-$kerjahasilx = explode(".",$kerjahasil);
-$kerjadepan = sprintf("%02d", $kerjahasilx[0]);
-$kerjagabung = $kerjadepan.":".$kerjahasilx[1];
-?>
-
 <html>
-<title>{{ config('app.name', 'Laravel') }}</title>
+<title>{{$rsDataKetApp->nama_aplikasi}}</title>
 <head>
     <style>
 		@media print
@@ -63,7 +45,7 @@ $kerjagabung = $kerjadepan.":".$kerjahasilx[1];
 <div class="page" align="center" id="container" style="width:25cm;margin:0 auto;">
     <body leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0">
         <span><b>Data Presensi Pegawai Bulanan</b></span><br/>
-        <span><b>Jam Kerja {{$jam_kerja->jam_masuk}} - {{$jam_kerja->jam_keluar}} ( {{$kerjagabung}} jam )</b></span><br/>
+        <span><b>Jam Kerja {{$jam_kerja_text}}</b></span><br/>
         <br/><hr style="border: 1px solid"/><br/>
         <span style="float:left;">Presensi Bulan {{$dt_bln['nm_bulan']}}</span>
         <table width="950" border=1 cellspacing=0 cellpadding="3" style="font-size:10pt";>
@@ -90,19 +72,23 @@ $kerjagabung = $kerjadepan.":".$kerjahasilx[1];
             <tbody>
                 <?php $no=1;?>
                 @foreach($arrData as $id_sdm=>$dt_sdm)
+                <?php 
+                $kode = $tahun.$id_bulan;
+                $dt_presensi = $dt_sdm['data_presensi'][$kode];
+                ?>
                 <tr>
                     <td>{{$no++}}</td>
                     <td>{{$dt_sdm['nip']}}</td>
                     <td>{{$dt_sdm['nm_sdm']}}</td>
-                    <td align="center">{{count((array)$dt_bln['tgl_bulan'])}}</td>
-                    <td align="center">{{count((array)$masuk[$id_sdm][$id_bulan])}}</td>
-                    <td align="center">{{count((array)$tidakmasuk[$id_sdm][$id_bulan])}}</td>
-                    <td align="center">{{$terlambat[$id_sdm][$id_bulan]}}</td>
-                    <td align="center">{{$molehcepet[$id_sdm][$id_bulan]}}</td>
-                    <td></td>
-                    <td></td>
+                    <td align="center">{{count($dt_bln['list_tgl'])}}</td>
+                    <td align="center">{{$dt_presensi['masuk']['total']}}</td>
+                    <td align="center">{{$dt_presensi['tidakmasuk']['total']}}</td>
+                    <td align="center">{{$dt_presensi['telat']['total']}}</td>
+                    <td align="center">{{$dt_presensi['pulang_cepat']['total']}}</td>
+                    <td align="center">{{$dt_presensi['absensekali']['total']}}</td>
+                    <td align="center">{{(int)$dt_presensi['dt_apel']['tidak_hadir']['total']}}</td>
                     @foreach($arrAlasan as $id=>$nm_alasan)
-                        <td>{{$arrAlasanabsen[$id_sdm][$id][$id_bulan]['jmabsen']}}</td>
+                        <td align="center">{{$dt_presensi['absen'][$id]['data']['total']}}</td>
                     @endforeach
                 </tr>
                 @endforeach

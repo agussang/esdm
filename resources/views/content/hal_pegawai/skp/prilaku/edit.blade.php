@@ -25,15 +25,12 @@ $induk = explode('/',request()->path());
                             <h5 class="card-label"><i class="fas fa-plus"></i> Form Pengisian Data SPK dan Perilaku </h5>
                         </div>
                         <div class="col-md-6">
-                            @if(Session::get('level')=="P")
+                            @if(Session::get('level')=="P" && Session::get('id_sdm_pengguna') != Session::get('id_sdm_atasan'))
                             <a href="{{URL::to('/skp-pegawai/skp')}}/{{Crypt::encrypt($dtpegawai->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                             @else
-                                @if($induk[2]=="detil-skp")
-                                    <a href="{{route('skp.data-skp.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
-                                @else
-
-                                @endif
+                                <a href="{{route('skp.data-skp.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                             @endif
+                            {{--  <a href="{{ URL::previous() }}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>  --}}
                         </div>
                     </div>
                 </div>
@@ -79,7 +76,7 @@ $induk = explode('/',request()->path());
         </div>
     </div>
 </div>
-@if($cek_file==0)
+@if($cek_file==0 && Session::get('id_sdm_pengguna') != Session::get('id_sdm_atasan'))
 <div class="row">
     <div class="col-md-12">
         <form class="form" action="{{route('skp-pegawai.skp.unggah_skp')}}" method="post" enctype="multipart/form-data">

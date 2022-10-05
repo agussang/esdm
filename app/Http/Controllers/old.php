@@ -83,7 +83,6 @@ $induk = explode('/',request()->path());
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Hari</th>
                                 <th>Jam Masuk</th>
                                 <th>Jam Maksimal Terlambat</th>
                                 <th>Jam Pulang</th>
@@ -92,16 +91,13 @@ $induk = explode('/',request()->path());
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($jam_kerja_unit as $idhari=>$r)
                             <tr>
-                                <td>{{$kategoriwaktuabsen[$idhari]}}</td>
-                                <td>{{$r['jam_masuk']}}</td>
-                                <td>{{$r['masuk_telat']}}</td>
-                                <td>{{$r['jam_pulang']}}</td>
-                                <td>{{$r['pulang_telat']}}</td>
-                                <td>{{$r['lama_kerja']}}</td>
+                                <td>{{$jam_kerja_unit->jam_masuk}}</td>
+                                <td>{{$jam_kerja_unit->masuk_telat}}</td>
+                                <td>{{$jam_kerja_unit->jam_keluar}}</td>
+                                <td>{{$jam_kerja_unit->pulang_telat}}</td>
+                                <td>{{$jam_kerja_unit->lama_kerja}}</td>
                             </tr>
-                            @endforeach
                         </tbody>
                     </table>
                 </div>
@@ -145,26 +141,20 @@ $induk = explode('/',request()->path());
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $no=1;?>
-                                        @foreach($arrData as $tgl=>$presensi)
-                                        <?php
-                                            $hariabsen = explode(',',$presensi['ket_tgl']);
-                                            $jam_masuk = array_shift($presensi['jam_absen']);
-                                            $jam_keluar = end($presensi['jam_absen']);
+                                        @foreach($arrAbsen as $id_sdm=>$r)
+                                            <?php $no=1;?>
+                                            @foreach($r as $tanggal=>$dt)
+                                            <?php
+                                            $jam_masuk = array_shift($dt);
+                                            $jam_keluar = end($dt);
                                             if($jam_keluar==null){
                                                 $jam_keluar = $jam_masuk;
                                             }
-                                            if($hariabsen[0]=="Jumat"){
-                                                $jamkerja = $jam_kerja_unit[2];
-                                            }else{
-                                                $jamkerja = $jam_kerja_unit[1];
-                                            }
                                             $warna = "";$ket = "";
-                                            if(end($presensi['jam_absen'])==null){
+                                            if(end($dt)==null){
                                                 $warna = "background-color: #F78282;";
                                                 $ket = "Absen 1x";
                                             }
-                                            $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
                                             $jam_masukex = explode(':',$jam_masuk);
                                             $jam_keluarex = explode(':',$jam_keluar);
 
@@ -180,27 +170,19 @@ $induk = explode('/',request()->path());
                                             $hasilx = explode(".",$hasil);
                                             $depan = sprintf("%02d", $hasilx[0]);
                                             $gabung = $depan.":".$hasilx[1];
-                                            
-                                            if($gabung < $durasi){
-                                                $warna = "background-color: #F78282;";
-                                            }
-                                            $hari = explode(',',$tanggal);
-                                            if($hari[0]=="Minggu" || $hari[0]=="Sabtu"){
-                                                $warna = "background-color: #E3CC6D;";
-                                            }
                                             $menit = ($gabung*60)+$hasilx[1];
-                                            
                                             ?>
                                             <tr style="{{$warna}}">
                                                 <td>{{$no++}}</td>
-                                                <td>{{$presensi['ket_tgl']}}</td>
-                                                <td align="center">{{$jam_masuk}}</td>
-                                                <td align="center">{{$jam_keluar}}</td>
-                                                <td align="center">{{$gabung}}</td>
-                                                <td align="center">{{$menit}}</td>
-                                                <td align="center">{{$ket}}</td>
+                                                <td>{{$tanggal}}</td>
+                                                <td>{{$jam_masuk}}</td>
+                                                <td>{{$jam_keluar}}</td>
+                                                <td>{{$gabung}}</td>
+                                                <td>{{$menit}}</td>
+                                                <td>{{$ket}}</td>
                                             </tr>
                                             @endforeach
+                                        @endforeach
                                     </tbody>
                                 </table>
                             </div>
@@ -212,28 +194,15 @@ $induk = explode('/',request()->path());
                                         <tr>
                                             <th>No</th>
                                             <th>Tanggal</th>
-                                            <th>Ket Justifikasi</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <?php $noz=1;?>
-                                        @foreach($rekap['tidakmasuk']['list_tgl'] as $tgl=>$presensi)
-                                            <?php $nm_tgl = Fungsi::formatDate($thn_bulan."-".$tgl);
-                                            $tgl_jus = "";
-                                            $alasan_jus = "";
-                                            if(count($presensi['justifikasi'])>0){
-                                                $tgl_jus = $presensi['justifikasi']['tgl_justifikasi'];
-                                                $alasan_jus = $presensi['justifikasi']['alasan'];
-                                            }
-                                            ?>
-                                            <tr>
-                                                <td>{{$noz++}}</td>
-                                                <td>{{$nm_tgl}}</td>
-                                                <td>
-                                                    <li>Tgl : {{$tgl_jus}}</li>
-                                                    <li>Alasan : {{$alasan_jus}}</li>
-                                                </td>
-                                            </tr>
+                                        
+                                        @foreach($tidakmasuk as $tgl=>$dttgl)
+                                        <tr>
+                                            <td>{{$noz++}}</td>
+                                            <td>{{$dttgl}}</td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
@@ -248,38 +217,18 @@ $induk = explode('/',request()->path());
                                         <th>Waktu Fingger Masuk</th>
                                         <th>Waktu Finger Pulang</th>
                                         <th>Durasi Terlambat <br/>(Menit)</th>
-                                        <th>Ket</th>
-                                        <th>Ket Justifikasi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php $noz=1;?>
-                                    @foreach($rekap['telat']['list_tglwaktuabsen'] as $tgltlt=>$presensitlt)
-                                        <?php $nm_tgltlt = Fungsi::formatDate($thn_bulan."-".$tgltlt);
-                                        $ket = "";
-                                        if($presensitlt['masuk']==$presensitlt['pulang']){
-                                            $ket = "Absen 1x";
-                                        }
-                                        $tgl_justlt = "";
-                                        $alasan_justlt = "";
-                                        if(count($presensitlt['justifikasi'])>0){
-                                            $tgl_justlt = $presensitlt['justifikasi']['tgl_justifikasi'];
-                                            $alasan_justlt = $presensitlt['justifikasi']['alasan'];
-                                        }
-                                        
-                                        ?>
-                                        <tr>
-                                            <td>{{$noz++}}</td>
-                                            <td>{{$nm_tgltlt}}</td>
-                                            <td>{{$presensitlt['masuk']}}</td>
-                                            <td>{{$presensitlt['pulang']}}</td>
-                                            <td>{{$presensitlt['menit']}}</td>
-                                            <td>{{$ket}}</td>
-                                            <td>
-                                                <li>Tgl : {{$tgl_justlt}}</li>
-                                                <li>Alasan : {{$alasan_justlt}}</li>
-                                            </td>
-                                        </tr>
+                                    <?php $nox=1;?>
+                                    @foreach($telat as $tgltelat=>$dtterlambat)
+                                    <tr>
+                                        <td>{{$nox++}}</td>
+                                        <td>{{$tgltelat}}</td>
+                                        <td>{{$dtterlambat['jam_masuk']}}</td>
+                                        <td>{{$dtterlambat['jam_pulang']}}</td>
+                                        <td>{{$dtterlambat['durasi']}}</td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>
@@ -292,38 +241,17 @@ $induk = explode('/',request()->path());
                                         <th>Tanggal</th>
                                         <th>Waktu Fingger Masuk</th>
                                         <th>Waktu Finger Pulang</th>
-                                        <th>Durasi Pulang Cepat <br/>(Menit)</th>
-                                        <th>Ket</th>
-                                        <th>Ket Justifikasi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php $noz=1;?>
-                                    @foreach($rekap['pulang_cepat']['list_tglwaktuabsen'] as $tglcpt=>$presensicpt)
-                                        <?php $nm_tglx = Fungsi::formatDate($thn_bulan."-".$tglcpt);
-                                        $tgl_juscpt = "";
-                                        $alasan_juscpt = "";
-                                        if(count($presensicpt['justifikasi'])>0){
-                                            $tgl_juscpt = $presensicpt['justifikasi']['tgl_justifikasi'];
-                                            $alasan_juscpt = $presensicpt['justifikasi']['alasan'];
-                                        }
-                                        $ketx = "";
-                                        if($presensicpt['masuk']==$presensicpt['pulang']){
-                                            $ketx = "Absen 1x";
-                                        }
-                                        ?>
-                                        <tr>
-                                            <td>{{$noz++}}</td>
-                                            <td>{{$nm_tglx}}</td>
-                                            <td>{{$presensicpt['masuk']}}</td>
-                                            <td>{{$presensicpt['pulang']}}</td>
-                                            <td>{{$presensicpt['menit']}}</td>
-                                            <td>{{$ketx}}</td>
-                                            <td>
-                                                <li>Tgl : {{$tgl_juscpt}}</li>
-                                                <li>Alasan : {{$alasan_juscpt}}</li>
-                                            </td>
-                                        </tr>
+                                    <?php $nox=1;?>
+                                    @foreach($cepatpulang as $tglcepat=>$dtplngcepat)
+                                    <tr>
+                                        <td>{{$nox++}}</td>
+                                        <td>{{$tglcepat}}</td>
+                                        <td>{{$dtplngcepat['jam_masuk']}}</td>
+                                        <td>{{$dtplngcepat['jam_pulang']}}</td>
+                                    </tr>
                                     @endforeach
                                 </tbody>
                             </table>

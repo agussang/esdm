@@ -63,6 +63,9 @@ if($induk[0]=="setting"){
         <li class="{{ $induk[1]=="jabatan" ? 'active' : '' }}">
             <a href="{{route('data-master.jabatan')}}">  <i class="fa fa-book"></i><span> Master Jabatan</span> </a>
         </li>
+        <li class="{{ $induk[1]=="kategori-pelanggaran" ? 'active' : '' }}">
+            <a href="{{route('data-master.kategori-pelanggaran')}}">  <i class="fa fa-book"></i><span> Master Kategori Pelanggaran</span> </a>
+        </li>
         {{--  <li class="{{ $induk[1]=="eselon" ? 'active' : '' }}">
             <a href="{{route('data-master.eselon')}}">  <i class="fa fa-book"></i><span> Master Eselon</span> </a>
         </li>  --}}
@@ -101,6 +104,9 @@ if($induk[0]=="setting"){
     <ul id="master" class="iq-submenu collapse {{$collapse2}}" data-parent="#iq-sidebar-toggle">
         <li class="{{ $induk[1]=="master-pegawai" ? 'active' : '' }}">
             <a href="{{route('data-pegawai.master-pegawai.index')}}">  <i class="fa fa-list-alt"></i><span> Master Pegawai</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="pelanggaran" ? 'active' : '' }}">
+            <a href="{{route('data-pegawai.pelanggaran.index')}}"><i class="fa fa-tag"></i><span> Pelanggaran Disiplin</span> </a>
         </li>
         <li class="{{ $induk[1]=="atasan-pegawai" ? 'active' : '' }}">
             <a href="{{route('data-pegawai.atasan-pegawai.index')}}">  <i class="fas fa-pencil-ruler"></i><span> Setting Atasan Pegawai</span> </a>

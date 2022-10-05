@@ -13,7 +13,7 @@ class Repopresensiapel extends Repository
         $this->model = $model;
     }
 
-    public function get($with = null,$id_kegiatan=null,$id_sdm=null,$tahun=null)
+    public function get($with = null,$id_kegiatan=null,$id_sdm=null,$tahun=null,$bulan=null)
     {
         return $this->model
             ->when($with, function ($query) use ($with) {
@@ -22,8 +22,14 @@ class Repopresensiapel extends Repository
                 return $query->where('id_kegiatan',$id_kegiatan);
             })->when($id_sdm, function ($query) use ($id_sdm) {
                 return $query->where('id_sdm',$id_sdm);
-            })->whereHas('nm_kegiatan_apel', function ($query) use ($tahun) {
-                return $query->whereRaw(" SUBSTRING(CAST(tgl_kegiatan AS VARCHAR(19)), 0, 5) = '$tahun' ");
+            })->when($tahun, function ($query) use ($tahun) {
+                $query->whereHas('nm_kegiatan_apel', function ($query) use ($tahun) {
+                    return $query->whereRaw(" SUBSTRING(CAST(tgl_kegiatan AS VARCHAR(19)), 0, 5) = '$tahun' ");
+                });
+            })->when($bulan, function ($query) use ($bulan) {
+                $query->whereHas('nm_kegiatan_apel', function ($query) use ($bulan) {
+                    return $query->whereRaw(" SUBSTRING(CAST(tgl_kegiatan AS VARCHAR(19)), 6, 2) = '$bulan' ");
+                });
             })
             ->get();
     }

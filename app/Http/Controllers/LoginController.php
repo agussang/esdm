@@ -50,6 +50,7 @@ class LoginController extends Controller
                 $cek_dt_bawahan = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','stat_aktif']," id_stat_aktif = '1' and (id_sdm_atasan = '$id_sdm' or id_sdm_pendamping = '$id_sdm') ","nm_sdm");
                 if(count($cek_dt_bawahan)>0){
                     $this->request->session()->put('atasan_penilai',1);
+                    $this->request->session()->put('id_sdm_atasan',$id_sdm);
                 }
                 return redirect()->route('beranda')->with($notification);
             }else{

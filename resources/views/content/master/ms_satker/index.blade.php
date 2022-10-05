@@ -64,7 +64,7 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <button id="btnGroupDrop1" type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Aksi
+                                        <i class="fas fa-cogs"></i> Aksi
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                         <a onclick="edit('<?php echo $id_sms;?>');" class="dropdown-item" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-pencil-ruler"></i> Edit</a>
@@ -81,7 +81,7 @@
                             <td>
                                 <div class="btn-group" role="group">
                                     <button id="btnGroupDrop1" type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        Aksi
+                                        <i class="fas fa-cogs"></i> Aksi
                                     </button>
                                     <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                         <a onclick="edit('<?php echo $rsidsms;?>');" class="dropdown-item" data-toggle="modal" data-target="#exampleModal"><i class="fas fa-pencil-ruler"></i> Edit</a>

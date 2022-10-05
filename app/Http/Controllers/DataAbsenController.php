@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\Repotrabsenkehadiran;
+use App\Repositories\Repomspegawai;
+use App\Models\MsAlasanAbsen;
 use Session;
 use Fungsi;
 use Crypt;
@@ -14,10 +16,12 @@ class DataAbsenController extends Controller
 {
     public function __construct(
         Request $request,
-        Repotrabsenkehadiran $repotrabsenkehadiran  
+        Repotrabsenkehadiran $repotrabsenkehadiran,
+        Repomspegawai $repomspegawai
     ){
         $this->request = $request;
         $this->repotrabsenkehadiran = $repotrabsenkehadiran;
+        $this->repomspegawai = $repomspegawai;
     }
 
     public function index()
@@ -26,10 +30,17 @@ class DataAbsenController extends Controller
         $tgl_awal = Session::get('tgl_awal');
         $tgl_akhir = Session::get('tgl_akhir');
         $id_alasan = Session::get('id_alasan');
-
-        $data['pilihan_sdm'] = Fungsi::pilihan_sdm($id_sdm);
+        $id_sdm_atasan = Session::get('id_sdm_atasan');
+        $data['pilihan_sdm'] = Fungsi::pilihan_sdm($id_sdm,"","",$id_sdm_atasan);
         $data['pilihan_alasan_absen'] = Fungsi::pilihan_alasan_absen($id_alasan);
-        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan);
+        $arrIdSdm = array();
+        if($id_sdm_atasan){
+            $rsPegawai = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','nm_jab_struk','nm_jab_fung']," id_stat_aktif = '1' and (id_sdm_atasan = '$id_sdm_atasan' or id_sdm_pendamping = '$id_sdm_atasan') ","nm_sdm");
+            foreach($rsPegawai as $rs=>$r){
+                $arrIdSdm[$r->id_sdm] = $r->id_sdm;
+            }
+        }
+        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan,$arrIdSdm);
         $paging = $rsData->links();
         $totalRecord = $rsData->total();
         $data['rsData'] = $rsData;
@@ -41,18 +52,15 @@ class DataAbsenController extends Controller
     
     public function create()
     {
-        $id_sdm = "";
-        if(Session::get('level')=="P"){
-            $id_sdm = Session::get('id_sdm');
-        }
-        $data['pilihan_sdm'] = Fungsi::pilihan_sdm($id_sdm);
-        $data['pilihan_alasan_absen'] = Fungsi::pilihan_alasan_absen();
+        $id_sdm_atasan = Session::get('id_sdm_atasan');
+        $data['pilihan_sdm'] = Fungsi::pilihan_sdm("","","",$id_sdm_atasan);
+        $data['alasan_absen'] = MsAlasanAbsen::whereRaw("id_alasan = '7bd5db1b-ce78-4b5d-93ea-5cc5c20ff580' or id_alasan = '047a6862-b00d-4d58-9b57-d9448e8b5996'")->get();
         return view('content.data_pegawai.presensi.data_absen.tambah',$data);
     }
 
     public function cari(Request $request){
         $req = $request->except('_token');
-        if(Session::get('level')=="P"){
+        if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
             $req['id_sdm'] = Session::get('id_sdm');
         }
         foreach ($req as $k => $v) {
@@ -73,19 +81,18 @@ class DataAbsenController extends Controller
     public function store(Request $request)
     {
         $req = $request->except('_token');
-        if(Session::get('level')=="P"){
+        if(Session::get('level')=="P" && Session::get('id_sdm_atasan')==Session::get('id_sdm')){
             $req['id_sdm'] = Session::get('id_sdm');
         }
         $file = $request->file('file_surat');
         $tipe = $file->getClientOriginalExtension();
         $size = $file->getSize();
-        $url = url()->previous();
         if ($tipe != 'pdf') {
             $notification = [
                     'message' => 'File harus berformat pdf',
                     'alert-type' => 'error',
                     ];
-            if(Session::get('level')=="P"){
+            if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
                 return redirect()->route('data-presensi.data-absen.index')->with($notification);
             }else{
                 return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
@@ -112,20 +119,21 @@ class DataAbsenController extends Controller
                 'message' => 'Gagal, Data absen pegawai gagal ditambahkan.',
                 'alert-type' => 'error',
             ];
-            if(Session::get('level')=="P"){
+            if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
                 return redirect()->route('data-presensi.data-absen.index')->with($notification);
             }else{
                 return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
             }
         }else{
-            $jmlhabsen = Fungsi::jumlah_absen($req['tgl_awal'],$req['tgl_akhir']);
+            $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
             $req['lama_hari'] = $jmlhabsen['jmabsen'];
+
             $this->repotrabsenkehadiran->store($req);
             $notification = [
                 'message' => 'Berhasil, Data absen pegawai berhasil ditambahkan.',
                 'alert-type' => 'success',
             ];
-            if(Session::get('level')=="P"){
+            if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
                 return redirect()->route('data-presensi.data-absen.index')->with($notification);
             }else{
                 return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
@@ -176,7 +184,7 @@ class DataAbsenController extends Controller
                         'message' => 'File harus berformat pdf',
                         'alert-type' => 'error',
                         ];
-                if(Session::get('level')=="P"){
+                if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
                     return redirect()->intended('/data-presensi/data-absen/edit/'.Crypt::encrypt($id_absen))->with($notification);
                 }else{
                     return redirect()->intended('/data-pegawai/data-presensi/data-absen/edit/'.Crypt::encrypt($id_absen))->with($notification);
@@ -186,7 +194,7 @@ class DataAbsenController extends Controller
                         'message' => 'Ukuran File lebih dari 2MB',
                         'alert-type' => 'error',
                         ];
-                if(Session::get('level')=="P"){
+                if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
                     return redirect()->intended('/data-presensi/data-absen/edit/'.Crypt::encrypt($id_absen))->with($notification);
                 }else{
                     return redirect()->intended('/data-pegawai/data-presensi/data-absen/edit/'.Crypt::encrypt($id_absen))->with($notification);
@@ -208,7 +216,7 @@ class DataAbsenController extends Controller
             'message' => 'Berhasil, Data absen pegawai berhasil diupdate.',
             'alert-type' => 'success',
         ];
-        if(Session::get('level')=="P"){
+        if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
             return redirect()->route('data-presensi.data-absen.index')->with($notification);
         }else{
             return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
@@ -238,7 +246,7 @@ class DataAbsenController extends Controller
             'message' => 'Berhasil, Data absen pegawai berhasil dihapus.',
             'alert-type' => 'success',
         ];
-        if(Session::get('level')=="P"){
+        if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
             return redirect()->route('data-presensi.data-absen.index')->with($notification);
         }else{
             return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\Repomsabsen;
 use Crypt;
+use Fungsi;
 
 class MasterWaktuPresensiController extends Controller
 {
@@ -19,7 +20,17 @@ class MasterWaktuPresensiController extends Controller
     public function index()
     {
         $rsData = $this->repomsabsen->get();
-        $data['rsData'] = $rsData;
+        $arrData = array();
+        $kategoriwaktuabsen = Fungsi::kategoriwaktuabsen();
+        foreach($rsData as $rs=>$r){
+            $arrData[$r->id_khusus][$r->hari_biasa][$r->id]['ket'] = $kategoriwaktuabsen[$r->hari_biasa];
+            $arrData[$r->id_khusus][$r->hari_biasa][$r->id]['jam_masuk'] = $r->jam_masuk;
+            $arrData[$r->id_khusus][$r->hari_biasa][$r->id]['jam_keluar'] = $r->jam_keluar;
+            $arrData[$r->id_khusus][$r->hari_biasa][$r->id]['masuk_telat'] = $r->masuk_telat;
+            $arrData[$r->id_khusus][$r->hari_biasa][$r->id]['pulang_telat'] = $r->pulang_telat;
+            $arrData[$r->id_khusus][$r->hari_biasa][$r->id]['lama_kerja'] = $r->lama_kerja;
+        }
+        $data['arrData'] = $arrData;
         return view('content.master.waktu_absen.index',$data);
     }
 
@@ -54,9 +65,13 @@ class MasterWaktuPresensiController extends Controller
     }
 
     
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        $kategoriwaktuabsen = Fungsi::kategoriwaktuabsen();
+        $req = $request->except('_token');
+        $data['rsData'] = $this->repomsabsen->findId("",$req,"id");
+        $data['kategoriwaktuabsen'] = $kategoriwaktuabsen;
+        return view('content.master.waktu_absen.edit',$data);
     }
 
     
@@ -65,21 +80,16 @@ class MasterWaktuPresensiController extends Controller
         $req = $request->except('_token');
         $id = $req['id_waktu_absen'];
         $where['id']= $id;
-        $reqnot['status_aktif'] = 0;
-        $req['status_aktif'] = 0;
-        if($req['status_aktif']=="true"){
-            $req['status_aktif'] = 1;
-            $rsData = $this->repomsabsen->findId("",$id);
-            
-            $jam_masuk = explode(':',$rsData->jam_masuk);
-            $jam_pulang = explode(':',$rsData->jam_keluar);
-            $jam = $jam_pulang[0]-$jam_masuk[0];
-            $menit = $jam_pulang[1]-$jam_masuk[1];
-            $req['lama_kerja'] = sprintf("%02d", $jam).":".sprintf("%02d", $menit);
-        }
+        $req['status_aktif'] = 1;
+        $rsData = $this->repomsabsen->findId("",$id);
+        
+        $jam_masuk = explode(':',$rsData->jam_masuk);
+        $jam_pulang = explode(':',$rsData->jam_keluar);
+        $jam = abs($jam_pulang[0]-$jam_masuk[0]);
+        $menit = abs($jam_pulang[1]-$jam_masuk[1]);
+        $req['lama_kerja'] = sprintf("%02d", $jam).":".sprintf("%02d", $menit);
         unset($req['id_waktu_absen']);
         $this->repomsabsen->update($where,$req);
-        $this->repomsabsen->updatewherenot($id,$reqnot);
         echo '<script type="text/javascript">toastr.success("Data absen berlaku berhasil diubah.")</script>';
         echo "<script>
         setTimeout(function () {

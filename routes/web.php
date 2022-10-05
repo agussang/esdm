@@ -33,6 +33,8 @@ use App\Http\Controllers\{
     SkpPrilakuPegawaiController,
     TargetSkpPegawaiController,
     ApiController,
+    MasterKategoriPelanggaranController,
+    DataPelanggaranPegawaiController,
 };
 
 /*
@@ -65,8 +67,9 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
 
         Route::group(['prefix' => 'waktu-presensi'], function () {
             Route::get('/',[MasterWaktuPresensiController::class,'index'])->name('data-master.waktu-presensi');
+            Route::get('edit',[MasterWaktuPresensiController::class,'edit'])->name('data-master.waktu-presensi.edit');
             Route::get('hapus/{id}',[MasterWaktuPresensiController::class,'destroy'])->name('data-master.waktu-presensi.hapus');
-            Route::get('/update_status_aktif',[MasterWaktuPresensiController::class,'update'])->name('data-master.waktu-presensi.update');
+            Route::post('/update',[MasterWaktuPresensiController::class,'update'])->name('data-master.waktu-presensi.update');
             Route::post('/simpan',[MasterWaktuPresensiController::class,'store'])->name('data-master.waktu-presensi.simpan');
         });
 
@@ -88,6 +91,11 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
 
         Route::group(['prefix' => 'pendidikan'], function () {
             Route::get('/',[MsPendidikanController::class,'index'])->name('data-master.pendidikan');
+
+        });
+
+        Route::group(['prefix' => 'kategori-pelanggaran'], function () {
+            Route::get('/',[MasterKategoriPelanggaranController::class,'index'])->name('data-master.kategori-pelanggaran');
 
         });
 
@@ -145,6 +153,17 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
 
             Route::post('/update-foto',[MsPegawaiController::class,'update_foto'])->name('data-pegawai.master-pegawai.update-foto');
         });
+
+        Route::group(['prefix' => 'pelanggaran'], function () {
+            Route::get('/',[DataPelanggaranPegawaiController::class,'index'])->name('data-pegawai.pelanggaran.index');
+            Route::post('/cari',[DataPelanggaranPegawaiController::class,'cari'])->name('data-pegawai.pelanggaran.cari');
+            Route::get('/tambah',[DataPelanggaranPegawaiController::class,'create'])->name('data-pegawai.pelanggaran.tambah');
+            Route::post('/simpan',[DataPelanggaranPegawaiController::class,'store'])->name('data-pegawai.pelanggaran.simpan');
+            Route::get('/edit/{id}',[DataPelanggaranPegawaiController::class,'edit'])->name('data-pegawai.master-pegawai.edit');
+            Route::post('/update',[DataPelanggaranPegawaiController::class,'update'])->name('data-pegawai.pelanggaran.update');
+            Route::get('/hapus/{id}',[DataPelanggaranPegawaiController::class,'destroy'])->name('data-pegawai.master-pegawai.hapus');
+        });
+
         Route::group(['prefix' => 'riwayat'], function () {
             Route::group(['prefix' => 'jabatan'], function () {
                 Route::get('/{id}',[RiwayatJabatanController::class,'index'])->name('data-pegawai.riwayat.jabatan');
@@ -185,19 +204,6 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
                     Route::get('/clear/{id}',[PresensiApelController::class,'clear'])->name('data-pegawai.data-presensi.apel.peserta.clear');
                 });
             });
-
-            Route::group(['prefix' => 'data-absen'], function () {
-                //belum
-                Route::get('/',[DataAbsenController::class,'index'])->name('data-pegawai.data-presensi.data-absen.index');
-                Route::get('/tambah',[DataAbsenController::class,'create'])->name('data-pegawai.data-presensi.data-absen.tambah');
-                Route::post('/simpan',[DataAbsenController::class,'store'])->name('data-pegawai.data-presensi.data-absen.simpan');
-                Route::get('/edit/{id?}',[DataAbsenController::class,'edit'])->name('data-pegawai.data-presensi.data-absen.edit');
-                Route::post('/update',[DataAbsenController::class,'update'])->name('data-pegawai.data-presensi.data-absen.update');
-                Route::post('/cari',[DataAbsenController::class,'cari'])->name('data-pegawai.data-presensi.data-absen.cari');
-                Route::get('/hapus/{id?}',[DataAbsenController::class,'destroy'])->name('data-pegawai.data-presensi.data-absen.delete');
-                Route::get('/verifikasi/{id?}',[DataAbsenController::class,'verifikasi'])->name('data-pegawai.data-presensi.data-absen.verifikasi');
-                Route::post('/simpan_verifikasi',[DataAbsenController::class,'simpan_verifikasi'])->name('data-pegawai.data-presensi.data-absen.simpan_verifikasi');
-            });
         });
     });
 
@@ -223,11 +229,6 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
             Route::get('/',[SettingPeriodeSkpControler::class,'index'])->name('skp.setting-skp.index');
             Route::post('/cari',[SettingPeriodeSkpControler::class,'cari'])->name('skp.setting-skp.cari');
             Route::get('/update_status',[SettingPeriodeSkpControler::class,'update_status'])->name('skp.setting-skp.update_status');
-        });
-
-        Route::group(['prefix' => 'data-skp'], function () {
-            Route::get('/',[DataSkpController::class,'index'])->name('skp.data-skp.index');
-            Route::post('/cari',[DataSkpController::class,'cari'])->name('skp.data-skp.cari');
         });
 
         Route::group(['prefix' => 'master-skp'], function () {
@@ -280,13 +281,27 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
 
     
 });
-Route::group(['prefix' => 'api-rekap'], function () {
-    Route::group(['prefix' => 'presensi'], function () {
-        Route::get('/{nip?}/{tgl_awal?}/{tgl_akhir}',[ApiController::class,'index'])->name('api-rekap.presensi');
-    });
+Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
     Route::group(['prefix' => 'skp'], function () {
-        Route::get('/per-pegawai/{nip?}/{bulan?}/{tahun?}',[ApiController::class,'rekap_skp'])->name('api-rekap.rekap-skp');
-        Route::get('/all/{bulan?}/{tahun?}',[ApiController::class,'rekap_skp_all'])->name('api-rekap.rekap-skp-all');
+        Route::group(['prefix' => 'data-skp'], function () {
+            Route::get('/',[DataSkpController::class,'index'])->name('skp.data-skp.index');
+            Route::post('/cari',[DataSkpController::class,'cari'])->name('skp.data-skp.cari');
+        });
+    });
+    Route::group(['prefix' => 'data-pegawai'], function () {
+        Route::group(['prefix' => 'data-presensi'], function () {
+            Route::group(['prefix' => 'data-absen'], function () {
+                Route::get('/',[DataAbsenController::class,'index'])->name('data-pegawai.data-presensi.data-absen.index');
+                Route::get('/tambah',[DataAbsenController::class,'create'])->name('data-pegawai.data-presensi.data-absen.tambah');
+                Route::post('/simpan',[DataAbsenController::class,'store'])->name('data-pegawai.data-presensi.data-absen.simpan');
+                Route::get('/edit/{id?}',[DataAbsenController::class,'edit'])->name('data-pegawai.data-presensi.data-absen.edit');
+                Route::post('/update',[DataAbsenController::class,'update'])->name('data-pegawai.data-presensi.data-absen.update');
+                Route::post('/cari',[DataAbsenController::class,'cari'])->name('data-pegawai.data-presensi.data-absen.cari');
+                Route::get('/hapus/{id?}',[DataAbsenController::class,'destroy'])->name('data-pegawai.data-presensi.data-absen.delete');
+                Route::get('/verifikasi/{id?}',[DataAbsenController::class,'verifikasi'])->name('data-pegawai.data-presensi.data-absen.verifikasi');
+                Route::post('/simpan_verifikasi',[DataAbsenController::class,'simpan_verifikasi'])->name('data-pegawai.data-presensi.data-absen.simpan_verifikasi');
+            });
+        });
     });
 });
 Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
@@ -306,6 +321,18 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
 
     });
 
+    Route::group(['prefix' => 'data-absen'], function () {
+        Route::get('/',[DataAbsenController::class,'index'])->name('data-presensi.data-absen.index');
+        Route::get('/tambah',[DataAbsenController::class,'create'])->name('data-presensi.data-absen.tambah');
+        Route::post('/simpan',[DataAbsenController::class,'store'])->name('data-presensi.data-absen.simpan');
+        Route::get('/edit/{id?}',[DataAbsenController::class,'edit'])->name('data-presensi.data-absen.edit');
+        Route::post('/update',[DataAbsenController::class,'update'])->name('data-presensi.data-absen.update');
+        Route::post('/cari',[DataAbsenController::class,'cari'])->name('data-presensi.data-absen.cari');
+        Route::get('/hapus/{id?}',[DataAbsenController::class,'destroy'])->name('data-presensi.data-absen.delete');
+        Route::get('/verifikasi/{id?}',[DataAbsenController::class,'verifikasi'])->name('data-presensi.data-absen.verifikasi');
+        Route::post('/simpan_verifikasi',[DataAbsenController::class,'simpan_verifikasi'])->name('data-presensi.data-absen.simpan_verifikasi');
+    });
+
     Route::group(['prefix' => 'pegawai-bawahan'], function () {
         Route::get('/detil/{id?}',[MsPegawaiController::class,'show'])->name('pegawai-bawahan.detil_pegawai');
         Route::get('/pegawai',[MsPegawaiController::class,'bawahan'])->name('pegawai-bawahan.pegawai');
@@ -320,19 +347,15 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
         Route::get('/riwayat-absen/{id?}',[MsPegawaiController::class,'riwayat_absen'])->name('pegawai-bawahan.riwayat-absen');
         Route::post('/cari/absen',[MsPegawaiController::class,'cari_absen_bawahan'])->name('pegawai-bawahan.cari.absen');
 
+        Route::get('/justifikasi/{id_sdm?}/{bulan?}/{tahun?}',[MsPegawaiController::class,'justifikasi'])->name('pegawai-bawahan.justifikasi');
+        Route::get('/gen-justifikasi',[MsPegawaiController::class,'gen_justifikasi_kehadiran'])->name('pegawai-bawahan.gen-justifikasi');
+        Route::post('/save-gen-justifikasi',[MsPegawaiController::class,'save_justifikasi_kehadiran'])->name('pegawai-bawahan.save-gen-justifikasi');
+
+        Route::get('/justifikasi-apel/{id_sdm?}/{bulan?}/{tahun?}',[MsPegawaiController::class,'justifikasi_apel'])->name('pegawai-bawahan.justifikasi-apel');
+        Route::get('/gen-justifikasi-apel',[MsPegawaiController::class,'gen_justifikasi_apel'])->name('pegawai-bawahan.gen-justifikasi-apel');
+        Route::post('/save-gen-justifikasi-apel',[MsPegawaiController::class,'save_justifikasi_apel'])->name('pegawai-bawahan.save-gen-justifikasi-apel');
     });
 
-    Route::group(['prefix' => 'data-absen'], function () {
-        Route::get('/',[DataAbsenController::class,'index'])->name('data-presensi.data-absen.index');
-        Route::get('/tambah',[DataAbsenController::class,'create'])->name('data-presensi.data-absen.tambah');
-        Route::post('/simpan',[DataAbsenController::class,'store'])->name('data-presensi.data-absen.simpan');
-        Route::get('/edit/{id?}',[DataAbsenController::class,'edit'])->name('data-presensi.data-absen.edit');
-        Route::post('/update',[DataAbsenController::class,'update'])->name('data-presensi.data-absen.update');
-        Route::post('/cari',[DataAbsenController::class,'cari'])->name('data-presensi.data-absen.cari');
-        Route::get('/hapus/{id?}',[DataAbsenController::class,'destroy'])->name('data-presensi.data-absen.delete');
-        Route::get('/verifikasi/{id?}',[DataAbsenController::class,'verifikasi'])->name('data-presensi.data-absen.verifikasi');
-        Route::post('/simpan_verifikasi',[DataAbsenController::class,'simpan_verifikasi'])->name('data-presensi.data-absen.simpan_verifikasi');
-    });
     Route::group(['prefix' => 'skp-pegawai'], function () {
         Route::group(['prefix' => 'target-skp'], function () {
             Route::get('/{id_sdm?}',[TargetSkpPegawaiController::class,'index'])->name('skp-pegawai.target-skp.index');
@@ -351,6 +374,21 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
         });
     });
 
+});
+
+Route::group(['prefix' => 'api-rekap'], function () {
+    Route::group(['prefix' => 'presensi'], function () {
+        Route::get('/{nip?}/{tgl_awal?}/{tgl_akhir}',[ApiController::class,'index'])->name('api-rekap.presensi');
+    });
+    Route::group(['prefix' => 'skp'], function () {
+        Route::get('/per-pegawai/{nip?}/{bulan?}/{tahun?}',[ApiController::class,'rekap_skp'])->name('api-rekap.rekap-skp');
+        Route::get('/all/{bulan?}/{tahun?}',[ApiController::class,'rekap_skp_all'])->name('api-rekap.rekap-skp-all');
+    });
+    Route::group(['prefix' => 'pelanggaran-disiplin'], function () {
+        Route::get('per-pegawai/{nip?}/{bulan?}/{tahun?}',[ApiController::class,'pelanggaran'])->name('api-rekap.pelanggaran-disiplin.per-pegawai');
+        Route::get('all/{bulan?}/{tahun?}',[ApiController::class,'pelanggaranall'])->name('api-rekap.pelanggaran-disiplin.all');
+        
+    });
 });
 
 

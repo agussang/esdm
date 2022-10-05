@@ -10,7 +10,7 @@
                             <h5 class="card-label"><i class="fa fa-plus"></i> Form Tambah Data Absen Kehadiran Pegawai</h5>
                         </div>
                         <div class="col-md-3">
-                            @if(Session::get('level')=="P")
+                            @if(Session::get('level')=="P" && Session::get('id_sdm_atasan')==Session::get('id_sdm'))
                             <a href="{{route('data-presensi.data-absen.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                             @else
                             <a href="{{route('data-pegawai.data-presensi.data-absen.index')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="card-body">
-                @if(Session::get('level')=="P")
+                @if(Session::get('level')=="P" && Session::get('id_sdm_atasan')==Session::get('id_sdm'))
                 <form class="form" action="{{route('data-presensi.data-absen.simpan')}}" method="post" enctype="multipart/form-data">
                 @else
                 <form class="form" action="{{route('data-pegawai.data-presensi.data-absen.simpan')}}" method="post" enctype="multipart/form-data">
@@ -32,7 +32,7 @@
                                 <div class="input-group-prepend">
                                 <span class="input-group-text" id="inputGroup-sizing-default">Nama Pegawai</span>
                                 </div>
-                                <select class="form-control" id="id_sdm" name="id_sdm" required @if(Session::get('level')=="P") disabled @endif>
+                                <select class="form-control" id="id_sdm" name="id_sdm" required>
                                         {!!$pilihan_sdm!!}
                                 </select>
                             </div>
@@ -61,7 +61,9 @@
                                 <span class="input-group-text" id="inputGroup-sizing-default">Alasan Absen</span>
                                 </div>
                                 <select class="form-control" id="id_alasan" name="id_alasan" required>
-                                        {!!$pilihan_alasan_absen!!}
+                                    @foreach ($alasan_absen as $rs => $r)
+                                        <option value="{{$r->id_alasan}}">{{$r->alasan}}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>
@@ -75,6 +77,7 @@
                             <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Simpan</button>
                         </div>
                     </div>
+                </form>
                 </form>
             </div>
         </div>

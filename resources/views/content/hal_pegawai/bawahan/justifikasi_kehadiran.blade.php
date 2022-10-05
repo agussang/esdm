@@ -1,46 +1,31 @@
 @extends('layouts.layout')
 @section('content')
-<?php
-$induk = explode('/',request()->path());
-?>
+
 <div class="row">
     <div class="col-md-12">
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
             <div class="card-header">
-                <div class="card-title">
-                    <div class="row">
-                        <div class="col-md-9">
-                            <h5 class="card-label"><i class="fa fa-list"></i> Riwayat / History Presensi Kehadiran Pegawai</h5>
-                        </div>
-                        <div class="col-md-3">
-                            @if(Session::get('level')!="P")
-                            <a href="{{URL::to('data-pegawai/master-pegawai/detil-data')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
-                            @else
-                                @if($induk[0]=="pegawai-bawahan")
-                                    <a href="{{URL::to('pegawai-bawahan/detil')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
-                                @else
-                                     <a href="{{URL::to('pegawai/detil')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
-                                @endif
-                            @endif
+                <div class="header-title">
+                    <div class="card-title">
+                        <div class="row">
+                            <div class="col-md-9">
+                                <h5 class="card-label"><i class="fas fa-list-alt"></i> Justifikasi Data Kehadiran Pegawai</h5>
+                            </div>
+                            <div class="col-md-3">
+                                <a href="{{route('pegawai-bawahan.pegawai')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <div class="card-body">
-                @if($induk[0]=="pegawai-bawahan")
-                <form class="form" action="{{route('pegawai-bawahan.cari.kehadiran')}}" method="post">
-                @else
-                <form class="form" action="{{route('pegawai.cari.kehadiran')}}" method="post">
-                @endif
-                {!! csrf_field() !!}
-                <input type="hidden" name="id_sdm" id="id_sdm" value="{{$rsData->id_sdm}}">
                 <div class="row">
                     <div class="col-md-4">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Bulan</span>
                             </div>
-                            <select class="form-control" name="bln" id="bln" required>
+                            <select class="form-control" name="bln" id="bln" required disabled>
                                 {!!$pilihan_bulan_presensi!!}
                             </select>
                         </div>
@@ -50,7 +35,7 @@ $induk = explode('/',request()->path());
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Tahun</span>
                             </div>
-                            <select class="form-control" name="tahun" id="tahun" required>
+                            <select class="form-control" name="tahun" id="tahun" required disabled>
                                 {!!$pilihan_tahun_presensi!!}
                             </select>
                         </div>
@@ -66,10 +51,11 @@ $induk = explode('/',request()->path());
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
+                        <div class="alert alert-warning" role="alert">
+                           <div class="iq-alert-text">Kehadiran yang dapat di justifikasi adalah yang berjenis kehadiran <b>Terlambat, Pulang Cepat, Tidak Hadir. Data presensi kehadiran yang dijustifikasi akan tersimpan sesuai dengan ketentuan waktu setting presensi yang berlaku.</b></b></div>
+                        </div>
                     </div>
                 </div>
-                </form>
             </div>
         </div>
     </div>
@@ -117,95 +103,17 @@ $induk = explode('/',request()->path());
                     <b><p>Data Riwayat Kehadiran Pegawai<hr/></p></b><br/>
                     <ul class="nav nav-tabs" id="myTab-two" role="tablist">
                         <li class="nav-item">
-                            <a class="nav-link active" id="home-tab-two" data-toggle="tab" href="#home-two" role="tab" aria-controls="home" aria-selected="true">Riwayat Kehadiran</a>
+                            <a class="nav-link active" id="profile-tab-two" data-toggle="tab" href="#profile-two" role="tab" aria-controls="profile" aria-selected="false">Tanggal Tidak Hadir <span class="badge badge-danger ml-2 rtl-mr-2 rtl-ml-0">{{count($rekap['tidakmasuk']['list_tgl'])}} Hari</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="profile-tab-two" data-toggle="tab" href="#profile-two" role="tab" aria-controls="profile" aria-selected="false">Tanggal Tidak Hadir</a>
+                            <a class="nav-link" id="contact-tab-two" data-toggle="tab" href="#contact-two" role="tab" aria-controls="contact" aria-selected="false">Tanggal Kehadiran Terlambat <span class="badge badge-danger ml-2 rtl-mr-2 rtl-ml-0">{{count($rekap['telat']['list_tglwaktuabsen'])}} Hari</span></a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" id="contact-tab-two" data-toggle="tab" href="#contact-two" role="tab" aria-controls="contact" aria-selected="false">Tanggal Kehadiran Terlambat</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="pulang-tab-two" data-toggle="tab" href="#pulang-two" role="tab" aria-controls="pulang" aria-selected="false">Tanggal Pulang Cepat</a>
+                            <a class="nav-link" id="pulang-tab-two" data-toggle="tab" href="#pulang-two" role="tab" aria-controls="pulang" aria-selected="false">Tanggal Pulang Cepat <span class="badge badge-danger ml-2 rtl-mr-2 rtl-ml-0">{{count($rekap['pulang_cepat']['list_tgl'])}} Hari</span></a>
                         </li>
                     </ul>
                     <div class="tab-content" id="myTabContent-1">
-                        <div class="tab-pane fade active show" id="home-two" role="tabpanel" aria-labelledby="home-tab-two">
-                           <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Tanggal</th>
-                                            <th>Jam Masuk</th>
-                                            <th>Jam Pulang</th>
-                                            <th>Durasi Bekerja <br/>(Jam)</th>
-                                            <th>Durasi Bekerja<br/>(Menit)</th>
-                                            <th>Ket</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php $no=1;?>
-                                        @foreach($arrData as $tgl=>$presensi)
-                                        <?php
-                                            $hariabsen = explode(',',$presensi['ket_tgl']);
-                                            $jam_masuk = array_shift($presensi['jam_absen']);
-                                            $jam_keluar = end($presensi['jam_absen']);
-                                            if($jam_keluar==null){
-                                                $jam_keluar = $jam_masuk;
-                                            }
-                                            if($hariabsen[0]=="Jumat"){
-                                                $jamkerja = $jam_kerja_unit[2];
-                                            }else{
-                                                $jamkerja = $jam_kerja_unit[1];
-                                            }
-                                            $warna = "";$ket = "";
-                                            if(end($presensi['jam_absen'])==null){
-                                                $warna = "background-color: #F78282;";
-                                                $ket = "Absen 1x";
-                                            }
-                                            $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
-                                            $jam_masukex = explode(':',$jam_masuk);
-                                            $jam_keluarex = explode(':',$jam_keluar);
-
-                                            $j_masuk_start = $jam_masukex[0];
-                                            $menit_masuk_start = $jam_masukex[1];
-
-                                            $j_keluar_start = $jam_keluarex[0];
-                                            $menit_keluar_start = $jam_keluarex[1];
-
-                                            $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
-                                            $hasil = $hasil / 60;
-                                            $hasil = number_format($hasil,2);
-                                            $hasilx = explode(".",$hasil);
-                                            $depan = sprintf("%02d", $hasilx[0]);
-                                            $gabung = $depan.":".$hasilx[1];
-                                            
-                                            if($gabung < $durasi){
-                                                $warna = "background-color: #F78282;";
-                                            }
-                                            $hari = explode(',',$tanggal);
-                                            if($hari[0]=="Minggu" || $hari[0]=="Sabtu"){
-                                                $warna = "background-color: #E3CC6D;";
-                                            }
-                                            $menit = ($gabung*60)+$hasilx[1];
-                                            
-                                            ?>
-                                            <tr style="{{$warna}}">
-                                                <td>{{$no++}}</td>
-                                                <td>{{$presensi['ket_tgl']}}</td>
-                                                <td align="center">{{$jam_masuk}}</td>
-                                                <td align="center">{{$jam_keluar}}</td>
-                                                <td align="center">{{$gabung}}</td>
-                                                <td align="center">{{$menit}}</td>
-                                                <td align="center">{{$ket}}</td>
-                                            </tr>
-                                            @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        <div class="tab-pane fade" id="profile-two" role="tabpanel" aria-labelledby="profile-tab-two">
+                        <div class="tab-pane fade active show" id="profile-two" role="tabpanel" aria-labelledby="profile-tab-two">
                             <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
@@ -213,12 +121,14 @@ $induk = explode('/',request()->path());
                                             <th>No</th>
                                             <th>Tanggal</th>
                                             <th>Ket Justifikasi</th>
+                                            <th>Justifikasi ?</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         <?php $noz=1;?>
                                         @foreach($rekap['tidakmasuk']['list_tgl'] as $tgl=>$presensi)
                                             <?php $nm_tgl = Fungsi::formatDate($thn_bulan."-".$tgl);
+                                            $tgltidakmasuk = $thn_bulan."-".$tgl;
                                             $tgl_jus = "";
                                             $alasan_jus = "";
                                             if(count($presensi['justifikasi'])>0){
@@ -233,6 +143,11 @@ $induk = explode('/',request()->path());
                                                     <li>Tgl : {{$tgl_jus}}</li>
                                                     <li>Alasan : {{$alasan_jus}}</li>
                                                 </td>
+                                                <td>
+                                                    @if(count($presensi['justifikasi'])<1)
+                                                    <a onclick="edit('<?php echo $tgltidakmasuk;?>','{{$id_sdm}}','1');" class="btn btn-primary text-white" data-toggle="modal" data-target=".bd-example-modal-lg">Justifikasi Tidak Masuk</a>
+                                                    @endif
+                                                </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
@@ -245,17 +160,18 @@ $induk = explode('/',request()->path());
                                     <tr>
                                         <th>No</th>
                                         <th>Tanggal</th>
-                                        <th>Waktu Fingger Masuk</th>
-                                        <th>Waktu Finger Pulang</th>
+                                        <th>Waktu Fingger</th>
                                         <th>Durasi Terlambat <br/>(Menit)</th>
                                         <th>Ket</th>
                                         <th>Ket Justifikasi</th>
+                                        <th>Justifikasi ?</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php $noz=1;?>
                                     @foreach($rekap['telat']['list_tglwaktuabsen'] as $tgltlt=>$presensitlt)
                                         <?php $nm_tgltlt = Fungsi::formatDate($thn_bulan."-".$tgltlt);
+                                        $tgltelat = $thn_bulan."-".$tgltlt;
                                         $ket = "";
                                         if($presensitlt['masuk']==$presensitlt['pulang']){
                                             $ket = "Absen 1x";
@@ -266,19 +182,24 @@ $induk = explode('/',request()->path());
                                             $tgl_justlt = $presensitlt['justifikasi']['tgl_justifikasi'];
                                             $alasan_justlt = $presensitlt['justifikasi']['alasan'];
                                         }
-                                        
                                         ?>
                                         <tr>
                                             <td>{{$noz++}}</td>
                                             <td>{{$nm_tgltlt}}</td>
-                                            <td>{{$presensitlt['masuk']}}</td>
-                                            <td>{{$presensitlt['pulang']}}</td>
+                                            <td>
+                                                <li>Masuk : {{$presensitlt['masuk']}}</li>
+                                                <li>Pulang : {{$presensitlt['pulang']}}</li>
+                                            </td>
                                             <td>{{$presensitlt['menit']}}</td>
                                             <td>{{$ket}}</td>
                                             <td>
                                                 <li>Tgl : {{$tgl_justlt}}</li>
                                                 <li>Alasan : {{$alasan_justlt}}</li>
                                             </td>
+                                            <td>
+                                            @if(count($presensitlt['justifikasi'])<1)
+                                            <a onclick="edit('<?php echo $tgltelat;?>','{{$id_sdm}}','2');" class="btn btn-primary text-white" data-toggle="modal" data-target=".bd-example-modal-lg">Justifikasi Terlambat</a></td>
+                                            @endif
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -290,17 +211,18 @@ $induk = explode('/',request()->path());
                                     <tr>
                                         <th>No</th>
                                         <th>Tanggal</th>
-                                        <th>Waktu Fingger Masuk</th>
-                                        <th>Waktu Finger Pulang</th>
-                                        <th>Durasi Pulang Cepat <br/>(Menit)</th>
+                                        <th>Waktu Fingger</th>
+                                        <th>Durasi Bekerja <br/>(Menit)</th>
                                         <th>Ket</th>
                                         <th>Ket Justifikasi</th>
+                                        <th>Justifikasi ?</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php $noz=1;?>
                                     @foreach($rekap['pulang_cepat']['list_tglwaktuabsen'] as $tglcpt=>$presensicpt)
                                         <?php $nm_tglx = Fungsi::formatDate($thn_bulan."-".$tglcpt);
+                                        $tglplngcpt = $thn_bulan."-".$tglcpt;
                                         $tgl_juscpt = "";
                                         $alasan_juscpt = "";
                                         if(count($presensicpt['justifikasi'])>0){
@@ -315,13 +237,20 @@ $induk = explode('/',request()->path());
                                         <tr>
                                             <td>{{$noz++}}</td>
                                             <td>{{$nm_tglx}}</td>
-                                            <td>{{$presensicpt['masuk']}}</td>
-                                            <td>{{$presensicpt['pulang']}}</td>
+                                            <td>
+                                                <li>Masuk : {{$presensicpt['masuk']}}</li>
+                                                <li>Pulang : {{$presensicpt['pulang']}}</li>
+                                            </td>
                                             <td>{{$presensicpt['menit']}}</td>
                                             <td>{{$ketx}}</td>
                                             <td>
                                                 <li>Tgl : {{$tgl_juscpt}}</li>
                                                 <li>Alasan : {{$alasan_juscpt}}</li>
+                                            </td>
+                                            <td>
+                                                @if(count($presensicpt['justifikasi'])<1)
+                                                <a onclick="edit('<?php echo $tglplngcpt;?>','{{$id_sdm}}','3');" class="btn btn-primary text-white" data-toggle="modal" data-target=".bd-example-modal-lg">Justifikasi Pulang Cepat</a>
+                                                @endif
                                             </td>
                                         </tr>
                                     @endforeach
@@ -334,4 +263,54 @@ $induk = explode('/',request()->path());
         </div>
     </div>
 </div>
+<div class="modal fade bd-example-modal-lg" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Justifikasi Kehadiran Pegawai</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="formku" method="post">
+				{!! csrf_field() !!}
+                    <div id="form-edit">
+                    
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="balik"></div>
+<meta name="csrf_token" content="{{ csrf_token() }}" />
+<script>
+function edit(tgl,id_sdm,kode)
+{
+    var request = $.ajax ({
+       url : "{{ route('pegawai-bawahan.gen-justifikasi') }}",
+       data:"tgl="+tgl+"&id_sdm="+id_sdm+"&kode="+kode,
+       type : "get",
+       dataType: "html"
+   });
+   $('#form-edit').html('Sedang Melakukan Proses Pencarian Data...');
+   request.done(function(output) {
+       $('#form-edit').html(output);
+   });
+}
+function simpan_edit()
+{
+    var x=$('#formku').serialize();
+    var request = $.ajax ({
+           url : "{{ route('pegawai-bawahan.save-gen-justifikasi') }}",
+           type : "post",
+           dataType: "html",
+           data: x
+       });
+       request.done(function(output) {
+        $('#balik').html(output);
+       });
+}
+</script>
 @stop

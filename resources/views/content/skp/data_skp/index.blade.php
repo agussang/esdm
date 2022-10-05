@@ -58,6 +58,9 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
+                <div class="alert alert-warning">
+                    <span>Skp dapat dinilai oleh atasan pegawai ketika file skp sudah diunggah oleh pegawai. File skp yang sudah dinilai dan divalidasi tidak bisa diubah kembali.</span>
+                </div>
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -109,7 +112,12 @@
                                 </td>
                                 <td>
                                     @if($dtnilai_skp)
-                                    <a href="{{URL::to('skp-pegawai/skp/detil-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> Lihat</a>
+                                    <?php $text = "Lihat";
+                                    if(Session::get('atasan_penilai')==1){
+                                        $text = "Nilai";
+                                    }
+                                    ?>
+                                    <a href="{{URL::to('skp-pegawai/skp/detil-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> {{$text}}</a>
                                     @endif
                                 </td>
                             </tr>

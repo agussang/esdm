@@ -95,7 +95,7 @@ class PresensiApelController extends Controller
     public function peserta($id){
         $id_kegiatan = Crypt::decrypt($id);
         $data['rsData'] = $this->repomskegiatanapel->findId("",$id_kegiatan,"id_kegiatan");
-        $data['peserta'] = $this->repopresensiapel->get(['dt_pegawai'],$id_kegiatan,"id_kegiatan");
+        $data['peserta'] = $this->repopresensiapel->get(['dt_pegawai'],$id_kegiatan);
         $arrGrafik = array();
         foreach($data['peserta'] as $rs=>$r){
             $text = "Hadir";

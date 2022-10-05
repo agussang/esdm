@@ -26,6 +26,10 @@ class DataSkpController extends Controller
 
     public function index()
     {
+        $id_sdm_atasan = "";
+        if(Session::get('atasan_penilai')==1){
+            $id_sdm_atasan = Session::get('id_sdm');
+        }
         $tahun = Session::get('tahun');
         if($tahun==null){
             $tahun = date('Y');
@@ -35,11 +39,15 @@ class DataSkpController extends Controller
             $bulan = date('m');
         }
         $data['periode_pilihan'] = $this->repomsperiodeskp->findWhereRaw(""," bulan = '$bulan' and tahun='$tahun'");
-        $rekap_skp = $this->repotrrekapskp->get(['dt_periode'],"", $tahun, $bulan);
         $data['pilihan_tahun_skp'] = Fungsi::pilihan_tahun_skp($tahun);
         $data['pilihan_bulan_skp'] = Fungsi::pilihan_bulan_skp($bulan);
         $text_cari = Session::get('text_cari');
-        $data['rsData'] = $this->repomspegawai->getskp(['nm_atasan','nm_atasan_pendamping','nm_satker'],1,$text_cari);
+        $data['rsData'] = $this->repomspegawai->getskp(['nm_atasan','nm_atasan_pendamping','nm_satker'],1,$text_cari,$id_sdm_atasan);
+        $arrIdSdm = array();
+        foreach($data['rsData'] as $rsp=>$rp){
+            $arrIdSdm[$rp->id_sdm] = $rp->id_sdm;
+        }
+        $rekap_skp = $this->repotrrekapskp->get(['dt_periode'],"", $tahun, $bulan,$arrIdSdm);
         $arrrekapnilai = array();
         foreach($rekap_skp as $rs=>$r){
             $arrrekapnilai[$r->id_sdm]['idperiode'] = $r->idperiode;

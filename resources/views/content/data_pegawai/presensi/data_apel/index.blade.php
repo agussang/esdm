@@ -85,7 +85,7 @@
                                         <td>
                                             <div class="btn-group" role="group">
                                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                                    Aksi
+                                                    <i class="fas fa-cogs"></i> Aksi
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                                     <a class="dropdown-item" href="#" data-toggle="modal" data-target="#exampleModal" onclick="edit('<?php echo $r->id_kegiatan;?>');"><i class="fas fa-pencil-ruler text-warning"></i> Edit</a>

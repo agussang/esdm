@@ -1,23 +1,5 @@
-<?php
-$kerja_jam_masukex = explode(':',$jam_kerja->jam_masuk);
-$kerja_jam_keluarex = explode(':',$jam_kerja->jam_keluar);
-
-$kerja_j_masuk_start = $kerja_jam_masukex[0];
-$kerja_menit_masuk_start = $kerja_jam_masukex[1];
-
-$kerja_j_keluar_start = $kerja_jam_keluarex[0];
-$kerja_menit_keluar_start = $kerja_jam_keluarex[1];
-
-$kerjahasil = (intVal($kerja_j_keluar_start) - intVal($kerja_j_masuk_start)) * 60 + (intVal($kerja_menit_keluar_start) - intVal($kerja_menit_masuk_start));
-$kerjahasil = $kerjahasil / 60;
-$kerjahasil = number_format($kerjahasil,2);
-$kerjahasilx = explode(".",$kerjahasil);
-$kerjadepan = sprintf("%02d", $kerjahasilx[0]);
-$kerjagabung = $kerjadepan.":".$kerjahasilx[1];
-?>
-
 <html>
-<title>{{ config('app.name', 'Laravel') }}</title>
+<title>{{$rsDataKetApp->nama_aplikasi}}</title>
 <head>
     <style>
 		@media print
@@ -64,7 +46,7 @@ $kerjagabung = $kerjadepan.":".$kerjahasilx[1];
 <div class="page" align="center" id="container">
     <body leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0">
         <span><b>Data Presensi Pegawai</b></span><br/>
-        <span><b>Jam Kerja {{$jam_kerja->jam_masuk}} - {{$jam_kerja->jam_keluar}} ( {{$kerjagabung}} jam )</b></span><br/>
+        <span><b>Jam Kerja {{$jam_kerja_text}}</b></span><br/>
         <br/><hr style="border: 1px solid"/><br/>
         <br/><hr style="border: 1px solid"/><br/>
         <table width="100%" border=1 cellspacing=0 cellpadding="3" style="font-size:12pt";>
@@ -84,14 +66,21 @@ $kerjagabung = $kerjadepan.":".$kerjahasilx[1];
             <tbody>
                 <?php $no=1;?>
                 @foreach($arrData as $id_sdm=>$dt_sdm)
+                    <?php $no=1;?>
                     @foreach($dt_sdm['data_presensi'] as $tanggal=>$presensi)
                     <?php
-                    $jam_masuk = array_shift($presensi);
-                    $jam_keluar = end($presensi);
+                    $hariabsen = explode(',',$presensi['ket_tgl']);
+                    $jam_masuk = array_shift($presensi['jam_absen']);
+                    $jam_keluar = end($presensi['jam_absen']);
                     if($jam_keluar==null){
                         $jam_keluar = $jam_masuk;
                     }
-
+                    if($hariabsen[0]=="Jumat"){
+                        $jamkerja = $jam_kerja[2];
+                    }else{
+                        $jamkerja = $jam_kerja[1];
+                    }
+                    $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
                     $jam_masukex = explode(':',$jam_masuk);
                     $jam_keluarex = explode(':',$jam_keluar);
 
@@ -108,19 +97,20 @@ $kerjagabung = $kerjadepan.":".$kerjahasilx[1];
                     $depan = sprintf("%02d", $hasilx[0]);
                     $gabung = $depan.":".$hasilx[1];
                     $warna = "";
-                    if($gabung < $kerjagabung){
+                    
+                    if($gabung < $durasi){
                         $warna = "background-color: #F78282;";
-                    }
-                    $gabung_lembur = 0;
-                    if($gabung>$kerjagabung){
-                        $jamkel = explode(':',$jam_kerja->jam_keluar);
-                        $jamlembur = -($jamkel[0]-$j_keluar_start);
-                        $menit_lembur = -($jamkel[1]-$menit_keluar_start);
-                        $gabung_lembur = sprintf("%02d", $jamlembur).":".sprintf("%02d", $menit_lembur);
                     }
                     $hari = explode(',',$tanggal);
                     if($hari[0]=="Minggu" || $hari[0]=="Sabtu"){
                         $warna = "background-color: #E3CC6D;";
+                    }
+                    $gabung_lembur = 0;
+                    if($gabung>$durasi){
+                        $jamkel = explode(':',$jamkerja['jam_pulang']);
+                        $jamlembur = -($jamkel[0]-$j_keluar_start);
+                        $menit_lembur = -($jamkel[1]-$menit_keluar_start);
+                        $gabung_lembur = sprintf("%02d", $jamlembur).":".sprintf("%02d", $menit_lembur);
                     }
                     $menit = ($gabung*60)+$hasilx[1];
                     ?>
@@ -128,7 +118,7 @@ $kerjagabung = $kerjadepan.":".$kerjahasilx[1];
                         <td>{{$no++}}</td>
                         <td>{{$dt_sdm['nip']}}</td>
                         <td>{{$dt_sdm['nm_sdm']}}</td>
-                        <td>{{$tanggal}}</td>
+                        <td>{{$presensi['ket_tgl']}}</td>
                         <td align="center">{{$jam_masuk}}</td>
                         <td align="center">{{$jam_keluar}}</td>
                         <td align="center">{{$gabung}}</td>

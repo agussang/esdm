@@ -163,7 +163,8 @@ class SkpPrilakuPegawaiController extends Controller
             'message' => 'Berhasil, Penilaian prilaku pegawai berhasil disimpan.',
             'alert-type' => 'success',
         ];
-        return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+        return redirect()->back()->with($notification);
+        //return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
     }
 
     
@@ -208,21 +209,23 @@ class SkpPrilakuPegawaiController extends Controller
                     'message' => 'File harus berformat pdf',
                     'alert-type' => 'error',
                     ];
-            if(Session::get('level')=="P"){
-                return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
-            }else{
-                return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
-            }
+            // if(Session::get('level')=="P"){
+            //     return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+            // }else{
+            //     return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+            // }
+            return redirect()->back()->with($notification);
         } elseif ($size > 2000000) {
             $notification = [
                     'message' => 'Ukuran File lebih dari 2MB',
                     'alert-type' => 'error',
                     ];
-            if(Session::get('level')=="P"){
-                return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
-            }else{
-                return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
-            }
+            // if(Session::get('level')=="P"){
+            //     return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+            // }else{
+            //     return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+            // }
+            return redirect()->back()->with($notification);
         }
         unset($req['file_skp']);
         $name = md5($req['id_sdm']);
@@ -242,8 +245,8 @@ class SkpPrilakuPegawaiController extends Controller
             'message' => 'Berhasil, Unggah File dokumen skp berhasil dilakukan.',
             'alert-type' => 'success',
         ];
-        return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
-
+        //return redirect()->intended('/skp-pegawai/skp/isi/'.Crypt::encrypt($req['idperiode']).'/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+        return redirect()->back()->with($notification);
     }
 
     

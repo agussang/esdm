@@ -13,13 +13,15 @@ class Repotrrekapskp extends Repository
         $this->model = $model;
     }
 
-    public function get($with = null, $id_sdm = null, $tahun = null, $bulan = null)
+    public function get($with = null, $id_sdm = null, $tahun = null, $bulan = null,$arrIdSdm = null)
     {
         return $this->model
             ->when($with, function ($query) use ($with) {
                 return $query->with($with);
             })->when($id_sdm, function ($query) use ($id_sdm) {
                 return $query->where('id_sdm',$id_sdm);
+            })->when($arrIdSdm, function ($query) use ($arrIdSdm) {
+                return $query->whereIn('id_sdm',$arrIdSdm);
             })->whereHas('dt_periode', function ($query) use ($tahun,$bulan) {
                 $tmbh = "";
                 if($bulan){
