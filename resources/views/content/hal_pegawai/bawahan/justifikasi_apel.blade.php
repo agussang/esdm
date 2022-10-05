@@ -13,15 +13,7 @@ $induk = explode('/',request()->path());
                             <h5 class="card-label"><i class="fa fa-list"></i> Riwayat / History Presensi Kehadiran Apel</h5>
                         </div>
                         <div class="col-md-3">
-                            @if(Session::get('level')!="P")
-                            <a href="{{URL::to('data-pegawai/master-pegawai/detil-data')}}/{{Crypt::encrypt($id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
-                            @else
-                                @if($induk[0]=="pegawai-bawahan")
-                                    <a href="{{URL::to('pegawai-bawahan/detil')}}/{{Crypt::encrypt($id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
-                                @else
-                                    <a href="{{URL::to('pegawai/detil')}}/{{Crypt::encrypt($id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
-                                @endif
-                            @endif
+                            <a href="{{route('pegawai-bawahan.pegawai')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                         </div>
                     </div>
                 </div>
