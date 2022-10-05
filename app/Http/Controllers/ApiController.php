@@ -106,7 +106,7 @@ class ApiController extends Controller
         $arrIdSdm[$rsData->id_sdm] = $rsData->id_sdm;
         $jam_kerja = Fungsi::jam_kerja_unit($rsData->id_satkernow);
         $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,4);
-        dd($getRekapDataAbsen);
+        return json_encode($getRekapDataAbsen);
     }
 
     public function pelanggaran($nip,$bulan,$tahun){
