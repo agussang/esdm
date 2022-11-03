@@ -49,7 +49,7 @@
                                  </div>
                               </div>
                            </div>
-                           <button type="submit" class="btn btn-primary">Login</button>
+                           <button type="submit" class="btn btn-primary">Login Ke Aplikasi</button>
                         </form>
                      </div>
                      <div class="col-lg-6 mb-lg-0 mb-4 mt-lg-0 mt-4">
