@@ -21,7 +21,7 @@ use App\Models\MsPeriodeSkp;
 use App\Models\MsBank;
 use App\Models\MsRole;
 use App\Models\MsSatuan;
-use App\Models\MsRubrik; 
+use App\Models\MsRubrik;
 use App\Models\TrAbsenKehadiran;
 use App\Models\RiwayatPresensi;
 use App\Models\MsKedinasan;
@@ -81,7 +81,7 @@ function harikerja($tgl_awal,$tgl_akhir){
                     $buwulan = $x;
                     $data_bulan[$buwulan][$i] = $i;
                 }
-            
+
         }
     }
     return $data_bulan;
@@ -128,10 +128,10 @@ function jam_kerjaunit($id_satker){
     }
     $arrData = array();
     foreach($rsData as $rs=>$r){
-        $arrData[$r->hari_biasa]['jam_masuk'] = $r->jam_masuk; 
-        $arrData[$r->hari_biasa]['jam_pulang'] = $r->jam_keluar; 
-        $arrData[$r->hari_biasa]['masuk_telat'] = $r->masuk_telat; 
-        $arrData[$r->hari_biasa]['pulang_telat'] = $r->pulang_telat; 
+        $arrData[$r->hari_biasa]['jam_masuk'] = $r->jam_masuk;
+        $arrData[$r->hari_biasa]['jam_pulang'] = $r->jam_keluar;
+        $arrData[$r->hari_biasa]['masuk_telat'] = $r->masuk_telat;
+        $arrData[$r->hari_biasa]['pulang_telat'] = $r->pulang_telat;
     }
     return $arrData;
 }
@@ -224,7 +224,7 @@ class Fungsi
     }
 
     public static function hitung_absen($tgl_awal,$tgl_akhir){
-        $jm_absensi = jm_absensi($tgl_awal,$tgl_akhir);  
+        $jm_absensi = jm_absensi($tgl_awal,$tgl_akhir);
         return $jm_absensi;
     }
     public static function rekap_presensi_pegawai($bulan,$tahun){
@@ -232,7 +232,7 @@ class Fungsi
         $tgl_awal = $tahun."-".$bulan."-01";
         $tgl_akhir = $tahun."-".$bulan."-".$tgl_terakhir;
         $gbng = $tahun."-".$bulan;
-        $jm_kerja = jm_absensi($tgl_awal,$tgl_akhir);  
+        $jm_kerja = jm_absensi($tgl_awal,$tgl_akhir);
         return $jm_kerja;
     }
     public static function pilihan_role($id=null){
@@ -321,7 +321,7 @@ class Fungsi
     }
 
     public static function rumus_prilaku_sebutan($nilai){
-       
+
         $ket = "";
         $nilai = (int)$nilai;
         if($nilai=="0"){
@@ -356,7 +356,7 @@ class Fungsi
         return $arrBulan;
     }
 
-    
+
 
     public static function nm_bulan_sing(){
         $arrBulan = array(
@@ -380,10 +380,10 @@ class Fungsi
         $rsData = MsAbsen::where('id_khusus',$id)->get();
         $arrData = array();
         foreach($rsData as $rs=>$r){
-            $arrData[$r->hari_biasa]['jam_masuk'] = $r->jam_masuk; 
-            $arrData[$r->hari_biasa]['jam_pulang'] = $r->jam_keluar; 
-            $arrData[$r->hari_biasa]['masuk_telat'] = $r->masuk_telat; 
-            $arrData[$r->hari_biasa]['pulang_telat'] = $r->pulang_telat; 
+            $arrData[$r->hari_biasa]['jam_masuk'] = $r->jam_masuk;
+            $arrData[$r->hari_biasa]['jam_pulang'] = $r->jam_keluar;
+            $arrData[$r->hari_biasa]['masuk_telat'] = $r->masuk_telat;
+            $arrData[$r->hari_biasa]['pulang_telat'] = $r->pulang_telat;
         }
         return $arrData;
     }
@@ -445,14 +445,14 @@ class Fungsi
             $data_bulan = array();
             for($x=$bulan_awal;$x<=$bulan_akhir;$x++){
                 $tanggal = cal_days_in_month(CAL_GREGORIAN, $x, $thn);
-                for ($i=1; $i < $tanggal+1; $i++) { 
+                for ($i=1; $i < $tanggal+1; $i++) {
                     $gbng = $thn."-".sprintf("%02d", $x)."-".sprintf("%02d", $i);
                     $tglx = Fungsi::formatDate($gbng);
                     $hari = explode(',',$tglx);
                     if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
                         $data_bulan[sprintf("%02d", $x)]['nm_bulan'] = bulan($x);
                         $data_bulan[sprintf("%02d", $x)]['tgl_bulan'][sprintf("%02d", $i)] = sprintf("%02d", $i);
-                    } 
+                    }
                 }
             }
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
@@ -595,6 +595,8 @@ class Fungsi
     public static function get_rekap_data_kehadiran($arrIdWaktuAbsen,$tgl_awal,$tgl_akhir,$arrIdSdm,$tipe){
         $rsDataAbsen = RiwayatPresensi::whereIn("id_sdm",$arrIdSdm)
                         ->whereRaw(" tanggal_absen >= '$tgl_awal' and tanggal_absen <= '$tgl_akhir'")
+                        ->orderBy('tanggal_absen','asc')
+                        ->orderBy('jam_absen','asc')
                         ->get();
         $arrAbsen = array();$justifikasi = array();
         foreach($rsDataAbsen as $rsA=>$rA){
@@ -631,14 +633,14 @@ class Fungsi
             $data_bulan = array();
             for($x=$bulan_awal;$x<=$bulan_akhir;$x++){
                 $tanggal = cal_days_in_month(CAL_GREGORIAN, $x, $thn);
-                for ($i=1; $i < $tanggal+1; $i++) { 
+                for ($i=1; $i < $tanggal+1; $i++) {
                     $gbng = $thn."-".sprintf("%02d", $x)."-".sprintf("%02d", $i);
                     $tglx = Fungsi::formatDate($gbng);
                     $hari = explode(',',$tglx);
                     if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
                         $data_bulan[sprintf("%02d", $x)]['nm_bulan'] = bulan($x);
                         $data_bulan[sprintf("%02d", $x)]['tgl_bulan'][sprintf("%02d", $i)] = sprintf("%02d", $i);
-                    } 
+                    }
                 }
             }
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
@@ -677,7 +679,7 @@ class Fungsi
                     if($jam_masuk >= $jam_kerja['jam_masuk']){
                         $jam_masukex = explode(':',$jam_masuk);
                         $jam_telatex = explode(':',$jam_kerja['jam_masuk']);
-                        
+
                         $j_masuk_start = $jam_masukex[0];
                         $menit_masuk = $jam_masukex[1];
 
@@ -729,7 +731,7 @@ class Fungsi
                         if($justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran]){
                             $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['justifikasi'] = $justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran];
                         }
-                        
+
                         $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['masuk'] = $jam_masuk;
                         $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['pulang'] = $jam_pulang;
                         $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['menit'] = $menitcpt;
@@ -1002,7 +1004,7 @@ class Fungsi
         }
         return $d;
     }
-    
+
     public static function pilihan_status_keaktifan($id = null){
         $arrData = MsStatusAktif::get();
         $d = '<option value="">Pilih Status</option>';
@@ -1173,11 +1175,11 @@ class Fungsi
         }
         $arrData = array();
         foreach($rsData as $rs=>$r){
-            $arrData[$r->hari_biasa]['jam_masuk'] = $r->jam_masuk; 
-            $arrData[$r->hari_biasa]['jam_pulang'] = $r->jam_keluar; 
-            $arrData[$r->hari_biasa]['masuk_telat'] = $r->masuk_telat; 
-            $arrData[$r->hari_biasa]['pulang_telat'] = $r->pulang_telat; 
-            $arrData[$r->hari_biasa]['lama_kerja'] = $r->lama_kerja; 
+            $arrData[$r->hari_biasa]['jam_masuk'] = $r->jam_masuk;
+            $arrData[$r->hari_biasa]['jam_pulang'] = $r->jam_keluar;
+            $arrData[$r->hari_biasa]['masuk_telat'] = $r->masuk_telat;
+            $arrData[$r->hari_biasa]['pulang_telat'] = $r->pulang_telat;
+            $arrData[$r->hari_biasa]['lama_kerja'] = $r->lama_kerja;
         }
         return $arrData;
     }

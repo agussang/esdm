@@ -60,6 +60,11 @@ abstract class Repository
         return $this->model->where($where)->update($request);
     }
 
+    public function updatefinger($where, $request)
+    {
+        return $this->model->where($where)->update($request);
+    }
+
     public function destroy($id,$id_field = 'id')
     {
         return $this->model->where($id_field,$id)->delete();

@@ -48,7 +48,7 @@ class DataPelanggaranPegawaiController extends Controller
         }
         return redirect()->route('data-pegawai.pelanggaran.index');
     }
-    
+
     public function create()
     {
         $id_pelanggaran = Session::get('id_pelanggaran');
@@ -57,7 +57,7 @@ class DataPelanggaranPegawaiController extends Controller
         return view('content.data_pegawai.pelanggaran.tambah',$data);
     }
 
-    
+
     public function store(Request $request)
     {
         $req = $request->except('_token');
@@ -100,13 +100,13 @@ class DataPelanggaranPegawaiController extends Controller
         return redirect()->route('data-pegawai.pelanggaran.index')->with($notification);
     }
 
-    
+
     public function show($id)
     {
-        
+
     }
 
-    
+
     public function edit($id)
     {
         $id = Crypt::decrypt($id);
@@ -117,7 +117,7 @@ class DataPelanggaranPegawaiController extends Controller
         return view('content.data_pegawai.pelanggaran.edit',$data);
     }
 
-    
+
     public function update(Request $request)
     {
         $req = $request->except('_token');
@@ -156,7 +156,7 @@ class DataPelanggaranPegawaiController extends Controller
         return redirect()->route('data-pegawai.pelanggaran.index')->with($notification);
     }
 
-    
+
     public function destroy($id)
     {
         $id = Crypt::decrypt($id);

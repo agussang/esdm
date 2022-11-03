@@ -120,7 +120,7 @@ if($induk[0]=="setting"){
             <ul id="form-controls" class="iq-submenu collapse" data-parent="#form" style="">
                 <li class="{{ $induk[2]=="upload-presensi" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.upload-presensi.index')}}">
-                        <i class="las la-book"></i><span>Upload Presensi</span>
+                        <i class="las la-book"></i><span>Upload / Sync Presensi</span>
                     </a>
                 </li>
                 <li class="{{ $induk[2]=="apel" ? 'active' : '' }}">

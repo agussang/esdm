@@ -15,13 +15,13 @@
       <link rel='stylesheet' href="{{URL::to('assets/vendor/fullcalendar/daygrid/main.css')}}" />
       <link rel='stylesheet' href="{{URL::to('assets/vendor/fullcalendar/timegrid/main.css')}}" />
       <link rel='stylesheet' href="{{URL::to('assets/vendor/fullcalendar/list/main.css')}}" />
-      <link rel="stylesheet" href="{{URL::to('assets/vendor/mapbox/mapbox-gl.css')}}">  
+      <link rel="stylesheet" href="{{URL::to('assets/vendor/mapbox/mapbox-gl.css')}}">
    </head>
    <body class=" ">
       <div id="loading">
           <div id="loading-center">
           </div>
-      </div>    
+      </div>
       <div class="wrapper">
       <section class="login-content">
          <div class="container h-100">
@@ -29,6 +29,7 @@
                <div class="col-12">
                   <div class="row align-items-center">
                      <div class="col-lg-6">
+                        <img src="{{URL::to('assets/images/logo_panjang.png')}}" class="img-fluid w-40" alt="">
                         <h2 class="mb-2">{{$rsData->nama_aplikasi}} <br/> {{$rsData->nama_instansi}}</h2>
                         <p>Masukkan Username dan Password Anda.</p>
                             <form class="form" action="{{route('login')}}" method="post">

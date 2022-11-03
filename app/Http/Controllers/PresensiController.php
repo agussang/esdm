@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\Reporiwayatpresensi;
+use App\Repositories\Repoclocktransaction;
+use App\Models\Iclocktransaction;
 use App\Repositories\Repomspegawai;
 use Crypt;
 use Fungsi;
@@ -15,27 +17,81 @@ class PresensiController extends Controller
     public function __construct(
         Request $request,
         Reporiwayatpresensi $reporiwayatpresensi,
-        Repomspegawai $repomspegawai
+        Repomspegawai $repomspegawai,
+        Repoclocktransaction $repoclocktransaction
     ){
         $this->request = $request;
         $this->reporiwayatpresensi = $reporiwayatpresensi;
         $this->repomspegawai = $repomspegawai;
+        $this->repoclocktransaction = $repoclocktransaction;
     }
 
     public function index()
     {
         $data['pilihan_sdm'] = Fungsi::pilihan_sdm();
         $data['pilihan_mesin_finger'] = Fungsi::pilihan_mesin_finger();
+        $ket_tgl = $this->repoclocktransaction->get();
+        $n=0; $no=0;$arrTgl = array();$listtgl = array();
+        foreach($ket_tgl as $tgl=>$rtgl){
+            $arrTgl[$n][] = date('d-m-Y',strtotime($rtgl->tgl_absen));
+            $no++;
+            if($no==4){
+                $no=0;
+                $n++;
+            }
+            $listtgl[] = $rtgl->tgl_absen;
+        }
+        $data['listtgl'] = $listtgl;
+        $data['arrTgl'] = $arrTgl;
         return view('content.data_pegawai.presensi.upload_presensi.index',$data);
     }
 
-    
+    public function sync_finger(Request $request){
+        $req = $request->except('_token');
+        if ($req['tgl_absen'] != 'undefined') {
+            $rsPeg = $this->repomspegawai->get();
+            $arrNip = array();$arrIdSdm = array();
+            foreach($rsPeg as $rs=>$r){
+                $arrNip[$r->nip] = $r->nip;
+                $arrIdSdm[$r->nip] = $r->id_sdm;
+            }
+            $sync = $this->repoclocktransaction->getsyncabsen($req['tgl_absen'],$arrNip);
+            foreach($sync as $empcode => $dt_tgl){
+                $id_sdm = $arrIdSdm[$empcode];
+                if($id_sdm){
+                    foreach($dt_tgl as $tgl_absen => $dttglabsen){
+                        foreach($dttglabsen as $jam_absen => $dt_jam_absen){
+                            $id_finger = $dt_jam_absen['id'];
+                            unset($dt_jam_absen['emp_code']);
+                            unset($dt_jam_absen['id']);
+                            $dt_jam_absen['tanggal_scan'] = date('Y-m-d H:i:s');
+                            $dt_jam_absen['id_sdm'] = $id_sdm;
+                            $this->reporiwayatpresensi->store($dt_jam_absen);
+                            $upfinger['csf'] = "1";
+                            $where['id'] = $id_finger;
+                            $update_finger = Iclocktransaction::where('id',$id_finger)->update(['csf'=>1]);
+                        }
+                    }
+                }
+            }
+        }else{
+            echo '<script type="text/javascript">toastr.success("Proses sync finger telah selesai.")</script>';
+            echo "<script>
+                setTimeout(function () {
+                location.reload();
+                }, 2000);
+                </script>";
+        }
+
+    }
+
+
     public function create()
     {
         //
     }
 
-    
+
     public function store(Request $request)
     {
         $req = $request->except('_token');
@@ -43,13 +99,13 @@ class PresensiController extends Controller
         $masuk['mesin'] = $req['mesin'];
         $masuk['tanggal_absen'] = $req['tgl_absen'];
         $masuk['jam_absen'] = $req['jam_absen'];
-        $masuk['tanggal_scan'] = date('d-m-Y H:i:s');
+        $masuk['tanggal_scan'] = date('Y-m-d H:i:s');
         $this->reporiwayatpresensi->store($masuk);
         $pulang['id_sdm'] = $req['id_sdm'];
         $pulang['mesin'] = $req['mesin'];
         $pulang['tanggal_absen'] = $req['tgl_absen'];
         $pulang['jam_absen'] = $req['jam_absen_pulang'];
-        $pulang['tanggal_scan'] = date('d-m-Y H:i:s');
+        $pulang['tanggal_scan'] = date('Y-m-d H:i:s');
         $this->reporiwayatpresensi->store($pulang);
         $notification = [
             'message' => 'Berhasil, Presensi manual berhasil dilakukan.',
@@ -126,19 +182,19 @@ class PresensiController extends Controller
         //
     }
 
-    
+
     public function edit($id)
     {
         //
     }
 
-    
+
     public function update(Request $request, $id)
     {
         //
     }
 
-    
+
     public function destroy($id)
     {
         //

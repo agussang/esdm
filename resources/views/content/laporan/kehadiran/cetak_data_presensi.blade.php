@@ -73,7 +73,8 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $no=1;?>
+                <?php $no=1;
+                ?>
                 @foreach($dt_sdm['data_presensi'] as $tanggal=>$presensi)
                 <?php
                 $hariabsen = explode(',',$presensi['ket_tgl']);
@@ -104,7 +105,7 @@
                 $depan = sprintf("%02d", $hasilx[0]);
                 $gabung = $depan.":".$hasilx[1];
                 $warna = "";
-                
+
                 if($gabung < $durasi){
                     $warna = "background-color: #F78282;";
                 }
