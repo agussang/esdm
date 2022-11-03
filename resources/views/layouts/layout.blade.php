@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="csrf_token" content="{{ csrf_token() }}" /> 
+        <meta name="csrf_token" content="{{ csrf_token() }}" />
+        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
         <title>{{Session::get('nama_aplikasi')}}</title>
         @include('layouts.css')
         @stack('css')
@@ -166,10 +167,10 @@
                             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                                 <ul class="navbar-nav ml-auto navbar-list align-items-center">
                                     <li class="nav-item nav-icon dropdown ml-4 rtl-ml-0">
-                                        
+
                                     </li>
                                     <li class="nav-item nav-icon dropdown">
-                                        
+
                                     </li>
                                     <li class="nav-item iq-full-screen"><a href="#" class="" id="btnFullscreen"><i class="ri-fullscreen-line"></i></a></li>
                                     <li class="caption-content">
@@ -238,7 +239,7 @@
                         </nav>
                     </div>
                 </div>
-            </div>        
+            </div>
             <div class="content-page">
                 <div class="container">
                      @yield('content')
@@ -246,7 +247,7 @@
 
                 <div id="container_spinner">
                     <div class="lds-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-                </div>    
+                </div>
             </div>
         </div>
         <div id="balik"></div>
