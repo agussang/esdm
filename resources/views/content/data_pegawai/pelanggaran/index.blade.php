@@ -53,7 +53,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Record Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}
@@ -125,7 +125,7 @@
 
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Record Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}
