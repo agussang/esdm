@@ -3,6 +3,7 @@
 <head>
    <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
       <title>{{$rsData->nama_aplikasi}} - {{$rsData->nama_instansi}}</title>
       <link rel="stylesheet" href="{{URL::to('assets/css/backend-plugin.min28b5.css?v=2.0.0')}}">
       <link rel="stylesheet" href="{{URL::to('assets/css/backend28b5.css?v=2.0.0')}}">
