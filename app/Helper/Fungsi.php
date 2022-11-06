@@ -832,9 +832,9 @@ class Fungsi
                     $arrDataRekapNew[$id_sdmz][$tglnya]['absen'] = $absen;
 
                     $dt_apel = $arrDataRekap[$id_sdmz][$tglnya]['dt_apel'];
-                    if(count($dt_apel)<1){
-                        $dt_apel = 0;
-                    }
+                    // if(count($dt_apel)<1){
+                    //     $dt_apel = 0;
+                    // }
                     $arrDataRekapNew[$id_sdmz][$tglnya]['dt_apel'] = $dt_apel;
 
                     $masuk = $arrDataRekap[$id_sdmz][$tglnya]['masuk'];
