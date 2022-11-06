@@ -10,7 +10,7 @@
             </div>
         </div>
         <div class="card-body">
-        
+            <span>Selamat Datang {{Session::get('nama_pengguna')}} di aplikasi E-SDM POLTEKBANG SURABAYA.</span>
         </div>
     </div>
 </div>
