@@ -41,7 +41,7 @@ class ApiController extends Controller
 
     public function rekap_skp($nip,$bulan,$tahun){
         $rsData = $this->repomspegawai->findId("",$nip,"nip");
-        
+
         $rekap_skp = $this->repotrrekapskp->get(['dt_periode'],$rsData->id_sdm, $tahun, $bulan);
         $data_prilaku = $this->repotrprilakupegawai->getWhereRaw(['dt_periode','dt_prilaku'],$rsData->id_sdm," bulan = '$bulan' and tahun = '$tahun' ");
         $arrrekapnilai = array();$arrdtprilaku = array();
@@ -57,7 +57,8 @@ class ApiController extends Controller
             $rekap['nilai_perilaku'] = $r->nilai_perilaku;
             $rekap['validasi'] = $r->validasi;
             $rekap['file_skp'] = $r->file_skp;
-            $rekap['validated_at'] = date('d-m-Y H:i:s',strtotime($r->validated_at));
+            $rekap['validated_at'] = $r->validated_at;
+            $rekap['created_at'] = $r->created_at;
             $arrrekapnilai[$r->dt_periode->bulan]['nm_bulan'] = $arrNamabulan[$r->dt_periode->bulan];
             $arrrekapnilai[$r->dt_periode->bulan]['tahun'] = $r->dt_periode->tahun;
             $arrrekapnilai[$r->dt_periode->bulan]['kode'] = $r->dt_periode->kode;
