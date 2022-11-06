@@ -115,7 +115,7 @@ class ApiController extends Controller
         $arrData = array();
         foreach($rsData as $rs=>$r){
             $arrData[$r['id_sdm']]['nip'] = $r->dt_pegawai->nip;
-            $arrData[$r['id_sdm']]['nip'] = $r->dt_pegawai->nm_pegawai;
+            $arrData[$r['id_sdm']]['nm_pegawai'] = $r->dt_pegawai->nm_sdm;
             $arrData[$r['id_sdm']]['nm_pelanggaran'] = $r->kategori_pelanggaran->nama_pelanggaran;
             $arrData[$r['id_sdm']]['lama_pengurang_remun'] = $r->kategori_pelanggaran->durasi;
             $arrData[$r['id_sdm']]['prosentase_pengurang'] = $r->kategori_pelanggaran->prosentase_pengurang;
