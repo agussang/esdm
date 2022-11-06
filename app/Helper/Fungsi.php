@@ -844,7 +844,7 @@ class Fungsi
                     $arrDataRekapNew[$id_sdmz][$tglnya]['masuk'] = $masuk;
                 }
             }
-            return $arrDataRekap;
+            return $arrDataRekapNew;
         }
     }
 
