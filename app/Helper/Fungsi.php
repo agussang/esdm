@@ -786,7 +786,65 @@ class Fungsi
                     $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['justifikasi']['tgl_justifikasi']=$dtapl->tgl_justifikasi;
                     $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['justifikasi']['ket_justifikasi']=$dtapl->ket_justifikasi;
                 }
+                $hadirapel = $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['hadir']['total'];
+                if(count($hadirapel)<1){
+                    $hadirapel = 0;
+                }
+                $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['hadir']['total'] = $hadirapel;
+                $tidak_hadirapel = $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['total'];
+                if(count($tidak_hadirapel)<1){
+                    $tidak_hadirapel = 0;
+                }
+                $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['total'] = $tidak_hadirapel;
             }
+            $arrDataRekapNew = array();
+            foreach($arrDataRekap as $id_sdmz=>$dtsdmz){
+                foreach($dtsdmz as $tglnya=>$dttglnya){
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['hari_kerja'] = $arrDataRekap[$id_sdmz][$tglnya]['hari_kerja'];
+                    $telat = $arrDataRekap[$id_sdmz][$tglnya]['telat'];
+                    if(count($telat)<1){
+                        $telat = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['telat'] = $telat;
+
+                    $pulang_cepat = $arrDataRekap[$id_sdmz][$tglnya]['pulang_cepat'];
+                    if(count($pulang_cepat)<1){
+                        $pulang_cepat = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['pulang_cepat'] = $pulang_cepat;
+
+                    $absensekali = $arrDataRekap[$id_sdmz][$tglnya]['absensekali'];
+                    if(count($absensekali)<1){
+                        $absensekali = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['absensekali'] = $absensekali;
+
+                    $tidakmasuk = $arrDataRekap[$id_sdmz][$tglnya]['tidakmasuk'];
+                    if(count($tidakmasuk)<1){
+                        $tidakmasuk = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['tidakmasuk'] = $tidakmasuk;
+
+                    $absen = $arrDataRekap[$id_sdmz][$tglnya]['absen'];
+                    if(count($absen)<1){
+                        $absen = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['absen'] = $absen;
+
+                    $dt_apel = $arrDataRekap[$id_sdmz][$tglnya]['dt_apel'];
+                    if(count($dt_apel)<1){
+                        $dt_apel = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['dt_apel'] = $dt_apel;
+
+                    $masuk = $arrDataRekap[$id_sdmz][$tglnya]['masuk'];
+                    if(count($masuk)<1){
+                        $masuk = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['masuk'] = $masuk;
+                }
+            }
+            dd($arrDataRekapNew);
             return $arrDataRekap;
         }
     }
