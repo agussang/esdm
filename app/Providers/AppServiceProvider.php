@@ -24,7 +24,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if($this->app->environment('production')) {
+	//var_dump(env('APP_ENV'));
+	//die();
+        if(env('APP_ENV')=='production') {
             \URL::forceScheme('https');
         }
         Paginator::useBootstrap();
