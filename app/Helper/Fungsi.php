@@ -139,6 +139,71 @@ function jam_kerjaunit($id_satker){
 
 class Fungsi
 {
+    public static function get_client_ip() {
+        $ipaddress = '';
+        if (getenv('HTTP_CLIENT_IP'))
+            $ipaddress = getenv('HTTP_CLIENT_IP');
+        else if(getenv('HTTP_X_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_X_FORWARDED_FOR');
+        else if(getenv('HTTP_X_FORWARDED'))
+            $ipaddress = getenv('HTTP_X_FORWARDED');
+        else if(getenv('HTTP_FORWARDED_FOR'))
+            $ipaddress = getenv('HTTP_FORWARDED_FOR');
+        else if(getenv('HTTP_FORWARDED'))
+           $ipaddress = getenv('HTTP_FORWARDED');
+        else if(getenv('REMOTE_ADDR'))
+            $ipaddress = getenv('REMOTE_ADDR');
+        else
+            $ipaddress = 'IP tidak dikenali';
+        return $ipaddress;
+    }
+
+    public static function get_client_browser() {
+        $browser = '';
+        if(strpos($_SERVER['HTTP_USER_AGENT'], 'Netscape'))
+            $browser = 'Netscape';
+        else if (strpos($_SERVER['HTTP_USER_AGENT'], 'Firefox'))
+            $browser = 'Firefox';
+        else if (strpos($_SERVER['HTTP_USER_AGENT'], 'Chrome'))
+            $browser = 'Chrome';
+        else if (strpos($_SERVER['HTTP_USER_AGENT'], 'Opera'))
+            $browser = 'Opera';
+        else if (strpos($_SERVER['HTTP_USER_AGENT'], 'MSIE'))
+            $browser = 'Internet Explorer';
+        else
+            $browser = 'Other';
+        return $browser;
+    }
+
+    public static function pilihan_penerima_remun($id=null){
+        $arrData = array('1'=>"Ya",'2'=>"Tidak");
+        $d = '<option value="">Pilih Penerima Remun</option>';
+        foreach ($arrData as $rs => $r) {
+            $sl = '';
+            if ($rs == $id) {
+                $sl = 'selected';
+            }
+            $d .= "<option value=\"$rs\" $sl>$r</option>";
+        }
+        return $d;
+    }
+    public static function ket_berlaku(){
+        $arrData = array('0'=>"Berlaku Selamanya",'1'=>"1 Bulan",'2'=>"2 Bulan",'3'=>"3 Bulan",'4'=>"4 Bulan",'5'=>"5 Bulan",'6'=>"6 Bulan",'7'=>"7 Bulan",'8'=>"8 Bulan",'9'=>"9 Bulan",'10'=>"10 Bulan",'11'=>"11 Bulan",'12'=>"12 Bulan");
+        return $arrData;
+    }
+    public static function list_bulan($id=null){
+        $arrData = array('1'=>"1 Bulan",'2'=>"2 Bulan",'3'=>"3 Bulan",'4'=>"4 Bulan",'5'=>"5 Bulan",'6'=>"6 Bulan",'7'=>"7 Bulan",'8'=>"8 Bulan",'9'=>"9 Bulan",'10'=>"10 Bulan",'11'=>"11 Bulan",'12'=>"12 Bulan");
+        $d = '<option value="">Pilih Lama Berlaku</option>';
+        $d .= '<option value="0">Berlaku Selamanya</option>';
+        foreach ($arrData as $rs => $r) {
+            $sl = '';
+            if ($rs == $id) {
+                $sl = 'selected';
+            }
+            $d .= "<option value=\"$rs\" $sl>$r</option>";
+        }
+        return $d;
+    }
     public static function kategoriwaktuabsen(){
         $arrData = array("1"=> "Senin - Kamis","2"=>"Jumat");
         return $arrData;
@@ -270,6 +335,14 @@ class Fungsi
             $d .= "<option value=\"$rs\" $sl>$r</option>";
         }
         return $d;
+    }
+    public static function arralasan_absen(){
+        $rsData = MsAlasanAbsen::get();
+        $arrData = array();
+        foreach($rsData as $rs=>$r){
+            $arrData[$r->kode_lokal] = $r->id_alasan;
+        }
+        return $arrData;
     }
     public static function pilihan_alasan_absen($id=null){
         $rsData = MsAlasanAbsen::get();
@@ -1029,11 +1102,11 @@ class Fungsi
     }
 
     public static function arrjenis_kelamin(){
-        $arrData = array('L'=>"Laki - Laki",'P'=>"Perempuan");
+        $arrData = array('L'=>"Laki - Laki",'P'=>"Perempuan",'99'=>"Tidak Diisi");
         return $arrData;
     }
     public static function pilihan_status_kawin($id = null){
-        $arrData = array('0'=>"Belum Menikah",'1'=>"Menikah",'3'=>"Janda / Duda");
+        $arrData = array('0'=>"Belum Menikah",'1'=>"Menikah",'3'=>"Janda / Duda",'99'=>"Tidak Diisi");
         $d = '<option value="">Pilih Status Kawin</option>';
         foreach ($arrData as $rs => $r) {
             $sl = '';
@@ -1061,7 +1134,14 @@ class Fungsi
         }
         return $d;
     }
-
+    public static function arrstatusaktif(){
+        $rsData = MsStatusAktif::get();
+        $arrData = array();
+        foreach($rsData as $rs=>$r){
+            $arrData[$r->idstatusaktif] = $r->idstatusaktif;
+        }
+        return $arrData;
+    }
     public static function pilihan_status_keaktifan($id = null){
         $arrData = MsStatusAktif::get();
         $d = '<option value="">Pilih Status</option>';
@@ -1080,6 +1160,15 @@ class Fungsi
         $arrData = array();
         foreach($rsData as $rs=>$r){
             $arrData[$r->kode_lokal] = $r->id_jns_sdm;
+        }
+        return $arrData;
+    }
+
+    public static function arrAgama(){
+        $rsData = MsAgama::orderBy('namaagama')->get();
+        $arrData = array();
+        foreach($rsData AS $rs=>$r){
+            $arrData[$r->idagama] = $r->idagama;
         }
         return $arrData;
     }

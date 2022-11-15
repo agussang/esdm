@@ -87,9 +87,13 @@ $induk = explode('/',request()->path());
                                 <td>{{$no++}}</td>
                                 <td align="center">{{Fungsi::formatDate($r->tgl_awal)}}<br/><b>Sampai</b><br/>{{Fungsi::formatDate($r->tgl_akhir)}}</td>
                                 <td>{{$r->lama_hari}} Hari</td>
-                                <td>{{$r->alasan->alasan}}</td>
+                                <td>{{$r->r_alasan->alasan}}</td>
                                 <td>
+                                    @if($r->file_bukti!=null)
                                     <a href="{{URL::to('assets/file_bukti_absen')}}/{{$r->file_bukti}}" target="_blank"><i class="fas fa-file-pdf" style="font-size:50px;"></i></a>
+                                    @else
+                                    File Tidak ada.
+                                    @endif
                                 </td>
                                 <td align="center">
                                     <?php

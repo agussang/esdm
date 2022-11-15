@@ -69,7 +69,7 @@
                     <div class="col-md-12">
                         <div class="card text-white bg-danger">
                             <div class="card-body">
-                                <center><span><h4 class="text-white">Periode Aktif Pengisian Skp dan Prilaku Pegawai</h4></span><hr/></center>
+                                <center><span><h4 class="text-white">Periode Aktif Pengisian Skp dan Prilaku Pegawai</h4></span><hr/>{{date('d-m-Y',strtotime($periodeaktif->tgl_batas_skp))}}</center>
                             </div>
                         </div>
                     </div>
@@ -81,7 +81,7 @@
                     <div class="col-md-6">
                         <center><h2 class="mt-2"><span class="badge badge-primary">Tahun</span></h2><h4><hr/>{{$periodeaktif->tahun}}</h4></center>
                     </div>
-                </div>   
+                </div>
             </div>
         </div>
     </div>

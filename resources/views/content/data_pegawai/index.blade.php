@@ -70,7 +70,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-primary pull-right">Tampilkan Data</button>
+                        <a href="{{route('data-pegawai.master-pegawai.import')}}" class="btn btn-danger"><i class="fas fa-upload"></i> Import Data Pegawai</a>
+                        <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
                     </div>
                 </div>
                 </form>
@@ -85,7 +86,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}
@@ -128,7 +129,7 @@
                 </div><br/>
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}

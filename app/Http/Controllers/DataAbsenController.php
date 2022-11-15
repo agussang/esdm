@@ -6,11 +6,13 @@ use Illuminate\Http\Request;
 use App\Repositories\Repotrabsenkehadiran;
 use App\Repositories\Repomspegawai;
 use App\Models\MsAlasanAbsen;
+use App\Imports\Absenkehadiranimport;
 use Session;
 use Fungsi;
 use Crypt;
 use DateTime;
-
+use Excel;
+use Illuminate\Support\Str;
 
 class DataAbsenController extends Controller
 {
@@ -40,7 +42,7 @@ class DataAbsenController extends Controller
                 $arrIdSdm[$r->id_sdm] = $r->id_sdm;
             }
         }
-        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan,$arrIdSdm);
+        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','r_alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan,$arrIdSdm);
         $paging = $rsData->links();
         $totalRecord = $rsData->total();
         $data['rsData'] = $rsData;
@@ -49,12 +51,12 @@ class DataAbsenController extends Controller
         return view('content.data_pegawai.presensi.data_absen.index',$data);
     }
 
-    
+
     public function create()
     {
         $id_sdm_atasan = Session::get('id_sdm_atasan');
         $data['pilihan_sdm'] = Fungsi::pilihan_sdm("","","",$id_sdm_atasan);
-        $data['alasan_absen'] = MsAlasanAbsen::whereRaw("id_alasan = '7bd5db1b-ce78-4b5d-93ea-5cc5c20ff580' or id_alasan = '047a6862-b00d-4d58-9b57-d9448e8b5996'")->get();
+        $data['alasan_absen'] = MsAlasanAbsen::orderBy('alasan','asc')->get();
         return view('content.data_pegawai.presensi.data_absen.tambah',$data);
     }
 
@@ -77,7 +79,7 @@ class DataAbsenController extends Controller
         }
     }
 
-    
+
     public function store(Request $request)
     {
         $req = $request->except('_token');
@@ -141,13 +143,172 @@ class DataAbsenController extends Controller
         }
     }
 
-    
+
     public function show($id)
     {
         //
     }
 
-    
+    public function import(){
+
+        return view('content.data_pegawai.presensi.data_absen.import');
+    }
+
+    public function gasimport(Request $request){
+        try {
+            $file = request()->file('file');
+            $extension = $request->file('file')->extension();
+            if($extension!="xlsx"){
+                $notification = [
+                    'message' => 'Gagal, Tidak bisa membaca file excel.',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->route('data-pegawai.data-presensi.data-absen.import')->with($notification);
+            }else{
+                $rsData = Excel::toArray(new Absenkehadiranimport(), request()->file('file'));
+                $arrData = array();
+                unset($rsData[0][0]);
+                foreach($rsData[0] as $rs=>$r){
+                    $tgl_awalx = date('Y-m-d',strtotime($r[2]));
+                    $tgl_akhirx = date('Y-m-d',strtotime($r[3]));
+                    $jmlhabsen = Fungsi::hitung_absen($tgl_awalx,$tgl_akhirx);
+                    $data['lama_hari'] = $jmlhabsen['jmabsen'];
+                    $data['nip'] = $r[0];
+                    $data['nama'] = $r[1];
+                    $data['tgl_awal'] = $tgl_awalx;
+                    $data['tgl_akhir'] = $tgl_akhirx;
+                    $data['kode_alasan_absen'] = $r[4];
+                    $data['is_valid'] = 1;
+                    $data['tgl_verifikasi'] = date('Y-m-d H:i:s');
+                    $data['no_sk'] = $r[5];
+                    $data['tgl_sk'] = $r[6];
+                    $arrData[] = $data;
+                }
+                $arralasan_absen = Fungsi::arralasan_absen();
+                $datagagal = array();$jberhasil = 0;
+                foreach($arrData as $rsp=>$rp){
+                    $cek = $this->repomspegawai->findWhereRaw("","nip = '$rp[nip]'");
+                    if($cek==null){
+                        $datagagal[$rp['nip']] = $rp['nama'];
+                    }else{
+                        //cek dulu kode alasan nya baru insert kan
+                        if($arralasan_absen[$rp['kode_alasan_absen']]){
+                            unset($rp['nip']);
+                            unset($rp['nama']);
+                            $rp['id_alasan'] = $arralasan_absen[$rp['kode_alasan_absen']];
+                            unset($rp['kode_alasan_absen']);
+                            $rp['id_sdm'] = $cek->id_sdm;
+                            // masukkan ke ms tr_absen_kehadiran
+                            $this->repotrabsenkehadiran->store($rp);
+                            $jberhasil++;
+                        }else{
+                            $datagagal[$rp['nip']] = $rp['nama'];
+                        }
+                    }
+                }
+                $text = "Data berhasil dimasukkan";
+                if($datagagal!=null){
+                    $datagagalimp = implode(',',$datagagal);
+                    $text = "Data berhasil masuk ".$jberhasil. " ,dan ada data yang gagal di masukkan : ($datagagalimp).";
+                }
+                $notification = [
+                    'message' => $text,
+                    'alert-type' => 'success',
+                ];
+                return redirect()->route('data-pegawai.data-presensi.data-absen.import')->with($notification);
+            }
+        }catch (Exception $e) {
+            $notification = [
+                'message' => 'Gagal, Tidak bisa membaca file excel.',
+                'alert-type' => 'error',
+            ];
+            return redirect()->route('data-pegawai.data-presensi.data-absen.import')->with($notification);
+        }
+    }
+
+    public function unggah_sk(){
+        $mode = Session::get('mode');
+        $text_cari = Session::get('no_sk');
+        if($mode==null){
+            $mode = 2;
+        }
+        $tmbh = "";
+        if($text_cari!=null){
+            $tmbh = " and no_sk like '$text_cari' ";
+        }
+        $data['mode'] = $mode;
+        $data['text_cari'] = $text_cari;
+        if($mode==1){
+            $rsData = $this->repotrabsenkehadiran->getWhereRaw(['r_alasan']," file_bukti is not null and no_sk is not null $tmbh","tgl_sk");
+        }else{
+            $rsData = $this->repotrabsenkehadiran->getWhereRaw(['r_alasan']," file_bukti is null and no_sk is not null $tmbh","tgl_sk");
+        }
+        $arrData = array();$arrpenerima = array();
+        foreach($rsData as $rs=>$r){
+            $arrpenerima[$r->no_sk][$r->id_absen] = $r->id_absen;
+            $arrData[$r->no_sk]['tgl_sk'] = $r->tgl_sk;
+            $arrData[$r->no_sk]['file_bukti'] = $r->file_bukti;
+            $arrData[$r->no_sk]['alasan'] = $r->r_alasan->alasan;
+        }
+        $data['arrpenerima'] = $arrpenerima;
+        $data['arrData'] = $arrData;
+
+        return view('content.data_pegawai.presensi.data_absen.unggah_sk',$data);
+    }
+
+    public function hapus_file($no_sk){
+        $no_sk = Crypt::decrypt($no_sk);
+        $where['no_sk'] = $no_sk;
+        $req['file_bukti'] = null;
+        $this->repotrabsenkehadiran->update($where,$req);
+        $notification = [
+            'message' => 'Berhasil, Data absen pegawai berhasil dihapus.',
+            'alert-type' => 'success',
+        ];
+        return redirect()->route('data-pegawai.data-presensi.data-absen.unggah-sk')->with($notification);
+    }
+
+    public function cari_sk(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->route('data-pegawai.data-presensi.data-absen.unggah-sk');
+    }
+
+    public function unggah_file_sk(Request $request){
+        $req = $request->except('_token');
+        $data['rsData'] = $this->repotrabsenkehadiran->getWhereRaw(['r_alasan']," no_sk = '$req[no_sk]' ","tgl_sk");
+        $arrData = array();
+        foreach($data['rsData'] as $rs=>$r){
+            $arrData[$r->no_sk] = $r->tgl_sk;
+        }
+        $data['arrData'] = $arrData;
+        return view('content.data_pegawai.presensi.data_absen.form_unggah_sk',$data);
+    }
+
+
+    public function unggah_file_sk_simpan(Request $request){
+        $req = $request->except('_token');
+        $file = request()->file('file');
+        $uuid = (string) Str::uuid();
+        $req['file_bukti'] = $uuid.".pdf";
+        $destinationPath = 'assets/file_bukti_absen/';
+        $file->move($destinationPath, $req['file_bukti']);
+        unset($req['file']);
+        $where['no_sk'] = $req['no_sk'];
+        $this->repotrabsenkehadiran->update($where,$req);
+        $notification = [
+            'message' => "Berhasil, File sk ".$req['no_sk']." berhasil disimpan.",
+            'alert-type' => 'success',
+        ];
+        return redirect()->route('data-pegawai.data-presensi.data-absen.unggah-sk')->with($notification);
+    }
+
     public function edit($id)
     {
         $id = Crypt::decrypt($id);
@@ -169,7 +330,7 @@ class DataAbsenController extends Controller
         return view('content.data_pegawai.presensi.data_absen.verifikasi',$data);
     }
 
-    
+
     public function update(Request $request)
     {
         $req = $request->except('_token');
@@ -237,7 +398,7 @@ class DataAbsenController extends Controller
         return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
     }
 
-    
+
     public function destroy($id)
     {
         $id = Crypt::decrypt($id);

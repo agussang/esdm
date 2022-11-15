@@ -200,7 +200,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Jalan</span>
                             </div>
-                            <input type="text" class="form-control" name="jln" id="jln" required value="{{ $rsData->jln }}">
+                            <input type="text" class="form-control" name="jln" id="jln" value="{{ $rsData->jln }}">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -208,7 +208,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Kode Pos</span>
                             </div>
-                            <input type="text" class="form-control" name="kode_pos" value="{{ $rsData->kode_pos }}" id="kode_pos" required minlength="5" maxlength="5" onkeypress="return goodchars(event,'1234567890',this)">
+                            <input type="text" class="form-control" name="kode_pos" value="{{ $rsData->kode_pos }}" id="kode_pos" minlength="5" maxlength="5" onkeypress="return goodchars(event,'1234567890',this)">
                         </div>
                     </div>
                 </div>
@@ -218,7 +218,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Nama Desa</span>
                             </div>
-                            <input type="text" class="form-control" name="ds_kel" id="ds_kel" required value="{{ $rsData->ds_kel }}">
+                            <input type="text" class="form-control" name="ds_kel" id="ds_kel" value="{{ $rsData->ds_kel }}">
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -226,7 +226,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Nama Dusun</span>
                             </div>
-                            <input type="text" class="form-control" name="nm_dsn" id="nm_dsn" required value="{{ $rsData->nm_dsn }}">
+                            <input type="text" class="form-control" name="nm_dsn" id="nm_dsn" value="{{ $rsData->nm_dsn }}">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -234,7 +234,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">RT</span>
                             </div>
-                            <input type="text" class="form-control" name="rt" id="rt" required minlength="1" value="{{ $rsData->rt }}">
+                            <input type="text" class="form-control" name="rt" id="rt" minlength="1" value="{{ $rsData->rt }}">
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -242,7 +242,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">RW</span>
                             </div>
-                            <input type="text" class="form-control" name="rw" id="rw" required minlength="1" value="{{ $rsData->rw }}">
+                            <input type="text" class="form-control" name="rw" id="rw" minlength="1" value="{{ $rsData->rw }}">
                         </div>
                     </div>
                 </div>
@@ -375,7 +375,7 @@ if($rsData->file_foto){
                                 {!!$pilihan_jns_sdm!!}
                             </select>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-md-4">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
@@ -385,7 +385,7 @@ if($rsData->file_foto){
                                 {!!$pilihan_status_kepegawaian!!}
                             </select>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-md-4">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
@@ -405,7 +405,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="number" class="form-control" name="nidn" id="nidn" value="{{ $rsData->nidn }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-md-6">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
@@ -413,7 +413,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="number" class="form-control" name="nip" id="nip" value="{{ $rsData->nip }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                 </div>
                 <div class="row" id="form-non-cpns">
                     <div class="col-md-6">
@@ -423,7 +423,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="text" class="form-control" name="no_sk" id="no_sk" value="{{ $rsData->no_sk }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-md-6">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
@@ -431,7 +431,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="date" class="form-control" name="tgl_sk_angkat" id="tgl_sk_angkat" value="{{ $rsData->tgl_sk_angkat }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                 </div>
                 <div class="row" id="form-cpns">
                     <div class="col-md-6">
@@ -441,7 +441,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="text" class="form-control" name="no_sk_cpns" id="no_sk_cpns" value="{{ $rsData->no_sk_cpns }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-md-6">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
@@ -449,7 +449,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="date" class="form-control" name="tgl_tmt_cpns" id="tgl_tmt_cpns" value="{{ $rsData->tgl_tmt_cpns }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                 </div>
                 <div class="row" id="form-pns">
                     <div class="col-md-6">
@@ -459,7 +459,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="text" class="form-control" name="no_sk_pns" id="no_sk_pns" value="{{ $rsData->no_sk_pns }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-md-6">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
@@ -467,7 +467,7 @@ if($rsData->file_foto){
                             </div>
                             <input type="date" class="form-control" name="tgl_tmt_pns" id="tgl_tmt_pns" value="{{ $rsData->tgl_tmt_pns }}" {{$readonly}}>
                         </div>
-                    </div> 
+                    </div>
                 </div>
             </div>
         </div>
@@ -511,7 +511,7 @@ $('#form-nidn').hide();
 function tmp_status_kepegawaian(a)
 {
     var x = (a.value || a.options[a.selectedIndex].value);
-    
+
     if (x == "eb592b52-58d8-4dfc-ac7d-c41c7cea695e") {
         $('#form-pns').show();
         $('#form-cpns').hide();
@@ -529,12 +529,12 @@ function tmp_status_kepegawaian(a)
 function tmp_jns_sdm(a)
 {
     var x = (a.value || a.options[a.selectedIndex].value);
-    
+
     if (x == "60943815-0ef4-403e-98d8-7a96ecdc6d5f") {
         $('#form-nidn').show();
     } else {
         $('#form-nidn').hide();
-    } 
+    }
 }
 </script>
 @stop

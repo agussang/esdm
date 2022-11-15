@@ -51,6 +51,11 @@ abstract class Repository
         return $this->model->create($request);
     }
 
+    public function storefinger($request,$user=null)
+    {
+        return $this->model->create($request);
+    }
+
     public function update($where, $request,$user=null)
     {
         if($user==null){

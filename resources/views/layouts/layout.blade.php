@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="csrf_token" content="{{ csrf_token() }}" />
-        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        {{-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> --}}
         <title>{{Session::get('nama_aplikasi')}}</title>
         @include('layouts.css')
         @stack('css')
@@ -225,7 +225,17 @@
                                                             <hr/>
                                                             <div class="row">
                                                                 <div class="col-md-12">
+                                                                    <center>
+                                                                        <a href="{{route('ubahpassword')}}" class="btn btn-primary">Ubah Password</a>
+                                                                    </center>
+                                                                </div>
+                                                            </div>
+                                                            <br/>
+                                                            <div class="row">
+                                                                <div class="col-md-12">
+                                                                    <center>
                                                                     <a href="{{route('logout')}}" class="btn btn-danger">Logout</a>
+                                                                    </center>
                                                                 </div>
                                                             </div>
                                                         </div>

@@ -10,4 +10,7 @@ class MsAgama extends Model
     protected $table = 'ms_agama';
     protected $primaryKey = 'id';
     public $keyType = 'string';
+
+    protected $guarded = [];
+
 }

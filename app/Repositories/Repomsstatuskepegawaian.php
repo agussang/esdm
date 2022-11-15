@@ -18,7 +18,7 @@ class Repomsstatuskepegawaian extends Repository
         return $this->model
             ->when($with, function ($query) use ($with) {
                 return $query->with($with);
-            })
+            })->orderBy('kode_lokal','asc')
             ->get();
     }
 }

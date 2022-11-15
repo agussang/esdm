@@ -13,24 +13,78 @@
                 </div>
             </div>
             <div class="card-body">
+                <span class="text-dark">Form Tambah Data Kategori Pelanggaran</span><br/><br/>
+                <form class="form" action="{{route('data-master.kategori-pelanggaran.simpan')}}" method="post">
+                    {!! csrf_field() !!}
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Nama Pelanggaran</span>
+                                </div>
+                                <input type="text" class="form-control" aria-label="Default" name="nama_pelanggaran" aria-describedby="inputGroup-sizing-default" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">% Pengurang</span>
+                                </div>
+                                <input type="text" class="form-control" aria-label="Default" name="prosentase_pengurang" aria-describedby="inputGroup-sizing-default" required maxlength="3" onkeypress="return goodchars(event,'1234567890.',this)">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Durasi Berlaku</span>
+                                </div>
+                                <select class="form-control" aria-label="Default" name="durasi" aria-describedby="inputGroup-sizing-default" required>
+                                    {!!$list_bulan!!}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <input type="hidden" name="urutan" id="urutan">
+                            <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Simpan</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-bordered table-md">
                         <thead>
-                            <tr>    
+                            <tr>
                                 <th>No</th>
                                 <th>Nama Ketagori Pelanggaran</th>
                                 <th>% Pengurang</th>
                                 <th>Durasi Berlaku<br/>(Bulan)</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no=1;?>
+                            <?php $no=1;$max = array();?>
                             @foreach($rsData as $rs=>$r)
+                            <?php
+                            $max[] = $r->id_pelanggaran;
+                            ?>
                             <tr>
                                 <td>{{$no++}}</td>
                                 <td>{{$r->nama_pelanggaran}}</td>
                                 <td>{{$r->prosentase_pengurang}} %</td>
-                                <td>{{$r->durasi}} Bulan</td>
+                                <td>{{$ket_berlaku[$r->durasi]}}</td>
+                                <td>
+                                    <a onclick="edit('<?php echo $r->id_pelanggaran;?>');" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary text-white"><i class="fas fa-pencil-ruler text-white"></i> Edit</a>
+                                    <a href="{{URL::to('/data-master/kategori-pelanggaran/hapus')}}/{{Crypt::encrypt($r->id_pelanggaran)}}" onclick="return confirm('Apakah anda yakin ingin menghapus data ini ? ');" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
@@ -40,5 +94,55 @@
         </div>
     </div>
 </div>
+<div class="modal fade bd-example-modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaledit">Form Edit Data Master Kategori Pelanggaran</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="formku" method="post">
+				{!! csrf_field() !!}
+                    <div id="form-edit">
 
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="balik"></div>
+<meta name="csrf_token" content="{{ csrf_token() }}" />
+<script type="text/javascript">
+document.getElementById("urutan").value = "{{count($max)+1}}";
+function edit(id)
+{
+    var request = $.ajax ({
+       url : "{{ route('data-master.kategori-pelanggaran.edit') }}",
+       data:"id="+id,
+       type : "get",
+       dataType: "html"
+   });
+   $('#form-edit').html('Sedang Melakukan Proses Pencarian Data...');
+   request.done(function(output) {
+       $('#form-edit').html(output);
+   });
+}
+function simpan_edit()
+{
+    var x=$('#formku').serialize();
+    var request = $.ajax ({
+           url : "{{ route('data-master.kategori-pelanggaran.update') }}",
+           type : "post",
+           dataType: "html",
+           data: x
+       });
+       request.done(function(output) {
+        $('#balik').html(output);
+       });
+}
+</script>
 @stop

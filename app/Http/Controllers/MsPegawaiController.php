@@ -9,9 +9,16 @@ use App\Repositories\Reporiwayatpresensi;
 use App\Repositories\Repopresensiapel;
 use App\Repositories\Repotrabsenkehadiran;
 use App\Repositories\Repotrjustifikasi;
+use App\Models\PersonnelEmployee;
+use App\Models\PersonnelEmployeeArea;
+use App\Repositories\Repoemployee;
+use App\Repositories\Repoemployeearea;
+
+use App\Imports\PegawaiImport;
 use Crypt;
 use Fungsi;
 use Session;
+use Excel;
 use DB;
 error_reporting(0);
 function bulan($idbln){
@@ -27,7 +34,9 @@ class MsPegawaiController extends Controller
         Reporiwayatpresensi $reporiwayatpresensi,
         Repopresensiapel $repopresensiapel,
         Repotrabsenkehadiran $repotrabsenkehadiran,
-        Repotrjustifikasi $repotrjustifikasi
+        Repotrjustifikasi $repotrjustifikasi,
+        Repoemployee $repoemployee,
+        Repoemployeearea $repoemployeearea
     ){
         $this->request = $request;
         $this->repomspegawai = $repomspegawai;
@@ -36,6 +45,8 @@ class MsPegawaiController extends Controller
         $this->repopresensiapel = $repopresensiapel;
         $this->repotrabsenkehadiran = $repotrabsenkehadiran;
         $this->repotrjustifikasi = $repotrjustifikasi;
+        $this->repoemployee = $repoemployee;
+        $this->repoemployeearea = $repoemployeearea;
     }
 
     public function index(Request $request)
@@ -50,10 +61,10 @@ class MsPegawaiController extends Controller
         //     if($nip){
         //         $cek = $this->repomspegawai->findId("",$nip,"nip");
         //         if($cek){
-        //             $arrData[$r->nama]['id_sdm'] = $cek->id_sdm;   
-        //             $arrData[$r->nama]['tmpt_lahir'] = $cek->tmpt_lahir;   
-        //             $arrData[$r->nama]['tgl_lahir'] = $cek->tgl_lahir;   
-        //             $arrData[$r->nama]['nm_ibu_kandung'] = $cek->nm_ibu_kandung;  
+        //             $arrData[$r->nama]['id_sdm'] = $cek->id_sdm;
+        //             $arrData[$r->nama]['tmpt_lahir'] = $cek->tmpt_lahir;
+        //             $arrData[$r->nama]['tgl_lahir'] = $cek->tgl_lahir;
+        //             $arrData[$r->nama]['nm_ibu_kandung'] = $cek->nm_ibu_kandung;
         //             $arrData[$r->nama]['nik'] =  $cek->nik;
         //             $arrData[$r->nama]['nidn'] = $cek->nidn;
         //             $arrData[$r->nama]['jln'] = $cek->jln;
@@ -132,6 +143,134 @@ class MsPegawaiController extends Controller
         return view('content.data_pegawai.index',$data);
     }
 
+    public function import(){
+        return view('content.data_pegawai.import');
+    }
+
+    public function gasimport(Request $request){
+        try {
+
+            $arrStatusKawin = Fungsi::arrStatusKawin();
+            $arrAgama = Fungsi::arrAgama();
+            $arrjnssdm = Fungsi::arrjnssdm();
+            $arrstatuskepegawaian = Fungsi::arrstatuskepegawaian();
+            $arrstatusaktif = Fungsi::arrstatusaktif();
+
+            $file = request()->file('file');
+            $extension = $request->file('file')->extension();
+            if($extension!="xlsx"){
+                $notification = [
+                    'message' => 'Gagal, Tidak bisa membaca file excel.',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->route('data-pegawai.master-pegawai.import')->with($notification);
+            }else{
+                $rsData = Excel::toArray(new PegawaiImport(), request()->file('file'));
+                $arrData = array();
+                unset($rsData[0][0]);
+                foreach($rsData[0] as $rs=>$r){
+                    $data['nip'] = $r[0];
+                    $data['nm_sdm'] = $r[1];
+                    // cek dulu nip nya orang baru apa bukan
+                    $data['jk'] = $r[2];
+                    $data['tmpt_lahir'] = $r[4];
+                    $data['tgl_lahir'] = date('Y-m-d',strtotime($r[3]));
+                    $data['nik'] = $r[5];
+                    $data['no_hp'] = $r[6];
+                    $data['email'] = $r[7];
+                    $data['id_stat_kawin'] = "99";
+                    if($arrStatusKawin[$r[8]]!=null){
+                        $data['id_stat_kawin'] = $r[8];
+                    }
+                    $data['id_agama'] = "99";
+                    if($arrAgama[$r[9]]!=null){
+                        $data['id_agama'] = $r[9];
+                    }
+                    $data['id_jns_sdm'] = "316e6e79-abef-4f0a-bda0-59514fe456bd";
+                    if($arrjnssdm[$r[10]]!=null){
+                        $data['id_jns_sdm'] = $arrjnssdm[$r[10]];
+                    }
+                    $data['id_stat_kepegawaian'] = "b06cabe9-6376-4010-9838-9bc8d05cb173";
+                    if($arrstatuskepegawaian[$r[11]]!=null){
+                        $data['id_stat_kepegawaian'] = $arrstatuskepegawaian[$r[11]];
+                    }
+                    $data['id_stat_aktif'] = "TD";
+                    if($arrstatusaktif[$r[12]]!=null){
+                        $data['id_stat_aktif'] = $r[12];
+                    }
+                    $arrData[] = $data;
+                }
+                // sebelum dimasukkan cek dulu di tabel finger employe dan employe area
+                $datagagal = array();$jberhasil = 0;
+                foreach($arrData as $rsp=>$rp){
+                    // cek employe
+                    $cekemploye = $this->repoemployee->findWhereRaw('',"emp_code = '$rp[nip]'");
+                    $maxemployee = PersonnelEmployee::selectRaw("max(id)")->first();
+                    $maxeployeearea = PersonnelEmployeeArea::selectRaw("max(id)")->first();
+                    $mx_employe = $maxemployee->max+1;
+                    $mx_employe_area = $maxeployeearea->max+1;
+                    $cekemployearea = $this->repoemployeearea->findWhereRaw('',"employee_id = '$mx_employe'");
+                    $cek = $this->repomspegawai->findWhereRaw("","nip = '$rp[nip]' or nm_sdm = '% $rp[nm_sdm] %'");
+                    if($cek!=null){
+                        $datagagal[$rp['nip']] = $rp['nm_sdm'];
+                    }else{
+                        if($cekemploye!=null && $cekemployearea!=null){
+                            $datagagal[$rp['nip']] = $rp['nm_sdm'];
+                        }else{
+                            // masukkan ke ms pegawai
+                            $this->repomspegawai->store($rp);
+                            // masukkan ke personnel employe
+                            $reqemploye['id'] = $mx_employe;
+                            $reqemploye['create_time'] = date('Y-m-d H:i:s');
+                            $reqemploye['change_time'] = date('Y-m-d H:i:s');
+                            $reqemploye['status'] = 0;
+                            $reqemploye['emp_code'] = $rp['nip'];
+                            $reqemploye['first_name'] = $rp['nm_sdm'];
+                            $reqemploye['dev_privilege'] = 0;
+                            $reqemploye['acc_group'] = 1;
+                            $reqemploye['enroll_sn'] = "CMWB221460008";
+                            $reqemploye['update_time'] = date('Y-m-d H:i:s');
+                            $reqemploye['hire_date'] = date('Y-m-d');
+                            $reqemploye['verify_mode'] = 0 ;
+                            $reqemploye['enable_payroll'] = 't';
+                            $reqemploye['app_status'] = 0;
+                            $reqemploye['app_role'] = 1;
+                            $reqemploye['is_active'] = 't';
+                            $reqemploye['department_id'] = 1;
+                            $reqemploye['emp_code_digit'] = $rp['nip'];
+                            $reqemploye['company_id'] =1;
+                            // eksekusi employe
+                            $this->repoemployee->storefinger($reqemploye);
+                            // masukkan ke employe area
+                            $reqemployeearea['id'] = $mx_employe_area;
+                            $reqemployeearea['employee_id'] = $mx_employe;
+                            $reqemployeearea['area_id'] = "4";
+                            // eksekusi employe area
+                            $this->repoemployeearea->storefinger($reqemployeearea);
+                            $jberhasil++;
+                        }
+                    }
+                }
+                $text = "Data berhasil dimasukkan";
+                if($datagagal!=null){
+                    $datagagalimp = implode(',',$datagagal);
+                    $text = "Data berhasil masuk ".$jberhasil. " ,dan ada data yang gagal di masukkan : ($datagagalimp).";
+                }
+                $notification = [
+                    'message' => $text,
+                    'alert-type' => 'success',
+                ];
+                return redirect()->route('data-pegawai.master-pegawai.import')->with($notification);
+            }
+        } catch (Exception $e) {
+            $notification = [
+                'message' => 'Gagal, Tidak bisa membaca file excel.',
+                'alert-type' => 'error',
+            ];
+            return redirect()->route('data-pegawai.master-pegawai.import')->with($notification);
+        }
+    }
+
     public function riwayat_kehadiran($id_sdm){
         $id_sdm = Crypt::decrypt($id_sdm);
         $rsData = $this->repomspegawai->first("",$id_sdm);
@@ -152,7 +291,7 @@ class MsPegawaiController extends Controller
         $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_terakhir,$arrIdSdm,1);
         $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
         $data['pilihan_bulan_presensi'] = Fungsi::pilihan_bulan_presensi($bln);
-        
+
         $data['jam_kerja_unit'] = $jam_kerja;
         $data['kategoriwaktuabsen'] = Fungsi::kategoriwaktuabsen();
         $arrAbsen = array();$data_bul = array();
@@ -188,7 +327,7 @@ class MsPegawaiController extends Controller
         $id_sdm = Crypt::decrypt($id_sdm);
         $data['dt_pegawai'] = $this->repomspegawai->first("",$id_sdm);
         $data['id_sdm'] = $id_sdm;
-        $data['rsData'] = $this->repotrabsenkehadiran->getpertahun(['alasan'],$tahun,$id_sdm);
+        $data['rsData'] = $this->repotrabsenkehadiran->getpertahun(['r_alasan'],$tahun,$id_sdm);
         return view('content.data_pegawai.riwayat.absen.index',$data);
     }
 
@@ -287,7 +426,7 @@ class MsPegawaiController extends Controller
         return view('content.data_pegawai.tambah',$data);
     }
 
-    
+
     public function store(Request $request)
     {
         $req = $request->except('_token');
@@ -321,11 +460,11 @@ class MsPegawaiController extends Controller
                         'alert-type' => 'error',
                     ];
                 return redirect()->route('data-pegawai.master-pegawai.tambah')->withInput()->with($notification);
-            }           
+            }
         }
 
     }
-    
+
     public function show($id)
     {
         $id_sdm = Crypt::decrypt($id);
@@ -346,7 +485,7 @@ class MsPegawaiController extends Controller
         return view('content.data_pegawai.detil',$data);
     }
 
-    
+
     public function edit($id)
     {
         //
@@ -429,7 +568,7 @@ class MsPegawaiController extends Controller
                 }else{
                     return redirect()->intended('/data-pegawai/master-pegawai/detil-data/'.Crypt::encrypt($req['id_sdm']))->with($notification);
                 }
-            }            
+            }
         }
     }
 
@@ -454,7 +593,7 @@ class MsPegawaiController extends Controller
         $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
         $data['pilihan_bulan_presensi'] = Fungsi::pilihan_bulan_presensi($bln);
         $dt_rekap_absen = Fungsi::rekap_presensi_pegawai($bln,$tahun);
-        
+
         $data['dt_rekap_absen'] = $dt_rekap_absen;
         $tgl_terakhir = cal_days_in_month(CAL_GREGORIAN, $bln, $tahun);
         $tgl_awal = $tahun."-".$bln."-01";
@@ -552,7 +691,7 @@ class MsPegawaiController extends Controller
                 $masuk['ket_justifikasi'] = $req['ket_justifikasi'];
                 $masuk['id_jns'] = 1;
                 $this->repotrjustifikasi->store($masuk);
-            }            
+            }
         }
         echo '<script type="text/javascript">toastr.success("Proses justifikasi kehadiran berhasil diproses.")</script>';
         echo "<script>
@@ -598,7 +737,7 @@ class MsPegawaiController extends Controller
         </script>";
     }
 
-    
+
     public function destroy($id)
     {
         //

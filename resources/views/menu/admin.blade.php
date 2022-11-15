@@ -66,11 +66,17 @@ if($induk[0]=="setting"){
         <li class="{{ $induk[1]=="kategori-pelanggaran" ? 'active' : '' }}">
             <a href="{{route('data-master.kategori-pelanggaran')}}">  <i class="fa fa-book"></i><span> Master Kategori Pelanggaran</span> </a>
         </li>
+        <li class="{{ $induk[1]=="alasan-absen" ? 'active' : '' }}">
+            <a href="{{route('data-master.alasan-absen')}}">  <i class="fa fa-book"></i><span> Master Alasan Absen</span> </a>
+        </li>
         {{--  <li class="{{ $induk[1]=="eselon" ? 'active' : '' }}">
             <a href="{{route('data-master.eselon')}}">  <i class="fa fa-book"></i><span> Master Eselon</span> </a>
         </li>  --}}
         <li class="{{ $induk[1]=="pendidikan" ? 'active' : '' }}">
             <a href="{{route('data-master.pendidikan')}}">  <i class="fa fa-book"></i><span> Master Pendidikan</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="hari-libur" ? 'active' : '' }}">
+            <a href="{{route('data-master.hari-libur')}}">  <i class="fa fa-calendar"></i><span> Master Hari Libur</span> </a>
         </li>
         <li class="{{ $induk[1]=="grade" ? 'active' : '' }}">
             <a href="{{route('data-master.grade')}}">  <i class="fa fa-book"></i><span> Master Grade</span> </a>
@@ -206,6 +212,9 @@ if($induk[0]=="setting"){
         @endif
         <li class="{{ $induk[1]=="manajemen-user" ? 'active' : '' }}">
             <a href="{{route('setting.manajemen-user.index')}}"> <i class="fa fa-users"></i><span> Manajemen User</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="log-login" ? 'active' : '' }}">
+            <a href="{{route('setting.log-login.index')}}"> <i class="fa fa-eye"></i><span> Log Login</span> </a>
         </li>
     </ul>
 </li>

@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use App\Repositories\Reposettingapp;
 use App\Repositories\Repouser;
 use App\Repositories\Repomspegawai;
+use App\Repositories\Repotrloglogin;
 use Session;
+use Fungsi;
 use Crypt;
 
 class LoginController extends Controller
@@ -15,12 +17,14 @@ class LoginController extends Controller
         Request $request,
         Reposettingapp $reposettingapp,
         Repouser $repouser,
-        Repomspegawai $repomspegawai
+        Repomspegawai $repomspegawai,
+        Repotrloglogin $repotrloglogin
     ){
         $this->request = $request;
         $this->reposettingapp = $reposettingapp;
         $this->repouser = $repouser;
         $this->repomspegawai = $repomspegawai;
+        $this->repotrloglogin = $repotrloglogin;
     }
 
     public function index(Request $request)
@@ -34,6 +38,18 @@ class LoginController extends Controller
     public function ceklogin($username,$password){
         if(auth()->attempt(array('username' => $username, 'password' => $password))){
             $dtUser = auth()->user()->load(['roleuser']);
+            // catat log
+            $getip = Fungsi::get_client_ip();
+            $getbrowser = Fungsi::get_client_browser();
+
+            $reqlog['tgl_login'] = date('Y-m-d H:i:s');
+            $reqlog['ip'] = $getip;
+            $reqlog['browser'] = $getbrowser;
+            $reqlog['id_user'] = $dtUser->id_user;
+            $reqlog['username'] = $dtUser->username;
+            $reqlog['nama_user'] = $dtUser->nama_user;
+            $this->repotrloglogin->store($reqlog);
+
             $this->request->session()->put('id_pengguna',$dtUser->id_user);
             $this->request->session()->put('username',$dtUser->username);
             $this->request->session()->put('nama_pengguna',$dtUser->nama_user);
@@ -65,6 +81,28 @@ class LoginController extends Controller
         }
     }
 
+    public function ubahpassword(){
+        $id = Session::get('id_pengguna');
+        $data['rsData'] = $this->repouser->findId("",$id,"id_user");
+        return view('content.change_password',$data);
+    }
+
+    public function simpan_ubah_password(Request $request){
+        $req = $request->except('_token');
+        if($req['password']!=null){
+            $req['hidden_password'] = $req['password'];
+            $req['password'] = bcrypt($req['password']);
+        }
+        $id = Session::get('id_pengguna');
+        $where['id_user'] = $id;
+        $this->repouser->update($where,$req);
+        $notification = [
+            'message' => 'Data berhasil disimpan, silahkan login ulang.',
+            'alert-type' => 'error',
+        ];
+        return redirect()->route('logout')->with($notification);
+    }
+
     public function proses_login(Request $request){
         $req = $request->except('_token');
         return $this->ceklogin($req['username'],$req['password']);
@@ -82,7 +120,7 @@ class LoginController extends Controller
         }else{
             return $this->ceklogin($cekuser->username,$cekuser->hidden_password);
         }
-        
+
     }
 
     public function logout()
@@ -91,37 +129,37 @@ class LoginController extends Controller
         Session::flush();
         return redirect()->intended('/');
     }
-    
+
     public function create()
     {
         //
     }
 
-    
+
     public function store(Request $request)
     {
         //
     }
 
-    
+
     public function show($id)
     {
         //
     }
 
-    
+
     public function edit($id)
     {
         //
     }
 
-    
+
     public function update(Request $request, $id)
     {
         //
     }
 
-    
+
     public function destroy($id)
     {
         //

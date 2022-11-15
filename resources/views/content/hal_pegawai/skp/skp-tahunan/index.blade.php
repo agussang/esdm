@@ -27,7 +27,7 @@
                         <div class="col-md-4">
                             <button href="" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
                         </div>
-                        
+
                     </div>
                 </form>
             </div>
@@ -48,7 +48,7 @@
                     <div class="col-md-6">
                         <center><h4>Tahun : {{$periodeaktif->tahun}}</h4></center>
                     </div>
-                </div>   
+                </div>
             </div>
         </div>
     </div>

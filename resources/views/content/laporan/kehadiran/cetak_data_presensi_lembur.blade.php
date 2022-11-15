@@ -60,7 +60,7 @@
                     <th>Jam Pulang</th>
                     <th>Durasi Bekerja <br/>(Jam)</th>
                     <th>Durasi Bekerja<br/>(Menit)</th>
-                    <th>Lembur</th>
+                    <th>Lembur<br/>(Jam)</th>
                 </tr>
             </thead>
             <tbody>
@@ -97,7 +97,7 @@
                     $depan = sprintf("%02d", $hasilx[0]);
                     $gabung = $depan.":".$hasilx[1];
                     $warna = "";
-                    
+
                     if($gabung < $durasi){
                         $warna = "background-color: #F78282;";
                     }
@@ -113,6 +113,7 @@
                         $gabung_lembur = sprintf("%02d", $jamlembur).":".sprintf("%02d", $menit_lembur);
                     }
                     $menit = ($gabung*60)+$hasilx[1];
+                    $gabung_lembur = explode(":",$gabung_lembur);
                     ?>
                     <tr style="{{$warna}}">
                         <td>{{$no++}}</td>
@@ -123,7 +124,7 @@
                         <td align="center">{{$jam_keluar}}</td>
                         <td align="center">{{$gabung}}</td>
                         <td align="center">{{$menit}}</td>
-                        <td align="center">{{$gabung_lembur}}</td>
+                        <td align="center">{{sprintf("%01d",$gabung_lembur[0])}}</td>
                     </tr>
                     @endforeach
                 @endforeach
