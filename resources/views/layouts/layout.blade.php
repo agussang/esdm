@@ -4,7 +4,7 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="csrf_token" content="{{ csrf_token() }}" />
-        <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+        {{-- <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests"> --}}
         <title>{{Session::get('nama_aplikasi')}}</title>
         @include('layouts.css')
         @stack('css')
@@ -109,6 +109,9 @@
                     opacity: 0;
                 }
             }
+            .iq-navbar-logo img {
+    height: 60px;
+}
         </style>
     </head>
     <body class="color-light fixed-top-navbar">
@@ -138,7 +141,7 @@
                                     </div>
                                 </div>
                                 <ul id="iq-sidebar-toggle" class="iq-menu d-flex">
-                                    @if(Session::get('level') == "SA" || Session::get('level') == "A")
+                                    @if(Session::get('level') == "SA" || Session::get('level') == "A" || Session::get('level') == "PI")
                                         @include('menu.admin')
                                     @elseif(Session::get('level')=="P")
                                         @include('menu.pegawai')

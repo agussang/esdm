@@ -57,6 +57,16 @@
                             </div>
                         </div>
                     </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Batas Pengumpulan SKP</span>
+                                </div>
+                                <input type="text" value="{{date('d-m-Y',strtotime($periodeaktif->tgl_batas_skp))}}" readonly="true" class="form-control">
+                            </div>
+                        </div>
+                    </div>
                 </form>
                 <br/>
             </div>
@@ -69,7 +79,7 @@
                     <div class="col-md-12">
                         <div class="card text-white bg-danger">
                             <div class="card-body">
-                                <center><span><h4 class="text-white">Periode Aktif Pengisian Skp dan Prilaku Pegawai</h4></span><hr/>{{date('d-m-Y',strtotime($periodeaktif->tgl_batas_skp))}}</center>
+                                <center><span><h4 class="text-white">Periode Aktif Pengisian Skp dan Prilaku Pegawai</h4></span><hr/></center>
                             </div>
                         </div>
                     </div>
@@ -107,6 +117,21 @@
 </div>
 <div class="row">
     <div class="col-md-12">
+        <div class="card bg-warning">
+            <div class="card-body">
+                <div class="col-md-12">
+                    <ul>Ketentuan Disiplin Pengumpulan SKP Point Pengurang E-Remun:
+                        <li>Terlambat lebih dari 5 hari kerja point remun dikurangi 3% pada setiap periode pengisian skp</li>
+                        <li>Terlambat lebih dari 10 hari kerja point remun dikurangi 10% pada setiap periode pengisian skp</li>
+                        <li>Penentuan point pengurang e-remun dilihat berdasarkan tanggal pengumpulan skp dan batas tanggal pengumpulan</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
         <div class="card">
             <div class="card-body">
                 <div class="row">
@@ -128,15 +153,18 @@
                                 <thead>
                                     <tr>
                                         <th rowspan="2">No</th>
-                                        <th rowspan="2">Nama Bulan</th>
-                                        <th colspan="2">Nilai Prilaku & Skp</th>
-                                        <th rowspan="2">File Skp</th>
-                                        <th rowspan="2">Status Validasi</th>
+                                        <th colspan="2">Periode SKP</th>
+                                        <th colspan="5">Realisasi SKP</th>
                                         <th rowspan="2">Aksi</th>
                                     </tr>
                                     <tr>
-                                        <th>Nilai Prilaku</th>
-                                        <th>Nilai Skp</th>
+                                        <th>Nama Bulan</th>
+                                        <th>Tanggal Batas Pengumpulan</th>
+                                        <th>NilaiSkp</th>
+                                        <th>File Skp</th>
+                                        <th>Status Validasi</th>
+                                        <th>Point Pengurang</th>
+                                        <th>Justifikasi Atasan</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -144,15 +172,32 @@
                                     @foreach($rsData as $rs=>$r)
                                     <?php
                                     $dtrekap = $arrRekapskp[$r->bulan];
+                                    $point = "100";
+                                    $ket = "Belum mengumpulkan.";
+                                    if($dtrekap['created_at']!=null && $dtrekap['point_disiplin']>0){
+                                        $point = $dtrekap['point_disiplin'];
+                                        $ket = $dtrekap['ket_disiplin'];
+                                    }else if($dtrekap['created_at']!=null && $dtrekap['point_disiplin']<1){
+                                        $point = "0";
+                                        $ket = "Sudah dinilai";
+                                    }
+                                    if($dtrekap['nilai_skp']==null && $dtrekap['created_at']!=null){
+                                        $ket = "Belum dinilai.<br/>".$dtrekap['ket_disiplin'];
+                                    }
+                                    if($dtrekap['ket_justifikasi']){
+                                        $point = "0";
+                                    }
                                     ?>
                                     <tr>
                                         <td>{{$no++}}</td>
                                         <td>{{$arrBulanPanjang[$r->bulan]}}</td>
-                                        <td>{{$dtrekap['nilai_perilaku']}}</td>
+                                        <td>{{date('d-m-Y',strtotime($r->tgl_batas_skp))}}</td>
+                                        {{-- <td>{{$dtrekap['nilai_perilaku']}}</td> --}}
                                         <td>{{$dtrekap['nilai_skp']}}</td>
                                         <td>
                                             @if($dtrekap['file_skp'])
                                             <a href="{{URL::to('assets/file_bukti_skp')}}/{{$dtrekap['file_skp']}}" target="_blank" class="btn btn-primary"><i class="fas fa-eye"></i> Lihat File Skp</a>
+                                            <br/><span>{{$dtrekap['created_at']}}</span>
                                             @endif
                                         </td>
                                         <td align="center">
@@ -166,6 +211,21 @@
                                                 </span>
                                             @endif
                                         @endif
+                                        </td>
+                                        <td align="center">
+                                            <span>
+                                                {{$point}} %<br/>
+                                                <i style="font-size:10px;">
+                                                    {!!$ket!!}
+                                                </i>
+                                            </span>
+                                        </td>
+                                        <td align="center">
+                                            @if($dtrekap['ket_justifikasi'])
+                                            <a href="#" class="mt-2 badge badge-primary" data-trigger="hover" data-toggle="popover" data-content="{{$dtrekap['ket_justifikasi']}}">Ya</a>
+                                            @else
+                                            <a href="#" class="mt-2 badge badge-danger">Tidak</a>
+                                            @endif
                                         </td>
                                         <td>
                                             @if($dtrekap)

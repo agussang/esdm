@@ -616,10 +616,11 @@ class MsPegawaiController extends Controller
         $rsData = $this->repomspegawai->findId("",$id_sdm,"id_sdm");
         $jam_kerja = Fungsi::jam_kerja_unit($rsData->id_satkernow);
         $rekap = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,4);
-
+        //dd($rekap);
         $gbng = $tahun.$bulan;
         $data['thn_bulan'] = $tahun."-".$bulan;
         $data['rekap'] = $rekap[$rsData->id_sdm][$gbng];
+        //dd($data['rekap']);
         $data['rsData'] = $rsData;
         $data['jam_kerja_unit'] = $jam_kerja;
         $data['kategoriwaktuabsen'] = Fungsi::kategoriwaktuabsen();
@@ -633,6 +634,7 @@ class MsPegawaiController extends Controller
         $req = $request->except('_token');
         $data['dt_pegawai'] = $this->repomspegawai->findId("",$req['id_sdm'],"id_sdm");
         $jam_kerja = Fungsi::jam_kerja_unit($rsData->id_satkernow);
+        $data['pilihan_menggangu'] = Fungsi::pilihan_menggangu("");
         $hari = Fungsi::formatDate($req['tgl']);
         if($hariabsen[0]=="Jumat"){
             $jam_kerja = $jam_kerja[2];
@@ -660,6 +662,10 @@ class MsPegawaiController extends Controller
         $where['tanggal_absen'] = $req['tanggal_absen'];
         $req['justifikasi_atasan'] = 1;
         $req['ket_justifikasi'] = $req['ket'];
+
+        $req['durasi_justifikasi'] = $req['durasi_justifikasi'];
+        $req['kategori_justifikasi'] = $req['kategori_justifikasi'];
+
         $req['tgl_justifikasi'] = date('Y-m-d H:i:s');
         unset($req['ket']);
         // hanya yang tidak masuk saja yang dimasukkan ke tr_justifikasi
@@ -677,8 +683,9 @@ class MsPegawaiController extends Controller
                 $update['tanggal_absen'] = $req['tanggal_absen'];
                 $update['id_sdm'] = $req['id_sdm'];
                 $update['justifikasi_atasan'] = $req['justifikasi_atasan'];
-                $update['alasan'] = $req['alasan'];
                 $update['ket_justifikasi'] = $req['ket_justifikasi'];
+                $update['durasi_justifikasi'] = $req['durasi_justifikasi'];
+                $update['kategori_justifikasi'] = $req['kategori_justifikasi'];
                 $update['id_jns'] = 1;
                 $where['id_justifikasi'] = $cek->id_justifikasi;
                 $this->repotrjustifikasi->update($where,$update);
@@ -687,8 +694,9 @@ class MsPegawaiController extends Controller
                 $masuk['tanggal_absen'] = $req['tanggal_absen'];
                 $masuk['id_sdm'] = $req['id_sdm'];
                 $masuk['justifikasi_atasan'] = $req['justifikasi_atasan'];
-                $masuk['alasan'] = $req['alasan'];
                 $masuk['ket_justifikasi'] = $req['ket_justifikasi'];
+                $masuk['durasi_justifikasi'] = $req['durasi_justifikasi'];
+                $masuk['kategori_justifikasi'] = $req['kategori_justifikasi'];
                 $masuk['id_jns'] = 1;
                 $this->repotrjustifikasi->store($masuk);
             }

@@ -68,6 +68,8 @@ class LaporanPresensiController extends Controller
             $arrData[$rx->id_sdm]['nip'] = $rx->nip;
             $arrData[$rx->id_sdm]['data_presensi'] = $getRekapDataAbsen[$rx->id_sdm];
         }
+        $dt_hari_libur = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_akhir);
+        $data['dt_hari_libur'] = $dt_hari_libur;
         $data['arrData'] = $arrData;
         $data['jam_kerja'] = $jam_kerja;
         $jam_kerja_text = "";
@@ -77,6 +79,7 @@ class LaporanPresensiController extends Controller
         }
         $data['jam_kerja_text'] = trim($jam_kerja_text, ", \t\n");
         $data['data_bulan'] = Fungsi::jumlah_absen($tgl_awal,$tgl_akhir,1);
+        //dd($arrData);
         if($req['tipe']==1){
             return view('content.laporan.kehadiran.cetak_data_presensi',$data);
         }
@@ -96,8 +99,8 @@ class LaporanPresensiController extends Controller
             $data['arrAlasan'] = $arrAlasan;
             //dd($data['arrData']);
             return view('content.laporan.kehadiran.cetak_data_presensi_bulanan',$data);
-        }       
-        
+        }
+
     }
 
 

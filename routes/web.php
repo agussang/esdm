@@ -351,6 +351,7 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
         Route::group(['prefix' => 'data-skp'], function () {
             Route::get('/',[DataSkpController::class,'index'])->name('skp.data-skp.index');
             Route::post('/cari',[DataSkpController::class,'cari'])->name('skp.data-skp.cari');
+
         });
     });
     Route::group(['prefix' => 'data-pegawai'], function () {
@@ -439,6 +440,7 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
             Route::get('/{id_sdm?}',[SkpPrilakuPegawaiController::class,'prilaku'])->name('skp-pegawai.skp.index');
 
             Route::get('detil-skp/{id_periode?}/{id_sdm?}',[SkpPrilakuPegawaiController::class,'edit'])->name('skp-pegawai.skp.detil-skp');
+            Route::get('reset-penilaian-skp/{id_periode?}/{id_sdm?}',[SkpPrilakuPegawaiController::class,'reset_penilaian'])->name('skp-pegawai.skp.reset-penilaian-skp');
 
             Route::post('/cari',[SkpPrilakuPegawaiController::class,'cari'])->name('skp-pegawai.skp.cari');
             Route::get('/isi/{id_periode?}/{id_sdm?}',[SkpPrilakuPegawaiController::class,'edit'])->name('skp-pegawai.skp.edit');

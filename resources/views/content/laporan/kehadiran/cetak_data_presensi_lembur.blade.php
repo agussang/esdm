@@ -102,7 +102,7 @@
                         $warna = "background-color: #F78282;";
                     }
                     $hari = explode(',',$tanggal);
-                    if($hari[0]=="Minggu" || $hari[0]=="Sabtu"){
+                    if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu"){
                         $warna = "background-color: #E3CC6D;";
                     }
                     $gabung_lembur = 0;

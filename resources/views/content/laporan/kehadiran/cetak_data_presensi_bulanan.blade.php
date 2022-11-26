@@ -41,6 +41,7 @@
         }
 </style>
 </head>
+
 @foreach($data_bulan as $id_bulan=>$dt_bln)
 <div class="page" align="center" id="container" style="width:25cm;margin:0 auto;">
     <body leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0">
@@ -72,15 +73,16 @@
             <tbody>
                 <?php $no=1;?>
                 @foreach($arrData as $id_sdm=>$dt_sdm)
-                <?php 
+                <?php
                 $kode = $tahun.$id_bulan;
                 $dt_presensi = $dt_sdm['data_presensi'][$kode];
+                $jmh_hari_kerja = count($dt_bln['list_tgl']) - count($dt_hari_libur[$dt_bln['tahun']."-".$id_bulan]);
                 ?>
                 <tr>
                     <td>{{$no++}}</td>
                     <td>{{$dt_sdm['nip']}}</td>
                     <td>{{$dt_sdm['nm_sdm']}}</td>
-                    <td align="center">{{count($dt_bln['list_tgl'])}}</td>
+                    <td align="center">{{$jmh_hari_kerja}}</td>
                     <td align="center">{{$dt_presensi['masuk']['total']}}</td>
                     <td align="center">{{$dt_presensi['tidakmasuk']['total']}}</td>
                     <td align="center">{{$dt_presensi['telat']['total']}}</td>

@@ -38,7 +38,7 @@ class DataSkpController extends Controller
         if($bulan==null){
             $bulan = date('m');
         }
-        $data['periode_pilihan'] = $this->repomsperiodeskp->findWhereRaw(""," bulan = '$bulan' and tahun='$tahun'");
+        $data['periode_skp'] = $this->repomsperiodeskp->findWhereRaw(""," bulan = '$bulan' and tahun='$tahun'");
         $data['pilihan_tahun_skp'] = Fungsi::pilihan_tahun_skp($tahun);
         $data['pilihan_bulan_skp'] = Fungsi::pilihan_bulan_skp($bulan);
         $text_cari = Session::get('text_cari');
@@ -55,11 +55,30 @@ class DataSkpController extends Controller
             $arrrekapnilai[$r->id_sdm]['nilai_perilaku'] = $r->nilai_perilaku;
             $arrrekapnilai[$r->id_sdm]['validasi'] = $r->validasi;
             $arrrekapnilai[$r->id_sdm]['file_skp'] = $r->file_skp;
+            $arrrekapnilai[$r->id_sdm]['ket_justifikasi'] = $r->ket_justifikasi;
             $arrrekapnilai[$r->id_sdm]['validated_at'] = date('d-m-Y H:i:s',strtotime($r->validated_at));
+            $arrrekapnilai[$r->id_sdm]['created_at'] = date('d-m-Y H:i:s',strtotime($r->created_at));
+            $arrrekapnilai[$r->id_sdm]['point_disiplin'] = 0;
+            $arrrekapnilai[$r->id_sdm]['ket_disiplin'] = "";
+            if(date('Ymd',strtotime($r->created_at)) > date('Ymd',strtotime($data['periode_skp']['tgl_batas_skp']))){
+                $keterlambatan = Fungsi::hitung_absen($data['periode_skp']['tgl_batas_skp'],date('Y-m-d',strtotime($r->created_at)),"");
+                $keter = $keterlambatan['jmabsen']-1;
+                if($keter>5 && $keter<10){
+                    $arrrekapnilai[$r->id_sdm]['point_disiplin'] = 3;
+                    $arrrekapnilai[$r->id_sdm]['ket_disiplin'] = "Terlambat ".$keter." hari";
+                }elseif($keter>=10){
+                    $arrrekapnilai[$r->id_sdm]['point_disiplin'] = 100;
+                    $arrrekapnilai[$r->id_sdm]['ket_disiplin'] = "Terlambat ".$keter." hari";
+                }
+            }
+
         }
+        //dd($arrrekapnilai);
         $data['arrrekapnilai'] = $arrrekapnilai;
         return view('content.skp.data_skp.index',$data);
     }
+
+
 
     public function cari(Request $request){
         $req = $request->except('_token');
@@ -72,37 +91,37 @@ class DataSkpController extends Controller
         }
         return redirect()->route('skp.data-skp.index');
     }
-    
+
     public function create()
     {
         //
     }
 
-    
+
     public function store(Request $request)
     {
         //
     }
 
-    
+
     public function show($id)
     {
         //
     }
 
-    
+
     public function edit($id)
     {
         //
     }
 
-    
+
     public function update(Request $request, $id)
     {
         //
     }
 
-    
+
     public function destroy($id)
     {
         //

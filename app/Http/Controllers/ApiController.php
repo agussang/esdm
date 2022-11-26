@@ -59,6 +59,23 @@ class ApiController extends Controller
             $rekap['file_skp'] = $r->file_skp;
             $rekap['validated_at'] = $r->validated_at;
             $rekap['created_at'] = $r->created_at;
+            $rekap['tgl_batas_pengumpulan_skp'] = $r->dt_periode->tgl_batas_skp;
+            $rekap['point_disiplin'] = 0;
+            $rekap['ket_disiplin'] = "";
+            if(date('Ymd',strtotime($r->created_at)) > date('Ymd',strtotime($r->dt_periode->tgl_batas_skp))){
+                $keterlambatan = Fungsi::hitung_absen($r->dt_periode->tgl_batas_skp,date('Y-m-d',strtotime($r->created_at)),"");
+                $keter = $keterlambatan['jmabsen']-1;
+                if($keter>5 && $keter<10){
+                    $rekap['point_disiplin'] = 3;
+                    $rekap['ket_disiplin'] = "Terlambat ".$keter." hari";
+                }elseif($keter>=10){
+                    $rekap['point_disiplin'] = 100;
+                    $rekap['ket_disiplin'] = "Terlambat ".$keter." hari";
+                }
+            }
+            $rekap['ket_justifikasi'] = $r->ket_justifikasi;
+            $rekap['justifikasi'] = $r->justifikasi;
+            $rekap['tgl_justifikasi'] = $r->tgl_justifikasi;
             $arrrekapnilai[$r->dt_periode->bulan]['nm_bulan'] = $arrNamabulan[$r->dt_periode->bulan];
             $arrrekapnilai[$r->dt_periode->bulan]['tahun'] = $r->dt_periode->tahun;
             $arrrekapnilai[$r->dt_periode->bulan]['kode'] = $r->dt_periode->kode;

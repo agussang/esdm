@@ -52,14 +52,21 @@
         <table width="100%" border=1 cellspacing=0 cellpadding="3" style="font-size:12pt";>
             <thead>
                 <tr>
-                    <th>No</th>
-                    <th>Nip</th>
-                    <th>Nama</th>
-                    <th>Tanggal</th>
-                    <th>Jam Masuk</th>
-                    <th>Jam Pulang</th>
-                    <th>Durasi Bekerja <br/>(Jam)</th>
-                    <th>Durasi Bekerja <br/>(Menit)</th>
+                    <th rowspan="2">No</th>
+                    <th rowspan="2">Nip</th>
+                    <th rowspan="2">Nama</th>
+                    <th rowspan="2">Tanggal</th>
+                    <th rowspan="2">Jam Masuk</th>
+                    <th rowspan="2">Jam Pulang</th>
+                    <th rowspan="2">Durasi Bekerja <br/>(Jam)</th>
+                    <th rowspan="2">Durasi Bekerja <br/>(Menit)</th>
+                    <th rowspan="2">Durasi Terlambat<br/>(Menit)</th>
+                    <th rowspan="2">Ket</th>
+                    <th colspan="2">Ket Justifikasi</th>
+                </tr>
+                <tr>
+                    <th>Kategori</th>
+                    <th>Durasi Justifikasi<br/>(Menit)</th>
                 </tr>
             </thead>
             <tbody>
@@ -95,15 +102,39 @@
                     $depan = sprintf("%02d", $hasilx[0]);
                     $gabung = $depan.":".$hasilx[1];
                     $warna = "";
-                    
-                    if($gabung < $durasi){
-                        $warna = "background-color: #F78282;";
+                    $hitungdurasi_terlambat = 0;
+                    $ket = "";
+                    $libur = $dt_hari_libur[substr($tanggal,0,7)][$tanggal];
+                    if($jam_masuk == $jam_keluar){
+                        $ket = "Absen 1 kali";
                     }
-                    $hari = explode(',',$tanggal);
-                    if($hari[0]=="Minggu" || $hari[0]=="Sabtu"){
+                    if($libur){
+                        $warna = "background-color: #E3CC6D;";
+                        $ket = $libur;
+                    }else{
+                        if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                            if($gabung < $durasi){
+                                $warna = "background-color: #F78282;";
+                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                if($hitungdurasi_terlambat>0){
+                                    $ket = "Terlambat";
+                                }
+                            }
+                        }
+                    }
+                    if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu"){
                         $warna = "background-color: #E3CC6D;";
                     }
                     $menit = ($gabung*60)+$hasilx[1];
+
+                    $kategori = "";
+                    $durasijustifikasi = "";
+                    $menitjustifikasi = 0;
+                    if($presensi['justifikasi']){
+                        $kategori = $presensi['justifikasi']['kategori_justifikasi'];
+                        $durasijustifikasi = $presensi['justifikasi']['durasi_justifikasi']." Menit";
+                        $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
+                    }
                     ?>
                     <tr style="{{$warna}}">
                         <td>{{$no++}}</td>
@@ -114,6 +145,16 @@
                         <td align="center">{{$jam_keluar}}</td>
                         <td align="center">{{$gabung}}</td>
                         <td align="center">{{$menit}}</td>
+                        <td align="center">{{$hitungdurasi_terlambat-$menitjustifikasi}}</td>
+                        <td align="center">
+                            {{$ket}}
+                        </td>
+                        <td>
+                            {{$kategori}}
+                        </td>
+                        <td>
+                            {{$durasijustifikasi}}
+                        </td>
                     </tr>
                     @endforeach
                 @endforeach
