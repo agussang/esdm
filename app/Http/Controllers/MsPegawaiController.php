@@ -13,6 +13,7 @@ use App\Models\PersonnelEmployee;
 use App\Models\PersonnelEmployeeArea;
 use App\Repositories\Repoemployee;
 use App\Repositories\Repoemployeearea;
+use App\Repositories\Repobank;
 
 use App\Imports\PegawaiImport;
 use Crypt;
@@ -36,7 +37,8 @@ class MsPegawaiController extends Controller
         Repotrabsenkehadiran $repotrabsenkehadiran,
         Repotrjustifikasi $repotrjustifikasi,
         Repoemployee $repoemployee,
-        Repoemployeearea $repoemployeearea
+        Repoemployeearea $repoemployeearea,
+        Repobank $repobank
     ){
         $this->request = $request;
         $this->repomspegawai = $repomspegawai;
@@ -47,6 +49,7 @@ class MsPegawaiController extends Controller
         $this->repotrjustifikasi = $repotrjustifikasi;
         $this->repoemployee = $repoemployee;
         $this->repoemployeearea = $repoemployeearea;
+        $this->repobank = $repobank;
     }
 
     public function index(Request $request)
@@ -251,10 +254,10 @@ class MsPegawaiController extends Controller
                         }
                     }
                 }
-                $text = "Data berhasil dimasukkan";
+                $text = "Data berhasil dimasukkan ".$jberhasil;
                 if($datagagal!=null){
                     $datagagalimp = implode(',',$datagagal);
-                    $text = "Data berhasil masuk ".$jberhasil. " ,dan ada data yang gagal di masukkan : ($datagagalimp).";
+                    $text = "Data berhasil masuk ".$jberhasil. " pegawai ,dan ada data yang gagal di masukkan : ($datagagalimp).";
                 }
                 $notification = [
                     'message' => $text,
@@ -268,6 +271,61 @@ class MsPegawaiController extends Controller
                 'alert-type' => 'error',
             ];
             return redirect()->route('data-pegawai.master-pegawai.import')->with($notification);
+        }
+    }
+
+    public function import_rekening(){
+        return view('content.data_pegawai.import-rekening');
+    }
+
+    public function gasimport_rekening(Request $request){
+        $extension = $request->file('file')->extension();
+        if($extension!="xlsx"){
+            $notification = [
+                'message' => 'Gagal, Tidak bisa membaca file excel.',
+                'alert-type' => 'error',
+            ];
+            return redirect()->route('data-pegawai.master-pegawai.import-rekening')->with($notification);
+        }else{
+            $arrData = array();$arrgagal = array();
+            $rsData = Excel::toArray(new PegawaiImport(), request()->file('file'));
+            unset($rsData[0][0]);
+            foreach($rsData[0] as $rs=>$r){
+                $cek = $this->repomspegawai->findWhereRaw("","nip = '$r[0]'");
+                if($cek==null){
+                    $arrgagal[$r[0]] = $r[1];
+                }else{
+                    // cek bank nya
+                    $cekbank = $this->repobank->findWhereRaw("","kode_bank = '$r[2]' and nama_bank = '$r[3]' ");
+                    if($cekbank==null){
+                        $arrgagal[$r[0]] = $r[1];
+                    }else{
+                        //masukan
+                        $arrData[$r[0]]['id_sdm'] = $cek->id_sdm;
+                        $arrData[$r[0]]['id_bank'] = $cekbank->id_bank;
+                        $arrData[$r[0]]['nmrek'] = $r[4];
+                        $arrData[$r[0]]['no_rekening'] = $r[5];
+                    }
+                }
+            }
+            $jberhasil = 0;
+            foreach($arrData as $nip=>$dtreg){
+                $where['id_sdm'] = $dtreg['id_sdm'];
+                unset($dtreg['id_sdm']);
+                $this->repomspegawai->update($where,$dtreg);
+                $jberhasil++;
+            }
+            $text = "Data berhasil dimasukkan ".$jberhasil;
+            if($arrgagal!=null){
+                $datagagalimp = implode(',',$arrgagal);
+                $text = "Data berhasil masuk ".$jberhasil. " pegawai ,dan ada data yang gagal di masukkan : ($datagagalimp).";
+            }
+            $notification = [
+                'message' => $text,
+                'alert-type' => 'success',
+            ];
+            return redirect()->route('data-pegawai.master-pegawai.import-rekening')->with($notification);
+
         }
     }
 

@@ -38,6 +38,8 @@ use App\Http\Controllers\{
     SettingHariLiburController,
     MasterAlasanAbsenController,
     TrLogloginController,
+    MsWaktuShiftController,
+    JadwalPresensiShiftController,
 };
 
 /*
@@ -61,6 +63,14 @@ Route::post('/ubahpassword/simpan', [LoginController::class, 'simpan_ubah_passwo
 Route::group(['middleware' => 'role:SA_A_PI'], function () {
     Route::get('home',[IndexController::class,'index'])->name('home');
     Route::group(['prefix' => 'data-master'], function () {
+        Route::group(['prefix' => 'waktu-shift'], function () {
+            Route::get('/',[MsWaktuShiftController::class,'index'])->name('data-master.waktu-shift');
+            Route::get('edit',[MsWaktuShiftController::class,'edit'])->name('data-master.waktu-shift.edit');
+            Route::post('/simpan',[MsWaktuShiftController::class,'store'])->name('data-master.waktu-shift.simpan');
+            Route::post('/update',[MsWaktuShiftController::class,'update'])->name('data-master.waktu-shift.update');
+            Route::get('hapus/{id}',[MsWaktuShiftController::class,'destroy'])->name('data-master.waktu-shift.hapus');
+        });
+
         Route::group(['prefix' => 'alasan-absen'], function () {
             Route::get('/',[MasterAlasanAbsenController::class,'index'])->name('data-master.alasan-absen');
             Route::get('edit',[MasterAlasanAbsenController::class,'edit'])->name('data-master.alasan-absen.edit');
@@ -209,6 +219,9 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
             Route::get('/import',[MsPegawaiController::class,'import'])->name('data-pegawai.master-pegawai.import');
             Route::post('/simpan-import',[MsPegawaiController::class,'gasimport'])->name('data-pegawai.master-pegawai.simpan-import');
 
+            Route::get('/import/rekening',[MsPegawaiController::class,'import_rekening'])->name('data-pegawai.master-pegawai.import-rekening');
+            Route::post('/simpan-import-rekening',[MsPegawaiController::class,'gasimport_rekening'])->name('data-pegawai.master-pegawai.simpan-import-rekening');
+
             Route::post('/update-foto',[MsPegawaiController::class,'update_foto'])->name('data-pegawai.master-pegawai.update-foto');
 
         });
@@ -246,6 +259,12 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
                 Route::post('/simpan',[PresensiController::class,'store'])->name('data-pegawai.data-presensi.upload-presensi.simpan');
                 Route::post('/upload',[PresensiController::class,'upload'])->name('data-pegawai.data-presensi.upload-presensi.upload');
                 Route::post('/sync-finger',[PresensiController::class,'sync_finger'])->name('data-pegawai.data-presensi.upload-presensi.sync-finger');
+            });
+
+            Route::group(['prefix' => 'jadwal-presensi-shift'], function () {
+                Route::get('/',[JadwalPresensiShiftController::class,'index'])->name('data-pegawai.data-presensi.jadwal-presensi-shift.index');
+                Route::post('/cari',[JadwalPresensiShiftController::class,'cari'])->name('data-pegawai.data-presensi.jadwal-presensi-shift.search');
+                Route::get('/import-jadwal',[JadwalPresensiShiftController::class,'import'])->name('data-pegawai.data-presensi.jadwal-presensi-shift.import-jadwal');
             });
 
             Route::group(['prefix' => 'apel'], function () {

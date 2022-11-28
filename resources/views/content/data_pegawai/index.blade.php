@@ -6,10 +6,11 @@
             <div class="card-header">
                 <div class="card-title">
                     <div class="row">
-                        <div class="col-md-9">
+                        <div class="col-md-8">
                             <h5 class="card-label"><i class="fa fa-list"></i> Data Master Pegawai</h5>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                            <a href="{{route('data-pegawai.master-pegawai.import')}}" class="btn btn-danger"><i class="fas fa-upload"></i> Import Data Pegawai</a>
                             <a href="{{route('data-pegawai.master-pegawai.tambah')}}" class="btn btn-warning pull-right"><i class="fas fa-plus"></i> Tambah Data</a>
                         </div>
                     </div>
@@ -70,7 +71,7 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <a href="{{route('data-pegawai.master-pegawai.import')}}" class="btn btn-danger"><i class="fas fa-upload"></i> Import Data Pegawai</a>
+                        <a href="{{route('data-pegawai.master-pegawai.import-rekening')}}" class="btn btn-success"><i class="fas fa-upload"></i> Import No Rekening</a>
                         <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
                     </div>
                 </div>

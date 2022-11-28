@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\Reporiwayatpresensi;
 use App\Repositories\Repoclocktransaction;
+use App\Repositories\Repomswaktushift;
 use App\Models\Iclocktransaction;
 use App\Repositories\Repomspegawai;
+use App\Repositories\Repotrjadwalshift;
 use Crypt;
 use Fungsi;
 use Session;
@@ -18,12 +20,16 @@ class PresensiController extends Controller
         Request $request,
         Reporiwayatpresensi $reporiwayatpresensi,
         Repomspegawai $repomspegawai,
-        Repoclocktransaction $repoclocktransaction
+        Repoclocktransaction $repoclocktransaction,
+        Repomswaktushift $repomswaktushift,
+        Repotrjadwalshift $repotrjadwalshift
     ){
         $this->request = $request;
         $this->reporiwayatpresensi = $reporiwayatpresensi;
         $this->repomspegawai = $repomspegawai;
         $this->repoclocktransaction = $repoclocktransaction;
+        $this->repomswaktushift = $repomswaktushift;
+        $this->repotrjadwalshift = $repotrjadwalshift;
     }
 
     public function index()
@@ -128,47 +134,58 @@ class PresensiController extends Controller
                 $array = Excel::toArray(new RiwayatPresensiImport(), request()->file('file_excel'));
                 unset($array[0][0]);
                 $xls = $array[0];
-                $arrData = array();$pegawaiblumada = array();
-                foreach ($xls as $rx) {
-                    $nip = trim($rx[4]);
+                $arrData = array();$arrgagal = array();
+                foreach ($xls as $rx=>$r) {
+                    $nip = trim($r[0]);
                     $cekidsdm = $this->repomspegawai->findId("",$nip,"nip");
                     if($cekidsdm){
-                        $data['tanggal_scan'] = date('Y-m-d H:i:s',strtotime($rx[0]));
-                        $data['tanggal_absen'] = Fungsi::strToDate($rx[1]);
-                        $data['jam_absen'] = $rx[2];
-                        $data['id_sdm'] = $cekidsdm->id_sdm;
-                        $data['sn'] = $rx[12];
-                        $data['mesin'] = $rx[13];
-                        $arrData[] = $data;
+                        //cek kode shift
+                        $cekkode = $this->repomswaktushift->findWhereRaw("","kode_shift = '$r[3]'");
+                        if($cekkode){
+                            $data['id_sdm'] = $cekidsdm->id_sdm;
+                            $data['tanggal_absen'] = $r[2];
+                            $data['id_shift'] = $cekkode->id;
+                            $arrData[] = $data;
+                        }else{
+                            $arrgagal[$r[0]] = $r[1];
+                        }
                     }else{
-                        $dtgagal['nip'] = $nip;
-                        $dtgagal['nama'] = $rx[5];
-                        $pegawaiblumada[] = $dtgagal;
+                        $arrgagal[$r[0]] = $r[1];
                     }
                 }
-                $jberhasil = 0;$jgagal=0;
-                if(count($arrData)>0){
-                    foreach($arrData as $rs=>$dt){
-                        $jberhasil++;
-                        $this->reporiwayatpresensi->store($dt);
+                $jberhasil = 0;
+                foreach($arrData as $key=>$dtkey){
+                    // cek sudah ada apa belum
+                    $cekrecod = $this->repotrjadwalshift->findWhereRaw("","tanggal_absen = '$dtkey[tanggal_absen]' and id_sdm = '$dtkey[id_sdm]' ");
+                    if($cekrecod!=null){
+                        //update
+                        $where['id'] = $cekrecod['id_jadwal_shift'];
+                        $this->repotrjadwalshift->update($where,$dtkey);
+                    }else{
+                        // insert
+                        $this->repotrjadwalshift->store($dtkey);
                     }
+                    $jberhasil++;
                 }
-                if(count($pegawaiblumada)>0){
-                    Session::put('pegawaiblumada',$pegawaiblumada);
-                    $jgagal+=count($pegawaiblumada);
+
+                $text = "Data berhasil dimasukkan ".$jberhasil;
+                if($arrgagal!=null){
+                    $datagagalimp = implode(',',$arrgagal);
+                    $text = "Data berhasil masuk ".$jberhasil. " pegawai ,dan ada data yang gagal di masukkan : ($datagagalimp).";
                 }
                 $notification = [
-                    'message' => 'Berhasil, Upload data finger berhasil dilakukan. '.$jberhasil." Berhasil di upload, ".$jgagal." gagal diupload.",
+                    'message' => $text,
                     'alert-type' => 'success',
                 ];
-                return redirect()->route('data-pegawai.data-presensi.upload-presensi.index')->with($notification);
+
+                return redirect()->route('data-pegawai.data-presensi.jadwal-presensi-shift.index')->with($notification);
             }
         } catch (Exception $e) {
             $notification = [
                 'message' => 'Gagal, Tidak bisa membaca file excel.',
                 'alert-type' => 'error',
             ];
-            return redirect()->route('data-pegawai.data-presensi.upload-presensi.index')->with($notification);
+            return redirect()->route('data-pegawai.data-presensi.jadwal-presensi-shift.index')->with($notification);
         }
     }
 

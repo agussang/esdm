@@ -58,7 +58,10 @@ if($induk[0]=="setting"){
             <a href="{{route('data-master.bank')}}">  <i class="fa fa-book"></i><span> Master Bank</span> </a>
         </li>
         <li class="{{ $induk[1]=="waktu-presensi" ? 'active' : '' }}">
-            <a href="{{route('data-master.waktu-presensi')}}">  <i class="fa fa-book"></i><span> Master Waktu Presensi</span> </a>
+            <a href="{{route('data-master.waktu-presensi')}}">  <i class="dripicons dripicons-alarm"></i><span> Master Waktu Presensi</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="waktu-shift" ? 'active' : '' }}">
+            <a href="{{route('data-master.waktu-shift')}}">  <i class="dripicons dripicons-alarm"></i><span> Master Waktu Presensi Shift</span> </a>
         </li>
         <li class="{{ $induk[1]=="jabatan" ? 'active' : '' }}">
             <a href="{{route('data-master.jabatan')}}">  <i class="fa fa-book"></i><span> Master Jabatan</span> </a>
@@ -127,6 +130,11 @@ if($induk[0]=="setting"){
                 <li class="{{ $induk[2]=="upload-presensi" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.upload-presensi.index')}}">
                         <i class="las la-book"></i><span>Upload / Sync Presensi</span>
+                    </a>
+                </li>
+                <li class="{{ $induk[2]=="jadwal-presensi-shift" ? 'active' : '' }}">
+                    <a href="{{route('data-pegawai.data-presensi.jadwal-presensi-shift.index')}}">
+                        <i class="las la-book"></i><span>Jadwal Presensi Shift</span>
                     </a>
                 </li>
                 <li class="{{ $induk[2]=="apel" ? 'active' : '' }}">
