@@ -71,10 +71,16 @@
                             <form class="form" action="{{route('data-pegawai.data-presensi.data-absen.unggah-file-sk-simpan')}}" method="post" enctype="multipart/form-data">
                             {!! csrf_field() !!}
                             <input type="hidden" name="no_sk" value="{{$nosk}}">
+                            <?php
+                            $tgl_sk = "Tidak Ada";
+                            if($r['tgl_sk']){
+                                $tgl_sk = date('d-m-Y',strtotime($r['tgl_sk']));
+                            }
+                            ?>
                             <tr>
                                 <td>{{$no++}}</td>
                                 <td>{{$nosk}}</td>
-                                <td>{{date('d-m-Y',strtotime($r['tgl_sk']))}}</td>
+                                <td>{{$tgl_sk}}</td>
                                 <td>{{count($arrpenerima[$nosk])}} Pegawai</td>
                                 <td>
                                     @if($r['file_bukti']!=null)

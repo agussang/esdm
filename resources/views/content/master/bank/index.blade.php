@@ -20,7 +20,7 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>Kode Bank</th>
+                                <th>Bank</th>
                                 <th>Nama Bank</th>
                                 <th>Aksi</th>
                             </tr>

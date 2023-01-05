@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\Repomspegawai;
+use App\Repositories\Repomsperiodeskp;
+use App\Repositories\Reposettingramadhan;
 use Session;
 use Fungsi;
 
@@ -11,16 +13,67 @@ class IndexController extends Controller
 {
     public function __construct(
         Request $request,
-        Repomspegawai $repomspegawai
+        Repomspegawai $repomspegawai,
+        Repomsperiodeskp $repomsperiodeskp,
+        Reposettingramadhan $reposettingramadhan
     ){
         $this->request = $request;
         $this->repomspegawai = $repomspegawai;
+        $this->repomsperiodeskp = $repomsperiodeskp;
+        $this->reposettingramadhan = $reposettingramadhan;
     }
-    
+
     public function index()
     {
         if(Session::get('level')=="P"){
-            return view('content.hal_pegawai.home');
+            $tahun = date('Y');
+            $data['ramadhan'] = Fungsi::ramadhan($tahun);
+            $id_sdm = Session::get('id_sdm');
+            $arrIdSdm[$id_sdm] = $id_sdm;
+            $data['info_pegawai'] = $this->repomspegawai->findId('',Session::get('id_sdm'),'id_sdm');
+            $data['tanggal_terakhir'] = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+            $tgl_awal = date('Y')."-".date('m')."-"."01";
+            $tgl_akhir = date('Y')."-".date('m')."-".$data['tanggal_terakhir'];
+            $getajuan_justifikasi = Fungsi::getajuan_justifikasi($id_sdm,$tgl_awal,$tgl_akhir);
+            $data['getajuan_justifikasi'] = $getajuan_justifikasi;
+            $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
+            $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
+            $jam_kerja_ramadhan = Fungsi::jam_kerja("347b23a9-8919-43ec-9b2d-a0c4b810b61d");
+            $durasibekerja = Fungsi::durasibekerja($req['id_jam_kerja']);
+            $durasibekerja_ramadhan = Fungsi::durasibekerja("347b23a9-8919-43ec-9b2d-a0c4b810b61d");
+            $data['getRekapDataAbsen'] = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,1);
+            $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_akhir,1);
+            $data['getDataAbsen'] = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
+            $data['dt_hari_libur'] = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_akhir);
+            $data['jam_kerja'] = $jam_kerja;
+            $data['jam_kerja_ramadhan'] = $jam_kerja_ramadhan;
+            $data['id_sdm'] = $id_sdm;
+            $jam_kerja_text = "";$durasi_kerja_text = "";$jam_kerja_textramadhan = "";$durasi_kerja_textramadhan = "";
+            $kategoriwaktuabsen = Fungsi::kategoriwaktuabsen();
+            foreach($jam_kerja as $id_hr_kerja=>$dt_hr_kerja){
+                $jam_kerja_text .= $kategoriwaktuabsen[$id_hr_kerja]." ( ".$dt_hr_kerja['jam_masuk']." - ".$dt_hr_kerja['jam_pulang']." ), ";
+            }
+            foreach($durasibekerja as $idhrkerja=>$dthrkerja){
+                $durasi_kerja_text .= $kategoriwaktuabsen[$idhrkerja]." ( ".$dthrkerja['lama_kerja']." Jam ), ";
+            }
+
+            foreach($jam_kerja_ramadhan as $id_hr_kerjaramadhan=>$dt_hr_kerjaramadhan){
+                $jam_kerja_textramadhan .= $kategoriwaktuabsen[$id_hr_kerjaramadhan]." ( ".$dt_hr_kerjaramadhan['jam_masuk']." - ".$dt_hr_kerjaramadhan['jam_pulang']." ), ";
+            }
+            foreach($durasibekerja_ramadhan as $idhrkerjaramadhan=>$dthrkerjaramadhan){
+                $durasi_kerja_textramadhan .= $kategoriwaktuabsen[$idhrkerjaramadhan]." ( ".$dthrkerjaramadhan['lama_kerja']." Jam ), ";
+            }
+
+            $data['durasibekerja'] = $durasibekerja;
+            $data['jam_kerja_text'] = trim($jam_kerja_text, ", \t\n");
+            $data['durasi_kerja_text'] = trim($durasi_kerja_text, ", \t\n");
+
+            $data['jam_kerja_textramadhan'] = trim($jam_kerja_textramadhan, ", \t\n");
+            $data['durasi_kerja_textramadhan'] = trim($durasi_kerja_textramadhan, ", \t\n");
+
+            $data['periodeaktif'] = $this->repomsperiodeskp->findWhereRaw("","status = '1'");
+            $data['arrBulanPanjang'] = Fungsi::nm_bulan();
+            return view('content.hal_pegawai.home',$data);
         }else{
             $jns_kelamin = Fungsi::arrjenis_kelamin();
             $rsData = $this->repomspegawai->getdata(['nm_golongan','nm_pendidikan'],1);
@@ -45,37 +98,37 @@ class IndexController extends Controller
         }
     }
 
-    
+
     public function create()
     {
         //
     }
 
-    
+
     public function store(Request $request)
     {
         //
     }
 
-    
+
     public function show($id)
     {
         //
     }
 
-    
+
     public function edit($id)
     {
         //
     }
 
-    
+
     public function update(Request $request, $id)
     {
         //
     }
 
-    
+
     public function destroy($id)
     {
         //

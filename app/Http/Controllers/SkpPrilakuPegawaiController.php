@@ -42,7 +42,7 @@ class SkpPrilakuPegawaiController extends Controller
         $data['rsData'] = $this->repomsperiodeskp->get("",$tahun);
         $arrBatas = array();
         foreach($data['rsData'] as $rsx=>$rx){
-            $arrBatas[$rx->bulan] = $rx->tgl_batas_skp;
+            $arrBatas[$rx->bulan] = $rx->tgl_potongan3persen;
         }
         $data['periodeaktif'] = $this->repomsperiodeskp->findWhereRaw("","status = '1'");
         $data['arrBulan'] = Fungsi::nm_bulan_sing();
@@ -65,13 +65,13 @@ class SkpPrilakuPegawaiController extends Controller
             if(date('Ymd',strtotime($r->created_at)) > date('Ymd',strtotime($arrBatas[$r->dt_periode->bulan]))){
                 $keterlambatan = Fungsi::hitung_absen($arrBatas[$r->dt_periode->bulan],date('Y-m-d',strtotime($r->created_at)),"");
                 $keter = $keterlambatan['jmabsen']-1;
-                if($keter>5 && $keter<10){
-                    $arrRekapskp[$r->dt_periode->bulan]['point_disiplin'] = 3;
-                    $arrRekapskp[$r->dt_periode->bulan]['ket_disiplin'] = "Terlambat ".$keter." hari";
-                }elseif($keter>10){
+                $arrRekapskp[$r->dt_periode->bulan]['point_disiplin'] = 3;
+                $arrRekapskp[$r->dt_periode->bulan]['ket_disiplin'] = "Terlambat ".$keter." hari";
+                if($keter>10){
                     $arrRekapskp[$r->dt_periode->bulan]['point_disiplin'] = 100;
                     $arrRekapskp[$r->dt_periode->bulan]['ket_disiplin'] = "Terlambat ".$keter." hari";
                 }
+                //$arrRekapskp[$r->dt_periode->bulan]['keter'] = $keter;
             }
         }
         //dd($arrRekapskp);

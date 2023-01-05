@@ -58,21 +58,58 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <div class="alert alert-warning">
-                    <span>
-                        <ul>Ketentuan Disiplin Pengumpulan SKP Point Pengurang E-Remun:
-                            <li>Terlambat lebih dari 5 hari kerja point remun dikurangi 3% pada setiap periode pengisian skp</li>
-                            <li>Terlambat lebih dari 10 hari kerja point remun dikurangi 10% pada setiap periode pengisian skp</li>
-                            <li>Penentuan point pengurang e-remun dilihat berdasarkan tanggal pengumpulan skp dan batas tanggal pengumpulan</li>
-                        </ul>
-                        <ul>
-                            <li>NB : Skp dapat dinilai oleh atasan pegawai ketika file skp sudah diunggah oleh pegawai. File skp yang sudah dinilai dan divalidasi tidak bisa diubah kembali.</li>
-                        </ul>
-                    </span>
+                <div calss="row">
+                    <div class="col-md-12">
+                        <div class="alert alert-warning">
+                            <span>
+                                <ul>Ketentuan Disiplin Pengumpulan SKP Point Pengurang E-Remun:
+                                    <li>Terlambat lebih dari 5 hari kerja point remun dikurangi 3% pada setiap periode pengisian skp</li>
+                                    <li>Terlambat lebih dari 10 hari kerja point remun dikurangi 100% pada setiap periode pengisian skp</li>
+                                    <li>Penentuan point pengurang e-remun dilihat berdasarkan tanggal pengumpulan skp dan batas tanggal pengumpulan</li>
+                                </ul>
+                                <ul>
+                                    <li>NB : Skp dapat dinilai oleh atasan pegawai ketika file skp sudah diunggah oleh pegawai. File skp yang sudah dinilai dan divalidasi tidak bisa diubah kembali.</li>
+                                </ul>
+                            </span>
+                        </div>
+                    </div>
                 </div>
-                <span>
-                    <i><b>Batas Pengumpulan dan penilaian SKP : {{date('d-m-Y',strtotime($periode_skp->tgl_batas_skp))}}</b></i>
-                </span>
+                <div calss="row">
+                    <div class="col-md-12">
+                        <table>
+                            <tr>
+                                <td >Skp Terisi</td>
+                                <td >: </td>
+                                <td ><div id="terisi"></div></td>
+                            </tr>
+                            <tr><td>Skp Belum Terisi</td>
+                                <td>: </td>
+                                <td><div id="belumterisi"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Skp Belum Dinilai</td>
+                                <td>: </td>
+                                <td><div id="sudahdiisibelumdinilai"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Skp Sudah Dinilai</td>
+                                <td>: </td>
+                                <td><div id="sudahdinilai"></div></td>
+                            </tr>
+                            <tr>
+                                <td>Batas Pengumpulan Skp</td>
+                                <td>: </td>
+                                <td><i><b>{{date('d-m-Y',strtotime($periode_skp->tgl_batas_skp))}}</b></i></td>
+                            </tr>
+                            <tr>
+                                <td>Tanggal Pengurang remun 3%</td>
+                                <td>: </td>
+                                <td><i><b>{{date('d-m-Y',strtotime($periode_skp->tgl_potongan3persen))}}</b></i></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -93,7 +130,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $no=1;?>
+                            <?php $no=1;$terisi = 0;$belumterisi=0;$sudahdiisibelumdinilai=0;$sudahdinilai=0;?>
                             @foreach($rsData as $rs=>$r)
                             <?php
                             $dtnilai_skp = $arrrekapnilai[$r->id_sdm];
@@ -105,9 +142,19 @@
                             }
                             if($dtnilai_skp['nilai_skp']==null && $dtnilai_skp['created_at']!=null){
                                 $ket = "Belum dinilai.<br/>".$dtnilai_skp['ket_disiplin'];
+                                $sudahdiisibelumdinilai++;
                             }
                             if($dtnilai_skp['ket_justifikasi']){
                                 $point = "0";
+                            }
+                            if($dtnilai_skp!=null){
+                                $terisi++;
+                            }
+                            if($dtnilai_skp==null){
+                                $belumterisi++;
+                            }
+                            if($dtnilai_skp['nilai_skp']){
+                                $sudahdinilai++;
                             }
                             ?>
                             <tr>
@@ -204,7 +251,14 @@
     </div>
 </div>
 <div id="balik"></div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <meta name="csrf_token" content="{{ csrf_token() }}" />
+<script type="text/javascript">
+document.getElementById("terisi").innerHTML = "{{$terisi}} Pegawai";
+document.getElementById("belumterisi").innerHTML = "{{$belumterisi}} Pegawai";
+document.getElementById("sudahdiisibelumdinilai").innerHTML = "{{$sudahdiisibelumdinilai}} Pegawai";
+document.getElementById("sudahdinilai").innerHTML = "{{$sudahdinilai}} Pegawai";
+</script>
 <script>
 function edit(tgl,id_sdm,kode)
 {

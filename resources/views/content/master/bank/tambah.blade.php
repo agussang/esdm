@@ -22,7 +22,7 @@
                     <div class="col-md-4">
                         <div class="input-group mb-4">
                             <div class="input-group-prepend">
-                            <span class="input-group-text" id="inputGroup-sizing-default">Kode Bank</span>
+                            <span class="input-group-text" id="inputGroup-sizing-default">Bank</span>
                             </div>
                             <input type="text" class="form-control" aria-label="Default" name="kode_bank" aria-describedby="inputGroup-sizing-default" required>
                         </div>

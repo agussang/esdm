@@ -61,6 +61,8 @@
                     <th rowspan="2">Durasi Bekerja <br/>(Jam)</th>
                     <th rowspan="2">Durasi Bekerja <br/>(Menit)</th>
                     <th rowspan="2">Durasi Terlambat<br/>(Menit)</th>
+                    <th rowspan="2">Durasi Pulang Cepat<br/>(Menit)</th>
+                    <th rowspan="2">Ket Tanggal</th>
                     <th rowspan="2">Ket</th>
                     <th colspan="2">Ket Justifikasi</th>
                 </tr>
@@ -70,92 +72,122 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $no=1;?>
                 @foreach($arrData as $id_sdm=>$dt_sdm)
-                    @foreach($dt_sdm['data_presensi'] as $tanggal=>$presensi)
-                    <?php
-                    $hariabsen = explode(',',$presensi['ket_tgl']);
-                    $jam_masuk = array_shift($presensi['jam_absen']);
-                    $jam_keluar = end($presensi['jam_absen']);
-                    if($jam_keluar==null){
-                        $jam_keluar = $jam_masuk;
-                    }
-                    if($hariabsen[0]=="Jumat"){
-                        $jamkerja = $jam_kerja[2];
-                    }else{
-                        $jamkerja = $jam_kerja[1];
-                    }
-                    $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
-                    $jam_masukex = explode(':',$jam_masuk);
-                    $jam_keluarex = explode(':',$jam_keluar);
+                    @foreach($data_bulan as $id_bulan=>$dtbulan)
+                        <?php $no=1;?>
+                        @foreach($dtbulan['list_tgl'] as $tgl=>$dtgl)
+                        <?php
+                        $presensi = $dt_sdm['data_presensi'][$tgl];
+                        $hariabsen = explode(',',$dtgl['tgl']);
+                        $jam_masuk = array_shift($presensi['jam_absen']);
+                        $jam_keluar = end($presensi['jam_absen']);
+                        if($jam_keluar==null){
+                            $jam_keluar = $jam_masuk;
+                        }
+                        if($hariabsen[0]=="Jumat"){
+                            $jamkerja = $jam_kerja[2];
+                        }else{
+                            $jamkerja = $jam_kerja[1];
+                        }
+                        $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
+                        $jam_masukex = explode(':',$jam_masuk);
+                        $jam_keluarex = explode(':',$jam_keluar);
 
-                    $j_masuk_start = $jam_masukex[0];
-                    $menit_masuk_start = $jam_masukex[1];
+                        $j_masuk_start = $jam_masukex[0];
+                        $menit_masuk_start = $jam_masukex[1];
+                        $ket = "";
+                        $j_keluar_start = $jam_keluarex[0];
+                        $menit_keluar_start = $jam_keluarex[1];
+                        $gabung = 0;$menit = 0;$hitungdurasi_terlambat = 0;$hitungdurasi_pulang_cepat = 0;
+                        $warna = "";
+                        if($jam_masuk!=null){
+                            if(str_replace(':','',$jam_keluar) < str_replace(':','',$jamkerja['jam_pulang'])){
+                                if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $jam_masuk != "--:--" && $jam_keluar != "--:--"){
 
-                    $j_keluar_start = $jam_keluarex[0];
-                    $menit_keluar_start = $jam_keluarex[1];
-
-                    $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
-                    $hasil = $hasil / 60;
-                    $hasil = number_format($hasil,2);
-                    $hasilx = explode(".",$hasil);
-                    $depan = sprintf("%02d", $hasilx[0]);
-                    $gabung = $depan.":".$hasilx[1];
-                    $warna = "";
-                    $hitungdurasi_terlambat = 0;
-                    $ket = "";
-                    $libur = $dt_hari_libur[substr($tanggal,0,7)][$tanggal];
-                    if($jam_masuk == $jam_keluar){
-                        $ket = "Absen 1 kali";
-                    }
-                    if($libur){
-                        $warna = "background-color: #E3CC6D;";
-                        $ket = $libur;
-                    }else{
-                        if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
-                            if($gabung < $durasi){
-                                $warna = "background-color: #F78282;";
-                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
-                                if($hitungdurasi_terlambat>0){
-                                    $ket = "Terlambat";
+                                    if($jam_masuk!=$jam_keluar){
+                                        $ket = "Pulang Cepat";
+                                        $pulang_cepat++;
+                                        $hitungdurasi_pulang_cepat = Fungsi::hitungdurasipulangcepat($jam_keluar,$jamkerja['jam_pulang']);
+                                    }
                                 }
                             }
-                        }
-                    }
-                    if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu"){
-                        $warna = "background-color: #E3CC6D;";
-                    }
-                    $menit = ($gabung*60)+$hasilx[1];
 
-                    $kategori = "";
-                    $durasijustifikasi = "";
-                    $menitjustifikasi = 0;
-                    if($presensi['justifikasi']){
-                        $kategori = $presensi['justifikasi']['kategori_justifikasi'];
-                        $durasijustifikasi = $presensi['justifikasi']['durasi_justifikasi']." Menit";
-                        $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
-                    }
-                    ?>
-                    <tr style="{{$warna}}">
-                        <td>{{$no++}}</td>
-                        <td>{{$dt_sdm['nip']}}</td>
-                        <td>{{$dt_sdm['nm_sdm']}}</td>
-                        <td>{{$presensi['ket_tgl']}}</td>
-                        <td align="center">{{$jam_masuk}}</td>
-                        <td align="center">{{$jam_keluar}}</td>
-                        <td align="center">{{$gabung}}</td>
-                        <td align="center">{{$menit}}</td>
-                        <td align="center">{{$hitungdurasi_terlambat-$menitjustifikasi}}</td>
-                        <td align="center">
-                            {{$ket}}
-                        </td>
-                        <td>
-                            {{$kategori}}
-                        </td>
-                        <td>
-                            {{$durasijustifikasi}}
-                        </td>
-                    </tr>
+
+                            if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                                //if($gabung < $durasi){
+                                    $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                    if($hitungdurasi_terlambat>0){
+                                        $ket = "Terlambat Datang";
+                                    }
+                                    if($jam_masuk == $jam_keluar){
+                                        $ket = "Absen 1x";
+                                    }
+                                //}
+                            }
+
+                            //$menit = ($gabung*60)+$hasilx[1];
+
+                            $kategori = "";
+                            $durasijustifikasi = "";
+                            $menitjustifikasi = 0;
+                            if($presensi['justifikasi']){
+                                $kategori = $presensi['justifikasi']['kategori_justifikasi'];
+                                $durasijustifikasi = $presensi['justifikasi']['durasi_justifikasi']." Menit";
+                                $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
+                            }
+                        }
+                        if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                            if($ket == null && $jam_masuk==null && $jam_keluar==null){
+                                $ket = "Tidak Hadir";
+                                $warna = "background-color: #F1E780;";
+                            }
+                        }
+                        if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu" || $dtgl['ket_nasional'] != null){
+                            $warna = "background-color: #F98686;";
+                            $ket = "";
+                        }
+                        if($jam_masuk == null){
+                            $jam_masuk = "--:--";
+                        }
+                        if($jam_keluar == null){
+                            $jam_keluar = "--:--";
+                        }
+                        $absenkehadiran = $dt_sdm['dt_absen'][$tgl]['alasan_absen'];
+                        if($absenkehadiran!=null){
+                            $ket = $absenkehadiran['kode_alasan'];
+                            $warna = "background-color: #F1E780;";
+                            $hitungdurasi_terlambat = "0";
+                            $hitungdurasi_pulang_cepat = 0;
+                        }
+                        $durasikerja = "00:00:00";$durasikerjamenit = "0";
+                        if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
+                            $jamawal = $tgl." ".$jam_masuk;
+                            $jamakhir = $tgl." ".$jam_keluar;
+                            $durasikerja = Fungsi::durasikerja($jamawal,$jamakhir);
+                            $durasikerjamenit = Fungsi::konversiwaktu($durasikerja);
+                        }
+                        ?>
+                        <tr style="{{$warna}}">
+                            <td>{{$no++}}</td>
+                            <td>{{$dt_sdm['nip']}}</td>
+                            <td>{{$dt_sdm['nm_sdm']}}</td>
+                            <td>{{$dtgl['tgl']}}</td>
+                            <td>{{$jam_masuk}}</td>
+                            <td>{{$jam_keluar}}</td>
+                            <td>{{$durasikerja}}</td>
+                            <td>{{$durasikerjamenit}}</td>
+                            <td>{{$hitungdurasi_terlambat}}</td>
+                            <td>{{$hitungdurasi_pulang_cepat}}</td>
+                            <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
+                            <td>{{$ket}}</td>
+                            <td>
+                                {{$kategori}}
+                            </td>
+                            <td>
+                                {{$durasijustifikasi}}
+                            </td>
+                        </tr>
+                        @endforeach
                     @endforeach
                 @endforeach
             </tbody>

@@ -41,7 +41,7 @@ if($induk[0]=="setting"){
 }
 
 ?>
-<li class="{{ $induk[0]=="home" ? 'active' : '' }}">
+<li class="{{ $induk[0]=="beranda" ? 'active' : '' }}">
     <a href="{{URL::to('/beranda')}}"> <i class="fa fa-home"></i><span> Home</span> </a>
 </li>
 <li class="{{ $induk[0]=="pegawai" ? 'active' : '' }}">

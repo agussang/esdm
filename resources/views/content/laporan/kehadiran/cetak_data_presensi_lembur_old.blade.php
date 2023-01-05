@@ -90,38 +90,30 @@
                     $j_keluar_start = $jam_keluarex[0];
                     $menit_keluar_start = $jam_keluarex[1];
 
-                    // $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
-                    // $hasil = $hasil / 60;
-                    // $hasil = number_format($hasil,2);
-                    // $hasilx = explode(".",$hasil);
-                    // $depan = sprintf("%02d", $hasilx[0]);
-                    // $gabung = $depan.":".$hasilx[1];
+                    $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
+                    $hasil = $hasil / 60;
+                    $hasil = number_format($hasil,2);
+                    $hasilx = explode(".",$hasil);
+                    $depan = sprintf("%02d", $hasilx[0]);
+                    $gabung = $depan.":".$hasilx[1];
                     $warna = "";
 
-                    // if($gabung < $durasi){
-                    //     $warna = "background-color: #F78282;";
-                    // }
-                    $durasikerja = "00:00:00";$durasikerjamenit = "0";
-                    if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
-                        $jamawal = $tgl." ".$jam_masuk;
-                        $jamakhir = $tgl." ".$jam_keluar;
-                        $durasikerja = Fungsi::durasikerja($jamawal,$jamakhir);
-                        $durasikerjamenit = Fungsi::konversiwaktu($durasikerja);
+                    if($gabung < $durasi){
+                        $warna = "background-color: #F78282;";
                     }
                     $hari = explode(',',$tanggal);
                     if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu"){
                         $warna = "background-color: #E3CC6D;";
                     }
                     $gabung_lembur = 0;
-                    if($durasikerja>$durasi){
+                    if($gabung>$durasi){
                         $jamkel = explode(':',$jamkerja['jam_pulang']);
                         $jamlembur = -($jamkel[0]-$j_keluar_start);
                         $menit_lembur = -($jamkel[1]-$menit_keluar_start);
                         $gabung_lembur = sprintf("%02d", $jamlembur).":".sprintf("%02d", $menit_lembur);
                     }
-                    //$menit = ($gabung*60)+$hasilx[1];
+                    $menit = ($gabung*60)+$hasilx[1];
                     $gabung_lembur = explode(":",$gabung_lembur);
-
                     ?>
                     <tr style="{{$warna}}">
                         <td>{{$no++}}</td>
@@ -130,8 +122,8 @@
                         <td>{{$presensi['ket_tgl']}}</td>
                         <td align="center">{{$jam_masuk}}</td>
                         <td align="center">{{$jam_keluar}}</td>
-                        <td align="center">{{$durasikerja}}</td>
-                        <td align="center">{{$durasikerjamenit}}</td>
+                        <td align="center">{{$gabung}}</td>
+                        <td align="center">{{$menit}}</td>
                         <td align="center">{{sprintf("%01d",$gabung_lembur[0])}}</td>
                     </tr>
                     @endforeach

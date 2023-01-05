@@ -309,6 +309,18 @@ if($rsData->file_foto){
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Grade Jabatan</span>
+                            </div>
+                            <select class="form-control" name="id_grade_khusus" id="id_grade_khusus" {{$disabled}}>
+                                {!!$pilihan_grade!!}
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

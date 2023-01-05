@@ -13,6 +13,12 @@ class TrJustifikasi extends Model
     public $incrementing = false;
     protected $table = 'tr_justifikasi';
     protected $primaryKey = 'id_justifikasi';
-    public $keyType = 'string'; 
+    public $keyType = 'string';
+
     protected $guarded = [];
+
+    public function dt_pegawai()
+    {
+        return $this->belongsTo(MsPegawai::class, 'id_sdm', 'id_sdm');
+    }
 }

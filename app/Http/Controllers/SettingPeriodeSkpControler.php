@@ -30,22 +30,29 @@ class SettingPeriodeSkpControler extends Controller
             if($r->tgl_batas_skp==null){
                 $bulan = $r->bulan;
                 $tahunx = $r->tahun;
+                $blntgl = $bulan+1;
+                $tahuntgl = $tahunx;
+                if($blntgl=="13"){
+                    $blntgl = 1;
+                    $tahuntgl = $tahuntgl+1;
+                }
+
                 $tglawal = 5;
-                $gbng = $tahunx."-".sprintf("%02d",$bulan)."-".sprintf("%02d", $tglawal);
+                $gbng = $tahuntgl."-".sprintf("%02d",$blntgl)."-".sprintf("%02d", $tglawal+1);
                 $tgl = Fungsi::formatDate($gbng);
                 $arrData[$tahunx][$bulan] = $gbng;
                 $hari = explode(',',$tgl);
-                if($hari[0]=='Sabtu'){
-                    $gbng2 = $tahunx."-".sprintf("%02d",$bulan)."-".sprintf("%02d", $tglawal+1);
+                if($hari[0]=='Sabtu' || $hari[0]=='Minggu'){
+                    $gbng2 = $tahuntgl."-".sprintf("%02d",$blntgl)."-".sprintf("%02d", $tglawal+1);
                     $tgl2 = Fungsi::formatDate($gbng2);
                     $arrData[$tahunx][$bulan] = $gbng2;
                     $hari2 = explode(',',$tgl2);
                     if($hari2[0]=='Minggu'){
-                        $gbng3 = $tahunx."-".sprintf("%02d",$bulan)."-".sprintf("%02d", $tglawal+2);
+                        $gbng3 = $tahuntgl."-".sprintf("%02d",$blntgl)."-".sprintf("%02d", $tglawal+2);
                         $arrData[$tahunx][$bulan] = $gbng3;
                     }
                 }else if($hari[0]=='Minggu'){
-                    $gbng4 = $tahunx."-".sprintf("%02d",$bulan)."-".sprintf("%02d", $tglawal+1);
+                    $gbng4 = $tahuntgl."-".sprintf("%02d",$blntgl)."-".sprintf("%02d", $tglawal+1);
                     $arrData[$tahunx][$bulan] = $gbng4;
                 }
             }
@@ -56,6 +63,7 @@ class SettingPeriodeSkpControler extends Controller
                     $where['tahun'] = $thn;
                     $where['bulan'] = $bln;
                     $req['tgl_batas_skp'] = $tglbln;
+                    $req['tgl_potongan3persen'] = date('Y-m-d', strtotime('+5 days', strtotime($tglbln)));
                     $this->repomsperiodeskp->update($where,$req);
                 }
             }

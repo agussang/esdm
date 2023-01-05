@@ -51,7 +51,6 @@ class DataAbsenController extends Controller
         return view('content.data_pegawai.presensi.data_absen.index',$data);
     }
 
-
     public function create()
     {
         $id_sdm_atasan = Session::get('id_sdm_atasan');

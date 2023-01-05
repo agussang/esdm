@@ -122,7 +122,7 @@
                 <div class="col-md-12">
                     <ul>Ketentuan Disiplin Pengumpulan SKP Point Pengurang E-Remun:
                         <li>Terlambat lebih dari 5 hari kerja point remun dikurangi 3% pada setiap periode pengisian skp</li>
-                        <li>Terlambat lebih dari 10 hari kerja point remun dikurangi 10% pada setiap periode pengisian skp</li>
+                        <li>Terlambat lebih dari 10 hari kerja point remun dikurangi 100% pada setiap periode pengisian skp</li>
                         <li>Penentuan point pengurang e-remun dilihat berdasarkan tanggal pengumpulan skp dan batas tanggal pengumpulan</li>
                     </ul>
                 </div>
@@ -139,9 +139,9 @@
                         <span><b>Data Pengisian Prilaku dan Sasaran Kinerja Pegawai Tahun {{$tahun}}</b></span>
                     </div>
                     <div class="col-md-4">
-                        @if($periodeaktif->tahun==$tahun)
+                        {{-- @if($periodeaktif->tahun==$tahun)
                             <a href="{{URL::to('/skp-pegawai/skp/isi')}}/{{Crypt::encrypt($periodeaktif->id)}}/{{Crypt::encrypt($dtpegawai->id_sdm)}}" class="btn btn-primary pull-right"><i class="fas fa-pencil-ruler text-white"></i> Isi / Edit Nilai Prilaku Dan Skp</a>
-                        @endif
+                        @endif --}}
                     </div>
                 </div>
                 <hr/>
@@ -154,7 +154,7 @@
                                     <tr>
                                         <th rowspan="2">No</th>
                                         <th colspan="2">Periode SKP</th>
-                                        <th colspan="5">Realisasi SKP</th>
+                                        <th colspan="4">Realisasi SKP</th>
                                         <th rowspan="2">Aksi</th>
                                     </tr>
                                     <tr>
@@ -164,7 +164,7 @@
                                         <th>File Skp</th>
                                         <th>Status Validasi</th>
                                         <th>Point Pengurang</th>
-                                        <th>Justifikasi Atasan</th>
+                                        {{-- <th>Justifikasi Atasan</th> --}}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -220,16 +220,20 @@
                                                 </i>
                                             </span>
                                         </td>
-                                        <td align="center">
+                                        {{-- <td align="center">
                                             @if($dtrekap['ket_justifikasi'])
                                             <a href="#" class="mt-2 badge badge-primary" data-trigger="hover" data-toggle="popover" data-content="{{$dtrekap['ket_justifikasi']}}">Ya</a>
                                             @else
                                             <a href="#" class="mt-2 badge badge-danger">Tidak</a>
                                             @endif
-                                        </td>
+                                        </td> --}}
                                         <td>
                                             @if($dtrekap)
                                             <a href="{{URL::to('/skp-pegawai/skp/isi')}}/{{Crypt::encrypt($dtrekap['idperiode'])}}/{{Crypt::encrypt($dtpegawai->id_sdm)}}" class="btn btn-primary"><i class="fas fa-eye text-white"></i> Lihat</a>
+                                            @else
+                                                @if($periodeaktif->bulan==$r->bulan)
+                                                <a href="{{URL::to('/skp-pegawai/skp/isi')}}/{{Crypt::encrypt($periodeaktif->id)}}/{{Crypt::encrypt($dtpegawai->id_sdm)}}" class="btn btn-primary"><i class="fas fa-pencil-ruler text-white"></i> Isi Skp</a>
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>

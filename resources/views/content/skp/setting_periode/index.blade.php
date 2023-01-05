@@ -48,11 +48,12 @@
                                 <th rowspan="2">Kode</th>
                                 <th rowspan="2">Bulan</th>
                                 <th rowspan="2">Tahun</th>
-                                <th colspan="2">Batas Pengumpulan Skp</th>
+                                <th colspan="3">Batas Pengumpulan Skp</th>
                                 <th rowspan="2">Aktif ?</th>
                             </tr>
                             <tr>
-                                <th>Tanggal</th>
+                                <th>Tanggal Batas</th>
+                                <th>Point Disiplin 3%</th>
                                 <th>Aksi ?</th>
                             </tr>
                         </thead>
@@ -69,6 +70,9 @@
                                 <td>{{$r->tahun}}</td>
                                 <td>
                                     <input type="date" class="form-control" name="tgl_batas_skp" value="{{$r->tgl_batas_skp}}" required>
+                                </td>
+                                <td>
+                                    <input type="date" class="form-control" name="tgl_potongan3persen" value="{{$r->tgl_potongan3persen}}" required>
                                 </td>
                                 <td>
                                     <button class="btn btn-primary"><i class="fas fa-save"></i> Update</button>

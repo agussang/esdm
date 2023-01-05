@@ -48,26 +48,7 @@
         <span><b>Data Presensi Pegawai Bulanan</b></span><br/>
         <span><b>Jam Kerja {{$jam_kerja_text}}</b></span><br/>
         <br/><hr style="border: 1px solid"/><br/>
-        <table width="100%" border=0 cellspacing=0 cellpadding="3" style="font-size:12pt";>
-            <thead>
-                <tr>
-                    <td>Nama Bulan</td>
-                    <td>:</td>
-                    <td>{{$dt_bln['nm_bulan']}}</td>
-                    <td>Jumlah Hari</td>
-                    <td>:</td>
-                    <td>{{count($dt_bln['list_tgl'])}}</td>
-                </tr>
-                <tr>
-                    <td>Jumlah Hari Kerja</td>
-                    <td>:</td>
-                    <td>{{count($dt_bln['hari_kerja'])}}</td>
-                    <td>Jumlah Hari Libur Nasional</td>
-                    <td>:</td>
-                    <td>{{count($dt_bln['hari_libur_nasional'])}}</td>
-                </tr>
-            </thead>
-        </table>
+        <span style="float:left;">Presensi Bulan {{$dt_bln['nm_bulan']}}</span>
         <table width="950" border=1 cellspacing=0 cellpadding="3" style="font-size:10pt";>
             <thead>
                 <tr>
@@ -101,7 +82,7 @@
                     <td>{{$no++}}</td>
                     <td>{{$dt_sdm['nip']}}</td>
                     <td>{{$dt_sdm['nm_sdm']}}</td>
-                    <td align="center">{{count($dt_bln['hari_kerja'])}}</td>
+                    <td align="center">{{$jmh_hari_kerja}}</td>
                     <td align="center">{{(int)$dt_presensi['masuk']['total']}}</td>
                     <td align="center">{{(int)$dt_presensi['tidakmasuk']['total']}}</td>
                     <td align="center">{{(int)$dt_presensi['telat']['total']}}</td>

@@ -30,7 +30,7 @@ abstract class Repository
             ->first();
     }
 
-    public function getWhereRaw($with = null, $whereRaw,$orderby){
+    public function getWhereRaw($with = null, $whereRaw,$orderby = null){
         return $this->model
             ->when($with, function ($query) use ($with) {
                 return $query->with($with);
@@ -38,7 +38,9 @@ abstract class Repository
             ->when($whereRaw, function ($query) use ($whereRaw) {
                 return $query->whereRaw($whereRaw);
             })
-            ->orderBy($orderby,'asc')
+            ->when($orderby, function ($query) use ($orderby) {
+                return $query->orderBy($orderby,'asc');
+            })
             ->get();
     }
 

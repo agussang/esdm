@@ -63,6 +63,9 @@ if($induk[0]=="setting"){
         <li class="{{ $induk[1]=="waktu-shift" ? 'active' : '' }}">
             <a href="{{route('data-master.waktu-shift')}}">  <i class="dripicons dripicons-alarm"></i><span> Master Waktu Presensi Shift</span> </a>
         </li>
+        <li class="{{ $induk[1]=="tanggal-ramadhan" ? 'active' : '' }}">
+            <a href="{{route('data-master.tanggal-ramadhan')}}">  <i class="dripicons dripicons-alarm"></i><span> Master Tanggal Ramadhan</span> </a>
+        </li>
         <li class="{{ $induk[1]=="jabatan" ? 'active' : '' }}">
             <a href="{{route('data-master.jabatan')}}">  <i class="fa fa-book"></i><span> Master Jabatan</span> </a>
         </li>

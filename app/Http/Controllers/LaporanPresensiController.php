@@ -38,6 +38,7 @@ class LaporanPresensiController extends Controller
         $data['pilihan_satker'] = Fungsi::pilihan_satker();
         $data['pilihan_sdm'] = Fungsi::pilihan_sdm();
         $data['pilihan_jam_kerja'] = Fungsi::pilihan_jam_kerja();
+        //dd($data);
         return view('content.laporan.kehadiran.index',$data);
     }
 
@@ -62,43 +63,55 @@ class LaporanPresensiController extends Controller
         }
         $tgl_awal = $req['tgl_awal'];
         $tgl_akhir = $req['tgl_akhir'];
-        $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,$req['tipe']);
-        foreach($rsData as $rsx=>$rx){
-            $arrData[$rx->id_sdm]['nm_sdm'] = $rx->nm_sdm;
-            $arrData[$rx->id_sdm]['nip'] = $rx->nip;
-            $arrData[$rx->id_sdm]['data_presensi'] = $getRekapDataAbsen[$rx->id_sdm];
-        }
-        $dt_hari_libur = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_akhir);
-        $data['dt_hari_libur'] = $dt_hari_libur;
-        $data['arrData'] = $arrData;
-        $data['jam_kerja'] = $jam_kerja;
-        $jam_kerja_text = "";
-        $kategoriwaktuabsen = Fungsi::kategoriwaktuabsen();
-        foreach($jam_kerja as $id_hr_kerja=>$dt_hr_kerja){
-            $jam_kerja_text .= $kategoriwaktuabsen[$id_hr_kerja]." ( ".$dt_hr_kerja['jam_masuk']." - ".$dt_hr_kerja['jam_pulang']." ), ";
-        }
-        $data['jam_kerja_text'] = trim($jam_kerja_text, ", \t\n");
-        $data['data_bulan'] = Fungsi::jumlah_absen($tgl_awal,$tgl_akhir,1);
-        //dd($arrData);
-        if($req['tipe']==1){
-            return view('content.laporan.kehadiran.cetak_data_presensi',$data);
-        }
-        if($req['tipe']==2){
-            return view('content.laporan.kehadiran.cetak_data_presensi2',$data);
-        }
-        if($req['tipe']==3){
-            return view('content.laporan.kehadiran.cetak_data_presensi_lembur',$data);
-        }
-        if($req['tipe']==4){
-            $rsAlasan = DB::table('ms_alasan_absen')->get();
-            foreach($rsAlasan as $rsa=>$ralasan){
-                $arrAlasan[$ralasan->id_alasan] = $ralasan->alasan;
+        $bulan_awal = date('m',strtotime($tgl_awal));
+        $bulan_akhir = date('m',strtotime($tgl_akhir));
+        if($bulan_awal!=$bulan_akhir){
+            $notification = [
+                'message' => 'Gagal menampilkan data, rekap maksimal yang ditampilkan hanya 1 dalam kurun waktu 1 bulan.',
+                'alert-type' => 'error',
+            ];
+            return redirect()->route('laporan.presensi-kehadiran.index')->with($notification);
+        }else{
+            $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,$req['tipe']);
+            $getDataAbsen = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
+            foreach($rsData as $rsx=>$rx){
+                $arrData[$rx->id_sdm]['nm_sdm'] = $rx->nm_sdm;
+                $arrData[$rx->id_sdm]['nip'] = $rx->nip;
+                $arrData[$rx->id_sdm]['dt_absen'] = $getDataAbsen[$rx->id_sdm];
+                $arrData[$rx->id_sdm]['data_presensi'] = $getRekapDataAbsen[$rx->id_sdm];
             }
-            $thn = date('Y',strtotime($tgl_awal));
-            $data['tahun'] = $thn;
-            $data['arrAlasan'] = $arrAlasan;
+            $dt_hari_libur = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_akhir);
+            $data['dt_hari_libur'] = $dt_hari_libur;
+            $data['arrData'] = $arrData;
+            $data['jam_kerja'] = $jam_kerja;
+            $jam_kerja_text = "";
+            $kategoriwaktuabsen = Fungsi::kategoriwaktuabsen();
+            foreach($jam_kerja as $id_hr_kerja=>$dt_hr_kerja){
+                $jam_kerja_text .= $kategoriwaktuabsen[$id_hr_kerja]." ( ".$dt_hr_kerja['jam_masuk']." - ".$dt_hr_kerja['jam_pulang']." ), ";
+            }
+            $data['jam_kerja_text'] = trim($jam_kerja_text, ", \t\n");
+            $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_akhir,1);
             //dd($data['arrData']);
-            return view('content.laporan.kehadiran.cetak_data_presensi_bulanan',$data);
+            if($req['tipe']==1){
+                return view('content.laporan.kehadiran.cetak_data_presensi',$data);
+            }
+            if($req['tipe']==2){
+                return view('content.laporan.kehadiran.cetak_data_presensi2',$data);
+            }
+            if($req['tipe']==3){
+                return view('content.laporan.kehadiran.cetak_data_presensi_lembur',$data);
+            }
+            if($req['tipe']==4){
+                $rsAlasan = DB::table('ms_alasan_absen')->get();
+                foreach($rsAlasan as $rsa=>$ralasan){
+                    $arrAlasan[$ralasan->id_alasan] = $ralasan->alasan;
+                }
+                $thn = date('Y',strtotime($tgl_awal));
+                $data['tahun'] = $thn;
+                $data['arrAlasan'] = $arrAlasan;
+                //dd($data['arrData']);
+                return view('content.laporan.kehadiran.cetak_data_presensi_bulanan',$data);
+            }
         }
 
     }

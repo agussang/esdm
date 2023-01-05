@@ -129,13 +129,17 @@ class PresensiController extends Controller
                     'message' => 'Gagal, Tidak bisa membaca file excel.',
                     'alert-type' => 'error',
                 ];
-                return redirect()->route('data-pegawai.data-presensi.upload-presensi.index')->with($notification);
+                return redirect()->route('data-pegawai.data-presensi.jadwal-presensi-shift.import-jadwal')->with($notification);
             }else{
                 $array = Excel::toArray(new RiwayatPresensiImport(), request()->file('file_excel'));
                 unset($array[0][0]);
                 $xls = $array[0];
                 $arrData = array();$arrgagal = array();
                 foreach ($xls as $rx=>$r) {
+                    $tgl_absen = date('Y-m-d',strtotime($r[2]));
+                    if($tgl_absen == '1970-01-01'){
+                        $tgl_absen = Fungsi::strToDate($r[2]);
+                    }
                     $nip = trim($r[0]);
                     $cekidsdm = $this->repomspegawai->findId("",$nip,"nip");
                     if($cekidsdm){
@@ -178,14 +182,14 @@ class PresensiController extends Controller
                     'alert-type' => 'success',
                 ];
 
-                return redirect()->route('data-pegawai.data-presensi.jadwal-presensi-shift.index')->with($notification);
+                return redirect()->route('data-pegawai.data-presensi.jadwal-presensi-shift.import-jadwal')->with($notification);
             }
         } catch (Exception $e) {
             $notification = [
                 'message' => 'Gagal, Tidak bisa membaca file excel.',
                 'alert-type' => 'error',
             ];
-            return redirect()->route('data-pegawai.data-presensi.jadwal-presensi-shift.index')->with($notification);
+            return redirect()->route('data-pegawai.data-presensi.jadwal-presensi-shift.import-jadwal')->with($notification);
         }
     }
 

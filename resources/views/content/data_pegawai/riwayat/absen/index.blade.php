@@ -55,6 +55,7 @@ $induk = explode('/',request()->path());
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
+                        <a href="{{route('pegawai.riwayat-absen.tambah')}}" class="btn btn-warning pull-right"><i class="fas fa-plus"></i> Tambah Data</a>
                     </div>
                 </div>
                 </from>

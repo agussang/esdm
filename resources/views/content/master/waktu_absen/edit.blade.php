@@ -27,7 +27,7 @@
         </div>
     </div>
 </div>
-<div class="row">
+{{-- <div class="row">
     <div class="col-md-6">
         <div class="input-group mb-4">
             <div class="input-group-prepend">
@@ -44,7 +44,7 @@
             <input type="time" class="form-control" aria-label="Default" name="pulang_telat" aria-describedby="inputGroup-sizing-default" required value="{{$rsData->pulang_telat}}">
         </div>
     </div>
-</div>
+</div> --}}
 <div class="row">
     <div class="col-md-12">
         <a class="btn btn-primary pull-right text-white" onclick="simpan_edit_waktu();"><i class="fas fa-save text-white"></i> Simpan</a>

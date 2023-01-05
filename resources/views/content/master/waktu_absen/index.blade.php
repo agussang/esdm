@@ -69,12 +69,11 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Keterangan</th>
+                                <th>Hari</th>
                                 <th>Jam Masuk</th>
                                 <th>Jam Pulang</th>
-                                <th>Jam Masuk Telat</th>
-                                <th>Jam Pulang Telat</th>
                                 <th>Durasi Bekerja</th>
+                                <th>Keterangan</th>
                                 <th>Aksi ?</th>
                             </tr>
                         </thead>
@@ -95,9 +94,8 @@
                                         <td>{{$dtwaktu['ket']}}</td>
                                         <td>{{$dtwaktu['jam_masuk']}}</td>
                                         <td>{{$dtwaktu['jam_keluar']}}</td>
-                                        <td>{{$dtwaktu['masuk_telat']}}</td>
-                                        <td>{{$dtwaktu['pulang_telat']}}</td>
                                         <td>{{$dtwaktu['lama_kerja']}}</td>
+                                        <td>{{$ketramahadhan[$idkatkhusus]}}</td>
                                         <td>
                                             <a onclick="edit('<?php echo $idwaktu;?>');" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary text-white"><i class="fas fa-pencil-ruler text-white"></i> Edit</a>
                                         </td>

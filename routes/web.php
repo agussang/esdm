@@ -40,6 +40,7 @@ use App\Http\Controllers\{
     TrLogloginController,
     MsWaktuShiftController,
     JadwalPresensiShiftController,
+    SettingTanggalRamadhanController,
 };
 
 /*
@@ -124,6 +125,16 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
             Route::get('hapus/{id?}',[MsPendidikanController::class,'destroy'])->name('data-master.pendidikan.hapus');
             Route::get('edit',[MsPendidikanController::class,'edit'])->name('data-master.pendidikan.edit');
             Route::post('/update',[MsPendidikanController::class,'update'])->name('data-master.pendidikan.update');
+        });
+
+        Route::group(['prefix' => 'tanggal-ramadhan'], function () {
+            Route::get('/',[SettingTanggalRamadhanController::class,'index'])->name('data-master.tanggal-ramadhan');
+            Route::post('/cari',[SettingTanggalRamadhanController::class,'cari'])->name('data-master.tanggal-ramadhan.cari');
+            Route::get('tambah',[SettingTanggalRamadhanController::class,'create'])->name('data-master.tanggal-ramadhan.tambah');
+            Route::post('/simpan',[SettingTanggalRamadhanController::class,'store'])->name('data-master.tanggal-ramadhan.simpan');
+            Route::get('hapus/{id?}',[SettingTanggalRamadhanController::class,'destroy'])->name('data-master.tanggal-ramadhan.hapus');
+            Route::get('edit/{id?}',[SettingTanggalRamadhanController::class,'edit'])->name('data-master.tanggal-ramadhan.edit');
+            Route::post('/update',[SettingTanggalRamadhanController::class,'update'])->name('data-master.tanggal-ramadhan.update');
         });
 
         Route::group(['prefix' => 'kategori-pelanggaran'], function () {
@@ -399,6 +410,10 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
 });
 Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
     Route::get('beranda',[IndexController::class,'index'])->name('beranda');
+    Route::group(['prefix' => 'justifikasi'], function () {
+        Route::get('/pengajuan/{id_sdm?}/{tanggal?}/{kode?}',[MsPegawaiController::class,'pengajuan_justifikasi'])->name('justifikasi.pengajuan');
+        Route::post('simpan-pengajuan',[MsPegawaiController::class,'simpan_pengajuan'])->name('justifikasi.simpan-pengajuan-justifikasi');
+    });
     Route::group(['prefix' => 'pegawai'], function () {
         Route::get('/riwayat-apel/{id?}',[MsPegawaiController::class,'riwayat_apel'])->name('pegawai.riwayat-apel');
         Route::post('/cari/apel',[MsPegawaiController::class,'cari_apel'])->name('pegawai.cari.apel');
@@ -408,6 +423,8 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
 
         Route::get('/riwayat-absen/{id?}',[MsPegawaiController::class,'riwayat_absen'])->name('pegawai.riwayat-absen');
         Route::post('/cari/absen',[MsPegawaiController::class,'cari_absen'])->name('pegawai.cari.absen');
+        Route::get('/riwayat-absen-tambah',[MsPegawaiController::class,'tambah_riwayat_absen'])->name('pegawai.riwayat-absen.tambah');
+        Route::post('/riwayat-absen-tambah-simpan',[MsPegawaiController::class,'tambah_riwayat_absen_simpan'])->name('pegawai.riwayat-absen.tambah.simpan');
 
         Route::get('detil/{id?}',[MsPegawaiController::class,'show'])->name('pegawai.detil-data');
         Route::post('/update',[MsPegawaiController::class,'update'])->name('pegawai.update');
@@ -430,6 +447,10 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
         Route::get('/detil/{id?}',[MsPegawaiController::class,'show'])->name('pegawai-bawahan.detil_pegawai');
         Route::get('/pegawai',[MsPegawaiController::class,'bawahan'])->name('pegawai-bawahan.pegawai');
         Route::post('/cari',[MsPegawaiController::class,'cari_bawahan'])->name('pegawai-bawahan.cari');
+        Route::get('/approve-justifikasi/{id_sdm?}/{tahun?}/{bulan?}',[MsPegawaiController::class,'form_approve_justifikasi'])->name('pegawai-bawahan.approve-justifikasi');
+        Route::get('/proses-justifikasi/{id_justifikasi?}',[MsPegawaiController::class,'proses_justifikasi'])->name('pegawai-bawahan.proses-justifikasi');
+        Route::post('simpan-proses-pengajuan-justifikasi',[MsPegawaiController::class,'simpan_proses_pengajuan'])->name('pegawai-bawahan.simpan-proses-pengajuan-justifikasi');
+
 
         Route::get('/riwayat-apel/{id?}',[MsPegawaiController::class,'riwayat_apel'])->name('pegawai-bawahan.riwayat-apel');
         Route::post('/cari/apel',[MsPegawaiController::class,'cari_apel_bawahan'])->name('pegawai-bawahan.cari.apel');

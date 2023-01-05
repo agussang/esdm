@@ -12,7 +12,7 @@
                                 <h5 class="card-label"><i class="fas fa-list-alt"></i> Data Pegawai Bawahan</h5>
                             </div>
                             <div class="col-md-3">
-
+                               
                             </div>
                         </div>
                     </div>
@@ -56,24 +56,10 @@
         <div class="card">
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-7"></div>
-                    <div class="col-md-5">
-                        @foreach($arrStatusJustifikasi as $key1=>$nm_status1)
-                        <?php
-                        $wrn1 = "primary";
-                        if($key1=="2"){
-                            $wrn1 = "danger";
-                        }
-                        if($key1=="0"){
-                            $wrn1 = "warning";
-                        }
-                        ?>
-                        <button type="button" class="btn mb-1 btn-{{$wrn1}} btn-xs">
-                            {{$nm_status1}} <span class="badge badge-light ml-2 rtl-ml-0 rtl-mr-2">{{(int)$arrRekap[$key1]['jmlh']}}</span>
-                        </button>
-                        @endforeach
+                    <div class="col-md-12">
+                        <a href="#" class="btn btn-warning pull-right">Jumlah hari kerja bulan agustus : {{$dt_rekap_absen['jmabsen']}} Hari </a>
                     </div>
-                </div>
+                </div><br/>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="table-responsive">
@@ -85,7 +71,9 @@
                                         <th>Nama Unit Kerja</th>
                                         <th>Golongan</th>
                                         <th>Jabatan</th>
-                                        <th>Pengajuan Justifikasi</th>
+                                        <th>Presensi Kehadiran</th>
+                                        <th>Jumlah Absen</th>
+                                        <th>Kehadiran Apel</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
@@ -93,6 +81,9 @@
                                     <?php $no=1;
                                     ?>
                                     @foreach($rsData as $rs=>$r)
+                                    <?php
+                                    $rekappresensi = $getRekapDataAbsen[$r->id_sdm][$tahun.$bulan];
+                                    ?>
                                     <tr>
                                         <td>{{$no++}}</td>
                                         <td>
@@ -107,37 +98,40 @@
                                             <li>Jab. Struktural : {{$r->nm_jab_struk->namajabatan}}</li>
                                         </td>
                                         <td>
-                                            @foreach($arrStatusJustifikasi as $key=>$nm_status)
-                                            <?php
-                                            $wrn = "primary";
-                                            if($key=="2"){
-                                                $wrn = "danger";
-                                            }
-                                            if($key=="0"){
-                                                $wrn = "warning";
-                                            }
-                                            ?>
-                                                <div class="row">
-                                                    <div class="col-md-12">
-                                                        <button type="button" class="btn mb-1 btn-{{$wrn}} btn-sm">
-                                                            {{$nm_status}} <span class="badge badge-light ml-2 rtl-ml-0 rtl-mr-2">{{(int)$getajuan_justifikasi[$r->id_sdm][$key]['jmlh']}}</span>
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            @endforeach
+                                            <ul>
+                                                <li style="font-size:12px;">Masuk <br/><b>( {{(int)$rekappresensi['masuk']['total']}} Hari)</b></li>
+                                                <li style="font-size:12px;">Telat <br/><b>( {{(int)$rekappresensi['telat']['total']}} Menit)</b></li>
+                                                <li style="font-size:12px;">Pulang Cepat <br/><b>({{(int)$rekappresensi['pulang_cepat']['total']}} Menit)</b></li>
+                                                <li style="font-size:12px;">Absen Sekali <br/><b>( {{(int)$rekappresensi['absensekali']['total']}} Hari)</b></li>
+                                                <li style="font-size:12px;">Tidak Masuk <br/><b>( {{(int)$rekappresensi['tidakmasuk']['total']}} Hari)</b></li>
+                                            </ul>
                                         </td>
                                         <td>
-                                            {{-- <div class="btn-group" role="group">
+                                            <ul>
+                                                @foreach($rekappresensi['absen'] as $id_alasan=>$dtalasan)
+                                                    @if($dtalasan && $dtalasan['data']['total'])
+                                                        <li style="font-size:12px;">{{$dtalasan['nm_alasan']}} <br/><b>({{$dtalasan['data']['total']}} Hari)</b></li>
+                                                    @endif
+                                                @endforeach
+                                             </ul>
+                                        </td>
+                                        <td>
+                                            <ul>
+                                                <li style="font-size:12px;">Hadir <br/><b>({{(int)$rekappresensi['dt_apel']['hadir']}} Kegiatan)</b></li>
+                                                <li style="font-size:12px;">Tidak Hadir <br/><b>({{(int)$rekappresensi['dt_apel']['tidak_hadir']}} Kegiatan)</b></li>
+                                             </ul>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
                                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     Aksi
                                                 </button>
                                                 <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                                    <a class="dropdown-item" href="{{URL::to('/pegawai-bawahan/detil')}}/{{Crypt::encrypt($r->id_sdm)}}"><i class="fas fa-eye"></i> Lihat Detil</a>
+                                                    {{--  <a class="dropdown-item" href="{{URL::to('/pegawai-bawahan/detil')}}/{{Crypt::encrypt($r->id_sdm)}}"><i class="fas fa-eye"></i> Lihat Detil</a>  --}}
                                                     <a class="dropdown-item" href="{{URL::to('/pegawai-bawahan/justifikasi')}}/{{Crypt::encrypt($r->id_sdm)}}/{{Crypt::encrypt($bulan)}}/{{Crypt::encrypt($tahun)}}"><i class="fas fa-calendar"></i> Justifikasi Kehadiran</a>
                                                     <a class="dropdown-item" href="{{URL::to('/pegawai-bawahan/justifikasi-apel')}}/{{Crypt::encrypt($r->id_sdm)}}/{{Crypt::encrypt($bulan)}}/{{Crypt::encrypt($tahun)}}"><i class="fas fa-tag"></i> Justifikasi Apel</a>
                                                 </div>
-                                            </div> --}}
-                                            <a href="{{URL::to('pegawai-bawahan/approve-justifikasi')}}/{{Crypt::encrypt($r->id_sdm)}}/{{$bulan}}/{{$tahun}}" class="btn btn-primary btn-xs">Approve Pengajuan</a>
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach
