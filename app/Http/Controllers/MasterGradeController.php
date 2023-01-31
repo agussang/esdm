@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Repositories\Repomsgrade;
 use App\Repositories\Repoprosentase;
+use App\Models\MsProsentaseRealisasi;
 use Crypt;
 use Fungsi;
 
@@ -51,8 +52,12 @@ class MasterGradeController extends Controller
         foreach($arrData as $id_grade=>$dtgrade){
             $where['id'] = $id_grade;
             unset($dtgrade['grade']);
-            $this->repomsgrade->update($where,$req);
+            $this->repomsgrade->update($where,$dtgrade);
         }
+        $wherepro['id_prosentase'] = $ambilnilai->id_prosentase;
+        $reqpro['is_aktif'] = '1';
+        $update = $this->repoprosentase->update($wherepro,$reqpro);
+        $updatenot = MsProsentaseRealisasi::where('id_prosentase','<>',$ambilnilai->id_prosentase)->where('kode_p',1)->update(['is_aktif'=>'0']);
         echo '<script type="text/javascript">toastr.success("Data grade berhasil di update")</script>';
             echo "<script>
             setTimeout(function () {
@@ -82,8 +87,12 @@ class MasterGradeController extends Controller
         foreach($arrData as $id_grade=>$dtgrade){
             $where['id'] = $id_grade;
             unset($dtgrade['grade']);
-            $this->repomsgrade->update($where,$req);
+            $this->repomsgrade->update($where,$dtgrade);
         }
+        $wherepro['id_prosentase'] = $ambilnilai->id_prosentase;
+        $reqpro['is_aktif'] = '1';
+        $update = $this->repoprosentase->update($wherepro,$reqpro);
+        $updatenot = MsProsentaseRealisasi::where('id_prosentase','<>',$ambilnilai->id_prosentase)->where('kode_p',2)->update(['is_aktif'=>'0']);
         echo '<script type="text/javascript">toastr.success("Data grade berhasil di update")</script>';
             echo "<script>
             setTimeout(function () {
