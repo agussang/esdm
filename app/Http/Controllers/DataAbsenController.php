@@ -172,7 +172,7 @@ class DataAbsenController extends Controller
                     $tgl_akhirx = date('Y-m-d',strtotime($r[3]));
                     $jmlhabsen = Fungsi::hitung_absen($tgl_awalx,$tgl_akhirx);
                     $data['lama_hari'] = $jmlhabsen['jmabsen'];
-                    $data['nip'] = $r[0];
+                    $data['nip'] = trim($r[0]);
                     $data['nama'] = $r[1];
                     $data['tgl_awal'] = $tgl_awalx;
                     $data['tgl_akhir'] = $tgl_akhirx;
@@ -198,7 +198,15 @@ class DataAbsenController extends Controller
                             unset($rp['kode_alasan_absen']);
                             $rp['id_sdm'] = $cek->id_sdm;
                             // masukkan ke ms tr_absen_kehadiran
-                            $this->repotrabsenkehadiran->store($rp);
+                            // cek dulu
+                            $cekdulu = $this->repotrabsenkehadiran->findWhereRaw("","id_sdm = '$cek->id_sdm' and tgl_awal='$rp[tgl_awal]' ");
+                            if($cekdulu){
+                                $where['id_absen'] = $cekdulu->id_absen;
+                                unset($rp['id_sdm']);
+                                $this->repotrabsenkehadiran->update($where,$rp);
+                            }else{
+                                $this->repotrabsenkehadiran->store($rp);
+                            }
                             $jberhasil++;
                         }else{
                             $datagagal[$rp['nip']] = $rp['nama'];
@@ -208,6 +216,7 @@ class DataAbsenController extends Controller
                 $text = "Data berhasil dimasukkan";
                 if($datagagal!=null){
                     $datagagalimp = implode(',',$datagagal);
+                    Session::put('niptidakterdeteksi',$datagagal);
                     $text = "Data berhasil masuk ".$jberhasil. " ,dan ada data yang gagal di masukkan : ($datagagalimp).";
                 }
                 $notification = [
@@ -224,6 +233,12 @@ class DataAbsenController extends Controller
             return redirect()->route('data-pegawai.data-presensi.data-absen.import')->with($notification);
         }
     }
+
+    public function clear(){
+        Session::forget('niptidakterdeteksi');
+        return redirect()->route('data-pegawai.data-presensi.data-absen.import');
+    }
+
 
     public function unggah_sk(){
         $mode = Session::get('mode');

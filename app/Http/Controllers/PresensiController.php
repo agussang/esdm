@@ -34,6 +34,7 @@ class PresensiController extends Controller
 
     public function index()
     {
+
         $data['pilihan_sdm'] = Fungsi::pilihan_sdm();
         $data['pilihan_mesin_finger'] = Fungsi::pilihan_mesin_finger();
         $ket_tgl = $this->repoclocktransaction->get();
@@ -138,7 +139,7 @@ class PresensiController extends Controller
                 foreach ($xls as $rx=>$r) {
                     $tgl_absen = date('Y-m-d',strtotime($r[2]));
                     if($tgl_absen == '1970-01-01'){
-                        $tgl_absen = Fungsi::strToDate($r[2]);
+                        $tgl_absen = Fungsi::inttodate($r[2]);
                     }
                     $nip = trim($r[0]);
                     $cekidsdm = $this->repomspegawai->findId("",$nip,"nip");
@@ -147,7 +148,7 @@ class PresensiController extends Controller
                         $cekkode = $this->repomswaktushift->findWhereRaw("","kode_shift = '$r[3]'");
                         if($cekkode){
                             $data['id_sdm'] = $cekidsdm->id_sdm;
-                            $data['tanggal_absen'] = $r[2];
+                            $data['tanggal_absen'] = $tgl_absen;
                             $data['id_shift'] = $cekkode->id;
                             $arrData[] = $data;
                         }else{
@@ -157,6 +158,7 @@ class PresensiController extends Controller
                         $arrgagal[$r[0]] = $r[1];
                     }
                 }
+                dd($arrData);
                 $jberhasil = 0;
                 foreach($arrData as $key=>$dtkey){
                     // cek sudah ada apa belum

@@ -136,16 +136,16 @@
                             $dtnilai_skp = $arrrekapnilai[$r->id_sdm];
                             $point = "100";
                             $ket = "Belum mengumpulkan.";
-                            if($dtnilai_skp['point_disiplin']){
+                            if($dtnilai_skp['created_at']!=null && $dtnilai_skp['point_disiplin']>0){
                                 $point = $dtnilai_skp['point_disiplin'];
                                 $ket = $dtnilai_skp['ket_disiplin'];
+                            }else if($dtnilai_skp['created_at']!=null && $dtnilai_skp['point_disiplin']<1){
+                                $point = "0";
+                                $ket = "Sudah dinilai";
                             }
                             if($dtnilai_skp['nilai_skp']==null && $dtnilai_skp['created_at']!=null){
                                 $ket = "Belum dinilai.<br/>".$dtnilai_skp['ket_disiplin'];
                                 $sudahdiisibelumdinilai++;
-                            }
-                            if($dtnilai_skp['ket_justifikasi']){
-                                $point = "0";
                             }
                             if($dtnilai_skp!=null){
                                 $terisi++;
@@ -210,7 +210,7 @@
                                             Aksi
                                         </button>
                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
-                                            <a class="dropdown-item" href="{{URL::to('skp-pegawai/skp/detil-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" ><i class="fas fa-eye"></i> {{$text}}</a>
+                                            <a class="dropdown-item" href="{{URL::to('skp/data-skp/penilaian-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" ><i class="fas fa-eye"></i> {{$text}}</a>
                                             @if($dtnilai_skp['nilai_skp'])
                                                 @if(Session::get('level')=='A')
                                                 <a class="dropdown-item" href="{{URL::to('skp-pegawai/skp/reset-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-sync"></i> Reset Penilaian</a>

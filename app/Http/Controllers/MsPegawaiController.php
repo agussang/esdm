@@ -299,6 +299,56 @@ class MsPegawaiController extends Controller
         return view('content.data_pegawai.riwayat.presensi_kehadiran.index',$data);
     }
 
+    public function justifikasi_kehadiran_pegawai($id_sdm,$tanggal,$kode){
+        $data['dt_pegawai'] = $this->repomspegawai->first("",$id_sdm);
+        $data['rsDataAbsen'] = RiwayatPresensi::where("id_sdm",$id_sdm)
+                        ->whereRaw(" tanggal_absen = '$tanggal'")
+                        ->orderBy('tanggal_absen','asc')
+                        ->orderBy('jam_absen','asc')
+                        ->get();
+        $arrData = array();
+        foreach($data['rsDataAbsen'] as $rs=>$r){
+            $tanggal_text = Fungsi::formatDate($r->tanggal_absen);
+            $arrData[$r->tanggal_absen]['tgl_text'] = $tanggal_text;
+            $arrData[$r->tanggal_absen]['jam_absen'][] = $r->jam_absen;
+        }
+        foreach($arrData as $tgl=>$dttgl){
+            $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
+            $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
+            $hariabsen = explode(',',$dttgl['tgl_text']);
+            $jam_masuk = array_shift($dttgl['jam_absen']);
+            $jam_keluar = end($dttgl['jam_absen']);
+            if($jam_keluar==null){
+                    $jam_keluar = $jam_masuk;
+            }
+            if($hariabsen[0]=="Jumat"){
+                    $jamkerja = $jam_kerja[2];
+            }else{
+                    $jamkerja = $jam_kerja[1];
+            }
+            if($jam_masuk!=null){
+                if($kode==3){
+                    $durasi = Fungsi::hitungdurasipulangcepat($jam_keluar,$jamkerja['jam_pulang']);
+                }
+                if($kode==2){
+                    $durasi = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                }
+            }
+        }
+        $data['tgl'] = $tanggal;
+        $data['arrData'] = $arrData;
+        $data['kode'] = $kode;
+        $data['durasi'] = $durasi;
+        $arrKode = Fungsi::arrkategorijustifikasi();
+        $data['text_kategori'] = $arrKode[$kode];
+        // jika 1 maka lupa finger / tidak masuk
+        // jika 2 maka terlambat
+        // jika 3 maka pulang cepat sama seperti terlambat
+        // jika 4 finger 1 kali
+
+        return view('content.data_pegawai.riwayat.presensi_kehadiran.form_ajuan_justifikasi',$data);
+    }
+
     public function pengajuan_justifikasi($id_sdm,$tanggal,$kode){
         $data['dt_pegawai'] = $this->repomspegawai->first("",$id_sdm);
         $data['rsDataAbsen'] = RiwayatPresensi::where("id_sdm",$id_sdm)
@@ -348,7 +398,33 @@ class MsPegawaiController extends Controller
 
         return view('content.hal_pegawai.form_ajuan_justifikasi',$data);
     }
-
+    public function simpan_justifikasi_by_admin(Request $request){
+        $req = $request->except('_token');
+        $req = $request->except('_token');
+        $cekdulu = $this->repotrjustifikasi->findWhereRaw("","id_sdm = '$req[id_sdm]' and tanggal_absen = '$req[tanggal_absen]' and kategori_justifikasi='$req[kategori_justifikasi]' ");
+        if($cekdulu==null){
+            unset($req['nm_sdm']);
+            unset($req['nip']);
+            $req['justifikasi_atasan'] = 1;
+            $req['durasi_justifikasi'] = $req['ajuan_durasi_justifikasi'];
+            $req['tgl_justifikasi'] = date('Y-m-d H:i:s');
+            $this->repotrjustifikasi->store($req);
+        }else{
+            $where['id_justifikasi'] = $cekdulu->id_justifikasi;
+            unset($req['id_sdm']);
+            unset($req['nm_sdm']);
+            unset($req['nip']);
+            $req['justifikasi_atasan'] = 1;
+            $req['durasi_justifikasi'] = $req['ajuan_durasi_justifikasi'];
+            $req['tgl_justifikasi'] = date('Y-m-d H:i:s');
+            $this->repotrjustifikasi->update($where,$req);
+        }
+        $notification = [
+            'message' => 'Justifikasi berhasil disimpan.',
+            'alert-type' => 'success',
+            ];
+        return redirect()->intended('pegawai-bawahan/riwayat-kehadiran/'.Crypt::encrypt($req['id_sdm']))->with($notification);
+    }
     public function simpan_pengajuan(Request $request){
         $req = $request->except('_token');
         $cekdulu = $this->repotrjustifikasi->findWhereRaw("","id_sdm = '$req[id_sdm]' and tanggal_absen = '$req[tanggal_absen]' and kategori_justifikasi='$req[kategori_justifikasi]' ");

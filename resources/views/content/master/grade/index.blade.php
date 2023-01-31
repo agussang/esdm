@@ -11,7 +11,7 @@
                             <h5 class="card-label"><i class="fa fa-list"></i> Data Master Grade</h5>
                         </div>
                         <div class="col-md-3">
-                            
+
                         </div>
                     </div>
                 </div>
@@ -79,8 +79,16 @@
                                     <tr>
                                         <th>30%</th>
                                         <th>70%</th>
-                                        <th>85%</th>
-                                        <th>80%</th>
+                                        <th>
+                                            <select class="form-control" onchange="update_nilai_prosentase_p1(this)">
+                                                {!!$pilihan_prosentase_realisasi_p1!!}
+                                            </select>%
+                                        </th>
+                                        <th>
+                                            <select class="form-control" onchange="update_nilai_prosentase_p2(this)">
+                                                {!!$pilihan_prosentase_realisasi_p2!!}
+                                            </select>%
+                                        </th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -123,7 +131,7 @@
                 <form class="form" id="formku" method="post">
 				{!! csrf_field() !!}
                     <div id="form-edit">
-                    
+
                     </div>
                 </form>
             </div>
@@ -132,6 +140,30 @@
 </div>
 <meta name="csrf_token" content="{{ csrf_token() }}" />
 <script type="text/javascript">
+function update_nilai_prosentase_p1(selectObject){
+    var id_prosentase = selectObject.value;
+    var request = $.ajax ({
+           url : "{{ route('data-master.grade.update_realisasi_p1') }}",
+           type : "post",
+           dataType: "html",
+           data: "id_prosentase="+id_prosentase
+       });
+       request.done(function(output) {
+        $('#balik').html(output);
+       });
+}
+function update_nilai_prosentase_p2(selectObject){
+    var id_prosentase = selectObject.value;
+    var request = $.ajax ({
+           url : "{{ route('data-master.grade.update_realisasi_p2') }}",
+           type : "post",
+           dataType: "html",
+           data: "id_prosentase="+id_prosentase
+       });
+       request.done(function(output) {
+        $('#balik').html(output);
+       });
+}
 function edit(id)
 {
     var request = $.ajax ({

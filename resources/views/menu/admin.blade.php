@@ -87,6 +87,9 @@ if($induk[0]=="setting"){
         <li class="{{ $induk[1]=="grade" ? 'active' : '' }}">
             <a href="{{route('data-master.grade')}}">  <i class="fa fa-book"></i><span> Master Grade</span> </a>
         </li>
+        <li class="{{ $induk[1]=="prosentase" ? 'active' : '' }}">
+            <a href="{{route('data-master.prosentase')}}">  <i class="fa fa-book"></i><span> Master Prosentase Realisasi</span> </a>
+        </li>
         <li class="{{ $induk[1]=="golongan" ? 'active' : '' }}">
             <a href="{{route('data-master.golongan')}}">  <i class="fa fa-book"></i><span> Master Golongan</span> </a>
         </li>

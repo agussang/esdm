@@ -40,4 +40,25 @@
     </div>
 </div>
 </form>
+<?php
+$dtabsenagagal = Session::get('niptidakterdeteksi');
+?>
+@if(count($dtabsenagagal)>0)
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <span>Data excel absen kehadiran yang gagal di upload, dikarenakan NIP tidak terdeteksi di dalam database.</span>
+                <ul>
+                    <?php $no=1;?>
+                    @foreach($dtabsenagagal as $nip=>$nm)
+                    <li>{{$no++}}. {{$nip}} ({{$nm}})</li>
+                    @endforeach
+                </ul>
+                <a href="{{route('data-pegawai.data-presensi.data-absen.clear')}}" class="btn btn-warning">Clear Data Gagal</a>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 @stop

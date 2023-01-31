@@ -184,9 +184,6 @@
                                     if($dtrekap['nilai_skp']==null && $dtrekap['created_at']!=null){
                                         $ket = "Belum dinilai.<br/>".$dtrekap['ket_disiplin'];
                                     }
-                                    if($dtrekap['ket_justifikasi']){
-                                        $point = "0";
-                                    }
                                     ?>
                                     <tr>
                                         <td>{{$no++}}</td>

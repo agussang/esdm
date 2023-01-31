@@ -225,7 +225,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                      <tbody>
                         <?php
                             $bulanx = sprintf("%0d", date('m'));
-                            $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$terlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
+                            $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
                         @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                         <?php
                         $presensi = $getRekapDataAbsen[$id_sdm][$tgl];
@@ -287,9 +287,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                     if($ket!="Absen 1x"){
                                        $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
                                        if($hitungdurasi_terlambat>0){
-                                          $ket = " Terlambat Datang";
+                                          $ket = "Terlambat Datang";
                                           $kode_justifikasi = 2;
-                                          $terlambat++;
                                        }
                                     }
                               }
@@ -337,7 +336,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                             $durasikerjamenit = Fungsi::konversiwaktu($durasikerja);
                         }
                         $tglajuanabsenjus = date('d',strtotime($tgl));
-                        $ketajuan = $getajuan_justifikasi[$tgl][sprintf("%0d",$tglajuanabsenjus)];
+                        $ketajuan = $getajuan_justifikasi[$tgl][$kode_justifikasi];
                         $ket_masuk = "";$ket_keluar = "";$menitjustifikasi=0;
 
                         if($ketajuan['status']==1){
@@ -355,6 +354,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                     $ket="";
                                 }
                             }
+                        }
+                        if($ket=="Terlambat Datang"){
+                            $jterlambat++;
                         }
                         $terlambat = $hitungdurasi_terlambat-$menitjustifikasi;
                         ?>
@@ -410,7 +412,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
 document.getElementById("tidak_masuk").innerHTML = "{{$tidak_hadir}}";
 document.getElementById("hadir").innerHTML = "{{$hadir}}";
 document.getElementById("finger_sekali").innerHTML = "{{$finger_sekali}}";
-document.getElementById("terlambat").innerHTML = "{{$terlambat}}";
+document.getElementById("terlambat").innerHTML = "{{$jterlambat}}";
 document.getElementById("pulang_cepat").innerHTML = "{{$pulang_cepat}}";
 document.getElementById("absen_kehadiran").innerHTML = "{{$absen_kehadiran}}";
 </script>

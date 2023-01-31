@@ -29,6 +29,7 @@ use App\Models\MsKategoriPelanggaran;
 use App\Models\TrJustifikasi;
 use App\Models\SettingHariLibur;
 use App\Models\SettingRamadhan;
+use App\Models\MsProsentaseRealisasi;
 use DB;
 use DatePeriod;
 use DateTime;
@@ -266,7 +267,18 @@ class Fungsi
             $ipaddress = 'IP tidak dikenali';
         return $ipaddress;
     }
-
+    public static function pilihan_prosentase_realisasi($id_prosentase,$kode_p){
+        $rsData = MsProsentaseRealisasi::where('kode_p',$kode_p)->get();
+        $d = '<option value=""></option>';
+        foreach ($rsData as $rs => $r) {
+            $sl = '';
+            if ($r->id_prosentase == $id_prosentase) {
+                $sl = 'selected';
+            }
+            $d .= "<option value=\"$r->id_prosentase\" $sl>$r->nilai</option>";
+        }
+        return $d;
+    }
     public static function get_client_browser() {
         $browser = '';
         if(strpos($_SERVER['HTTP_USER_AGENT'], 'Netscape'))
@@ -1619,6 +1631,11 @@ class Fungsi
         } else {
             return strtotime($date);
         }
+    }
+
+    public static function inttodate($int){
+        $convert = date("Y-m-d",($int  - 25569) * 86400);
+        return $convert;
     }
 
     public static function pilihan_satuan_rubrik($id = null){

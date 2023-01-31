@@ -4,31 +4,101 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Repositories\Repomsgrade;
+use App\Repositories\Repoprosentase;
 use Crypt;
+use Fungsi;
 
 class MasterGradeController extends Controller
 {
     public function __construct(
         Request $request,
-        Repomsgrade $repomsgrade  
+        Repomsgrade $repomsgrade,
+        Repoprosentase $repoprosentase
     ){
         $this->request = $request;
         $this->repomsgrade = $repomsgrade;
+        $this->repoprosentase = $repoprosentase;
     }
 
     public function index()
     {
         $data['rsData'] = $this->repomsgrade->get();
+        $dtpersen1 = $this->repoprosentase->findWhereRaw("","is_aktif='1' and kode_p = '1' ");
+        $dtpersen2 = $this->repoprosentase->findWhereRaw("","is_aktif='1' and kode_p = '2' ");
+        $data['pilihan_prosentase_realisasi_p1'] = Fungsi::pilihan_prosentase_realisasi($dtpersen1->id_prosentase,'1');
+        $data['pilihan_prosentase_realisasi_p2'] = Fungsi::pilihan_prosentase_realisasi($dtpersen2->id_prosentase,'2');
         return view('content.master.grade.index',$data);
     }
 
-    
+    public function update_realisasi_p1(Request $request){
+        $req = $request->except('_token');
+        $ambilnilai = $this->repoprosentase->findId("",$req,"id_prosentase");
+        $nilai = $ambilnilai->nilai;
+        $rsData = $this->repomsgrade->get();
+        $arrData = array();
+        foreach($rsData AS $rs=>$r){
+            if($r->jobscore > 0 && $r->jobprice > 0){
+                $persenp1=30;
+                $persenrealisasip1 = $nilai;
+                $p1 = round((($r->jobscore*$r->jobprice)*$persenp1)/100);
+                $realp1 = round((($p1*$persenrealisasip1)/100),-3);
+                $realp2 = $r->realisasi_p2;
+                $arrData[$r->id]['grade'] = $r->grade;
+                $arrData[$r->id]['realisasi_p1'] = $realp1;
+                $arrData[$r->id]['total_realisasi'] = $realp1+$realp2;
+            }
+        }
+        foreach($arrData as $id_grade=>$dtgrade){
+            $where['id'] = $id_grade;
+            unset($dtgrade['grade']);
+            $this->repomsgrade->update($where,$req);
+        }
+        echo '<script type="text/javascript">toastr.success("Data grade berhasil di update")</script>';
+            echo "<script>
+            setTimeout(function () {
+            location.reload();
+            }, 2000);
+            </script>";
+    }
+
+    public function update_realisasi_p2(Request $request){
+        $req = $request->except('_token');
+        $ambilnilai = $this->repoprosentase->findId("",$req,"id_prosentase");
+        $nilai = $ambilnilai->nilai;
+        $rsData = $this->repomsgrade->get();
+        $arrData = array();
+        foreach($rsData AS $rs=>$r){
+            if($r->jobscore > 0 && $r->jobprice > 0){
+                $persenp2=70;
+                $persenrealisasip2 = $nilai;
+                $p2 = round((($r->jobscore*$r->jobprice)*$persenp2)/100);
+                $realp1 = $r->realisasi_p1;
+                $realp2 = round((($p2*$persenrealisasip2)/100),-3);
+                $arrData[$r->id]['grade'] = $r->grade;
+                $arrData[$r->id]['realisasi_p2'] = $realp1;
+                $arrData[$r->id]['total_realisasi'] = $realp1+$realp2;
+            }
+        }
+        foreach($arrData as $id_grade=>$dtgrade){
+            $where['id'] = $id_grade;
+            unset($dtgrade['grade']);
+            $this->repomsgrade->update($where,$req);
+        }
+        echo '<script type="text/javascript">toastr.success("Data grade berhasil di update")</script>';
+            echo "<script>
+            setTimeout(function () {
+            location.reload();
+            }, 2000);
+            </script>";
+    }
+
+
     public function create()
     {
         //
     }
 
-    
+
     public function store(Request $request)
     {
         $req = $request->except('_token');
@@ -42,8 +112,10 @@ class MasterGradeController extends Controller
         }else{
             $persenp1=30;
             $persenp2=70;
-            $persenrealisasip1 = 85;
-            $persenrealisasip2 = 80;
+            $dtpersen1 = $this->repoprosentase->findWhereRaw("","is_aktif='1' and kode_p = '1' ");
+            $dtpersen2 = $this->repoprosentase->findWhereRaw("","is_aktif='1' and kode_p = '2' ");
+            $persenrealisasip1 = $dtpersen1->nilai;
+            $persenrealisasip2 =  $dtpersen2->nilai;
             $p1 = round((($req['jobscore']*$req['jobprice'])*$persenp1)/100);
             $p2 = round((($req['jobscore']*$req['jobprice'])*$persenp2)/100);
             $realp1 = round((($p1*$persenrealisasip1)/100),-3);
@@ -63,13 +135,13 @@ class MasterGradeController extends Controller
         }
     }
 
-    
+
     public function show($id)
     {
-        
+
     }
 
-    
+
     public function edit(Request $request)
     {
         $req = $request->except('_token');
@@ -77,7 +149,7 @@ class MasterGradeController extends Controller
         return view('content.master.grade.edit',$data);
     }
 
-    
+
     public function update(Request $request)
     {
         $req = $request->except('_token');
@@ -93,8 +165,10 @@ class MasterGradeController extends Controller
         }else{
             $persenp1=30;
             $persenp2=70;
-            $persenrealisasip1 = 85;
-            $persenrealisasip2 = 80;
+            $dtpersen1 = $this->repoprosentase->findWhereRaw("","is_aktif='1' and kode_p = '1' ");
+            $dtpersen2 = $this->repoprosentase->findWhereRaw("","is_aktif='1' and kode_p = '2' ");
+            $persenrealisasip1 = $dtpersen1->nilai;
+            $persenrealisasip2 =  $dtpersen2->nilai;
             $p1 = round((($req['jobscore']*$req['jobprice'])*$persenp1)/100);
             $p2 = round((($req['jobscore']*$req['jobprice'])*$persenp2)/100);
             $realp1 = round((($p1*$persenrealisasip1)/100),-3);

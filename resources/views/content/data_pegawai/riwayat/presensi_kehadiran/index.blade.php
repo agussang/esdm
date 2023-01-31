@@ -3,6 +3,10 @@
 <?php
 $induk = explode('/',request()->path());
 ?>
+<?php
+$arrnmbulan = Fungsi::nm_bulan();
+$arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Proses Persetujuan Atasan");
+?>
 <div class="row">
     <div class="col-md-12">
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
@@ -210,22 +214,25 @@ $induk = explode('/',request()->path());
                                         <table class="table table-bordered">
                                             <thead>
                                                <tr>
-                                                   <th rowspan="2">No</th>
-                                                   <th rowspan="2">Tanggal</th>
-                                                   <th rowspan="2">Jam Masuk</th>
-                                                   <th rowspan="2">Jam Pulang</th>
-                                                   <th rowspan="2"><center>Durasi Bekerja <br/>(Jam)</center></th>
-                                                   <th rowspan="2"><center>Durasi Bekerja<br/>(Menit)</center></th>
-                                                   <th rowspan="2"><center>Durasi Terlambat<br/>(Menit)</center></th>
-                                                   <th rowspan="2"><center>Durasi Pulang Cepat<br/>(Menit)</center></th>
-                                                   <th rowspan="2">Ket Tanggal</th>
-                                                   <th rowspan="2">Ket</th>
+                                                   <th>No</th>
+                                                   <th>Tanggal</th>
+                                                   <th>Jam Masuk</th>
+                                                   <th>Jam Pulang</th>
+                                                   <th><center>Durasi Bekerja <br/>(Jam)</center></th>
+                                                   <th><center>Durasi Bekerja<br/>(Menit)</center></th>
+                                                   <th><center>Durasi Terlambat<br/>(Menit)</center></th>
+                                                   <th><center>Durasi Pulang Cepat<br/>(Menit)</center></th>
+                                                   <th>Ket Tanggal</th>
+                                                   <th>Ket</th>
+                                                   @if(Session::get('level')=="A" || Session::get('level')=="SA")
+                                                   <th>Aksi</th>
+                                                   @endif
                                                </tr>
                                             </thead>
                                             <tbody>
                                                <?php
                                                $bulanx = sprintf("%0d", date('m'));
-                                                $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$terlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
+                                                $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
                                                 @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                                                 <?php
                                                 $presensi = $arrData[$tgl];
@@ -250,7 +257,7 @@ $induk = explode('/',request()->path());
                                                 $j_keluar_start = $jam_keluarex[0];
                                                 $menit_keluar_start = $jam_keluarex[1];
                                                 $gabung = 0;$menit = 0;$hitungdurasi_terlambat = 0;
-                                                $warna = "";
+                                                $warna = "";$kode_justifikasi = 0;
                                                 $hitungdurasi_pulang_cepat = 0;
                                                 if($jam_masuk!=null){
 
@@ -260,6 +267,7 @@ $induk = explode('/',request()->path());
                                                                 if($jam_masuk!=$jam_keluar){
                                                                     $ket = "Pulang Cepat";
                                                                     $pulang_cepat++;
+                                                                    $kode_justifikasi = 3;
                                                                     $hitungdurasi_pulang_cepat = Fungsi::hitungdurasipulangcepat($jam_keluar,$jamkerja['jam_pulang']);
                                                                 }
                                                             }
@@ -267,6 +275,7 @@ $induk = explode('/',request()->path());
                                                         if($jam_masuk == $jam_keluar && $hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
                                                             $ket = "Absen 1x";
                                                             $finger_sekali++;
+                                                            $kode_justifikasi = 4;
                                                         }
                                                     //   $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
                                                     //   $hasil = $hasil / 60;
@@ -280,8 +289,8 @@ $induk = explode('/',request()->path());
                                                             if($ket!="Absen 1x"){
                                                                 $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
                                                                 if($hitungdurasi_terlambat>0){
-                                                                    $ket = " Terlambat Datang";
-                                                                    $terlambat++;
+                                                                    $ket = "Terlambat Datang";
+                                                                    $kode_justifikasi = 2;
                                                                 }
                                                             }
                                                         }
@@ -331,7 +340,7 @@ $induk = explode('/',request()->path());
                                                     $durasikerjamenit = Fungsi::konversiwaktu($durasikerja);
                                                 }
                                                 $tglajuanabsenjus = date('d',strtotime($tgl));
-                                                $ketajuan = $getajuan_justifikasi[$tgl][sprintf("%0d",$tglajuanabsenjus)];
+                                                $ketajuan = $getajuan_justifikasi[$tgl][$kode_justifikasi];
                                                 $ket_masuk = "";$ket_keluar = "";$menitjustifikasi=0;
 
                                                 if($ketajuan['status']==1){
@@ -349,6 +358,9 @@ $induk = explode('/',request()->path());
                                                             $ket="";
                                                         }
                                                     }
+                                                }
+                                                if($ket=="Terlambat Datang"){
+                                                    $jterlambat++;
                                                 }
                                                 $terlambat = $hitungdurasi_terlambat-$menitjustifikasi;
                                                 ?>
@@ -375,6 +387,23 @@ $induk = explode('/',request()->path());
                                                     <td>{{$hitungdurasi_pulang_cepat}}</td>
                                                     <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
                                                     <td>{{$ket}}</td>
+                                                    @if(Session::get('level')=="A" || Session::get('level')=="SA")
+                                                    @if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                                                    <td>
+                                                        @if($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
+                                                            @if($ket!="Tidak Hadir")
+                                                                @if($ketajuan)
+                                                                    {{$arrStatusJustifikasi[$ketajuan['status']]}}
+                                                                @else
+                                                                    <a href="{{URL::to('pegawai/justifikasi-kehadiran-pegawai')}}/{{$rsData->id_sdm}}/{{$tgl}}/{{$kode_justifikasi}}" class="btn btn-primary">Justifikasi</a>
+                                                                @endif
+                                                            @else
+                                                            Tidak bisa dijustifikasi
+                                                            @endif
+                                                        @endif
+                                                    </td>
+                                                    @endif
+                                                    @endif
                                                 </tr>
                                                 @endforeach
                                                 </tbody>
@@ -518,7 +547,7 @@ $induk = explode('/',request()->path());
 document.getElementById("tidak_masuk").innerHTML = "{{$tidak_hadir}}";
 document.getElementById("hadir").innerHTML = "{{$hadir}}";
 document.getElementById("finger_sekali").innerHTML = "{{$finger_sekali}}";
-document.getElementById("terlambat").innerHTML = "{{$terlambat}}";
+document.getElementById("terlambat").innerHTML = "{{$jterlambat}}";
 document.getElementById("pulang_cepat").innerHTML = "{{$pulang_cepat}}";
 document.getElementById("absen_kehadiran").innerHTML = "{{$absen_kehadiran}}";
 </script>

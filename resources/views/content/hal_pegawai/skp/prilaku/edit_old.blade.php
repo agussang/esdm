@@ -182,6 +182,118 @@ $induk = explode('/',request()->path());
                                 </div>
                             </div>
                         </div>
+                        @if($dtpegawai->id_sdm_atasan != $dtpegawai->id_sdm && date('dmY',strtotime($rekap_skp->created_at)) >= date('dmY',strtotime($periodeaktif->tgl_batas_skp)))
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="card card-block card-stretch card-height iq-border-box iq-border-box-2 text-warning basic-drop-shadow p-4 shadow-showcase text-center">
+                                    <div class="card-body">
+                                        <span class="text-dark"><h5>FORM JUSTIFIKASI KETERLAMBATAN PENGUMPULAN SKP</h5></span>
+                                        <hr/>
+                                        <span class="text-dark">
+                                            Pegawai atas nama <b>{{$dtpegawai->nm_sdm}}</b> terlambat <b>{{$arrpointpenguran['ket_disiplin']}}</b> mengumpulkan SKP dan akan dikenakan sanksi disiplin berupa pengurangan point e-remun sebanyak <b>{{$arrpointpenguran['point_disiplin']}}%</b>. Anda sebagai atasan langsung diperbolehkan memberikan justifikasi terkait keterlambatan pengumpulan skp dengan cara memberikan alasan justifikasi pada form alasan justifikasi keterlambatan pengumpulan skp dibawah ini.
+                                            Justifikasi keterlambatan pengumpulan skp bisa dilakukan selama durasi terlambat masih dibawah 10 hari kerja.Jika anda tidak berkenan memberikan justifikasi silahkan kosongi alasan justifikasi.
+                                        </span>
+                                        <br/><br/>
+                                        <?php
+                                        $ket_justifikasi = $rekap_skp->ket_justifikasi;
+                                        if($arrpointpenguran['point_disiplin']=="100"){
+                                            $readonly = "readonly=\"true\"";
+                                            $ket_justifikasi = "";
+                                        }
+                                        ?>
+                                        <div class="row">
+                                            <div class="col-md-12">
+                                                <div class="form-group">
+                                                    <label for="exampleFormControlTextarea1"> Alasan justifikasi keterlambatan pengumpulan skp</label>
+                                                    <textarea class="form-control" rows="3" name="ket_justifikasi" placeholder="Masukkan alasan justifikasi keterlambatan pengumpulan skp" {{$readonly}}>{{$ket_justifikasi}}</textarea>
+                                                 </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @endif
+                        <div class="row">
+                            <div class="col-md-12">
+                                <hr/>
+                                {{-- <span><b>Nilai Realisasi Prilaku Pegawai</b></span> --}}
+                                {{-- <input type="hidden" value="{{$dtpegawai->id_sdm}}" name="id_sdm" id="id_sdm">
+                                <input type="hidden" value="{{$dtpegawai->nip}}" name="nip" id="nip">
+
+                                <div class="table-responsive">
+                                    <table class="table table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th rowspan="2">No</th>
+                                                <th rowspan="2">Nama Aspek</th>
+                                                <th colspan="2"><center>Penilaian</center></th>
+                                            </tr>
+                                            <tr>
+                                                <th>Nilai</th>
+                                                <th>Keterangan</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php $no=1;$ttl_nilai = 0;$jumlahkom=0;?>
+                                            @foreach($dtprilaku as $rs=>$r)
+                                            <?php $jumlahkom++;?>
+                                            <tr>
+                                                <td>{{$no++}}</td>
+                                                <td>{{$r->nama}}</td>
+                                                <td>
+                                                    <input value="{{$arrPenilaian[$r->id]['nilai']}}" onkeyup="getNilaiHuruf(this);calculateSum();" type="text" class="form-control" name="nilai_{{$r->id}}" id="nilai_{{$r->id}}" onkeypress="return goodchars(event,'1234567890.',this)" {{$readonly}}>
+                                                </td>
+                                                <td>
+                                                    <input value="{{$arrPenilaian[$r->id]['keterangan']}}" type="text" readonly="true" class="form-control" name="keterangan_{{$r->id}}" id="keterangan_row_nilai_{{$r->id}}" {{$readonly}}>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                            $ttl_nilai+=$arrPenilaian[$r->id]['nilai'];
+                                            ?>
+                                            @endforeach
+                                            <?php
+                                            $jmkom = count((array)$arrPenilaian);
+                                            $ratnilai = $ttl_nilai/$jumlahkom;
+                                            ?>
+                                            @if($jmkom>0)
+                                            <tr>
+                                                <td colspan="2">Total Nilai</td>
+                                                <td>
+                                                    <input type="text" id="ttl_nilai" name="ttl_nilai" value="{{$ttl_nilai}}" readonly="true" class="form-control">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="2">Nilai Rata-rata (Total Nilai / Jumlah Komponen Perilaku)</td>
+                                                <td colspan="2">
+                                                    <input type="text" id="ttl_nilai" name="ttl_nilai" value="{{$ratnilai}}" readonly="true" class="form-control">
+                                                </td>
+                                            </tr>
+                                            @endif
+                                        </tbody>
+                                    </table>
+                                </div> --}}
+                                <input type="hidden" value="{{$dtpegawai->nip}}" name="nip" id="nip">
+                                <input type="hidden" value="{{$dtpegawai->id_sdm}}" name="id_sdm" id="id_sdm">
+                                <input type="hidden" value="{{$periodeaktif->id}}" name="idperiode" id="idperiode">
+                                <br/>
+                                @if($rekap_skp->validasi!=1)
+                                    @if(Session::get('atasan_penilai')!=null && Session::get('id_sdm_pengguna') != $dtpegawai->id_sdm_atasan)
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <center>
+                                                <div class="checkbox d-inline-block mr-3 rtl-mr-0">
+                                                    <input type="checkbox" class="checkbox-input" id="checkbox1" name="valid" required>
+                                                    <label for="checkbox1">Data skp atas nama <b>{{$rsData->nm_sdm}} pada bulan {{$arrBulan[$periodeaktif->bulan]}} tahun {{$periodeaktif->tahun}} sudah saya nilai dan saya nyatakan valid.</b></label>
+                                                </div><br/>
+                                                <button class="btn btn-primary text-white"><i class="fas fa-save"></i> Simpan</button>
+                                            </center>
+                                        </div>
+                                    </div>
+                                    @endif
+                                @endif
+                            </div>
+                        </div>
                     </div>
                 </div>
                 </form>

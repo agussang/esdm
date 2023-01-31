@@ -41,6 +41,7 @@ use App\Http\Controllers\{
     MsWaktuShiftController,
     JadwalPresensiShiftController,
     SettingTanggalRamadhanController,
+    MasterProsentaseController,
 };
 
 /*
@@ -161,6 +162,15 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
             Route::get('edit',[MasterGradeController::class,'edit'])->name('data-master.grade.edit');
             Route::post('/update',[MasterGradeController::class,'update'])->name('data-master.grade.update');
             Route::get('hapus/{id}',[MasterGradeController::class,'destroy'])->name('data-master.grade.hapus');
+            Route::post('update_realisasi_p1',[MasterGradeController::class,'update_realisasi_p1'])->name('data-master.grade.update_realisasi_p1');
+            Route::post('update_realisasi_p2',[MasterGradeController::class,'update_realisasi_p2'])->name('data-master.grade.update_realisasi_p2');
+        });
+
+        Route::group(['prefix' => 'prosentase'], function () {
+            Route::get('/',[MasterProsentaseController::class,'index'])->name('data-master.prosentase');
+            Route::post('/simpan',[MasterProsentaseController::class,'store'])->name('data-master.prosentase.simpan');
+            Route::get('edit',[MasterProsentaseController::class,'edit'])->name('data-master.prosentase.edit');
+            Route::post('/update',[MasterProsentaseController::class,'update'])->name('data-master.prosentase.update');
         });
 
         Route::group(['prefix' => 'kedinasan'], function () {
@@ -380,8 +390,9 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
     Route::group(['prefix' => 'skp'], function () {
         Route::group(['prefix' => 'data-skp'], function () {
             Route::get('/',[DataSkpController::class,'index'])->name('skp.data-skp.index');
+            Route::get('penilaian-skp/{id_periode?}/{id_sdm?}',[SkpPrilakuPegawaiController::class,'penilaian'])->name('skp.data-skp.penilaian-skp');
             Route::post('/cari',[DataSkpController::class,'cari'])->name('skp.data-skp.cari');
-
+            Route::post('/simpan-penilaian-skp',[SkpPrilakuPegawaiController::class,'simpan_penilaian_skp'])->name('skp.data-skp.simpan-penilaian-skp');
         });
     });
     Route::group(['prefix' => 'data-pegawai'], function () {
@@ -399,6 +410,7 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
 
                 Route::get('/import',[DataAbsenController::class,'import'])->name('data-pegawai.data-presensi.data-absen.import');
                 Route::post('/import-simpan',[DataAbsenController::class,'gasimport'])->name('data-pegawai.data-presensi.data-absen.import-simpan');
+                Route::get('/clear',[DataAbsenController::class,'clear'])->name('data-pegawai.data-presensi.data-absen.clear');
 
                 Route::get('/hapus-file-sk/{id?}',[DataAbsenController::class,'hapus_file'])->name('data-pegawai.data-presensi.data-absen.hapus-file-sk');
                 Route::get('/unggah-sk',[DataAbsenController::class,'unggah_sk'])->name('data-pegawai.data-presensi.data-absen.unggah-sk');
@@ -420,6 +432,8 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
 
         Route::get('/riwayat-kehadiran/{id?}',[MsPegawaiController::class,'riwayat_kehadiran'])->name('pegawai.riwayat-kehadiran');
         Route::post('/cari/kehadiran',[MsPegawaiController::class,'cari_kehadiran'])->name('pegawai.cari.kehadiran');
+        Route::get('/justifikasi-kehadiran-pegawai/{id_sdm?}/{tanggal?}/{kode?}',[MsPegawaiController::class,'justifikasi_kehadiran_pegawai'])->name('pegawai.justifikasi-kehadiran-pegawai');
+        Route::post('simpan-pengajuan',[MsPegawaiController::class,'simpan_justifikasi_by_admin'])->name('pegawai.simpan-pengajuan-justifikasi');
 
         Route::get('/riwayat-absen/{id?}',[MsPegawaiController::class,'riwayat_absen'])->name('pegawai.riwayat-absen');
         Route::post('/cari/absen',[MsPegawaiController::class,'cari_absen'])->name('pegawai.cari.absen');
