@@ -158,7 +158,6 @@ class PresensiController extends Controller
                         $arrgagal[$r[0]] = $r[1];
                     }
                 }
-                dd($arrData);
                 $jberhasil = 0;
                 foreach($arrData as $key=>$dtkey){
                     // cek sudah ada apa belum

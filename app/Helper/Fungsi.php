@@ -58,6 +58,19 @@ function nm_bulan(){
     return $arrBulan;
 }
 
+function jam_kerja_cek($id){
+    $rsData = MsAbsen::where('id_khusus',$id)->orderBy('hari_biasa','asc')->get();
+    $arrData = array();
+    foreach($rsData as $rs=>$r){
+        $arrData[$r->hari_biasa]['jam_masuk'] = $r->jam_masuk;
+        $arrData[$r->hari_biasa]['jam_pulang'] = $r->jam_keluar;
+        $arrData[$r->hari_biasa]['masuk_telat'] = $r->masuk_telat;
+        $arrData[$r->hari_biasa]['pulang_telat'] = $r->pulang_telat;
+        $arrData[$r->hari_biasa]['lama_kerja'] = $r->lama_kerja;
+    }
+    return $arrData;
+}
+
 function nama_bulan(){
     $arrBulan = array(
         "1"=>"Januari",
@@ -131,6 +144,7 @@ function daterange($tgl_awal,$tgl_akhir){
     $bulan_awal = date('m',strtotime($tgl_awal));
     $bulan_akhir = date('m',strtotime($tgl_akhir));
     $bulan_awal = sprintf("%0d", $bulan_awal);
+    $bulan_akhir = sprintf("%0d", $bulan_akhir);
     $thn = date('Y',strtotime($tgl_awal));
     $data_bulan = array();
     $bts_tgl_awal = date('d',strtotime($tgl_awal));
@@ -974,6 +988,12 @@ class Fungsi
     }
 
     public static function get_rekap_data_kehadiran($arrIdWaktuAbsen,$tgl_awal,$tgl_akhir,$arrIdSdm,$tipe){
+        // cek ramadhan
+        $tahunpencarian = date('Y',strtotime($tgl_awal));
+        $arrtglramadhan = tgl_ramadhan($tahunpencarian);
+        // ambil waktu ramadhan
+        $wakturamadhan = jam_kerja_cek('347b23a9-8919-43ec-9b2d-a0c4b810b61d');
+
         $arrKategoriJustifikasi = array("0"=>"Tidak mengganggu layanan",'1'=>"Mengganggu Layanan");
         $rsDataAbsen = RiwayatPresensi::whereIn("id_sdm",$arrIdSdm)
                         ->whereRaw(" tanggal_absen >= '$tgl_awal' and tanggal_absen <= '$tgl_akhir'")
@@ -1049,7 +1069,9 @@ class Fungsi
             foreach($arrAbsen as $id_sdm=>$absen){
                 foreach($absen as $tgl_presensi=>$dt_absen){
                     $hariabsen = explode(',',$dt_absen['ket_tgl']);
-
+                    if($arrtglramadhan[$tgl_presensi]){
+                        $arrIdWaktuAbsen = $wakturamadhan;
+                    }
                     $tglpresensi = date('Y-m-d',strtotime($tgl_presensi));
                     $explode = explode('-',$tglpresensi);
                     $bln_presensi = sprintf("%02d", $explode[1]);

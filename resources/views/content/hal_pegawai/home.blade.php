@@ -189,12 +189,12 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                      <tr>
                         <td class="text-dark">Jumlah Hari</td>
                         <td class="text-dark">:</td>
-                        <td class="text-dark">{{count($data_bulan[date('m')]['list_tgl'])}} hari</td>
+                        <td class="text-dark">{{count($data_bulan[sprintf("%0d",date('m'))]['list_tgl'])}} hari</td>
                      </tr>
                      <tr>
                         <td class="text-dark">Jumlah Hari Kerja</td>
                         <td class="text-dark">:</td>
-                        <td class="text-dark">{{count($data_bulan[date('m')]['hari_kerja'])}} hari</td>
+                        <td class="text-dark">{{count($data_bulan[sprintf("%0d",date('m'))]['hari_kerja'])}} hari</td>
                      </tr>
                      <tr>
                         <td class="text-dark">Jumlah Hari Libur Nasional</td>
