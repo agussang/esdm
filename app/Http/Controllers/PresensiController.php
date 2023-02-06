@@ -164,7 +164,7 @@ class PresensiController extends Controller
                     $cekrecod = $this->repotrjadwalshift->findWhereRaw("","tanggal_absen = '$dtkey[tanggal_absen]' and id_sdm = '$dtkey[id_sdm]' ");
                     if($cekrecod!=null){
                         //update
-                        $where['id'] = $cekrecod['id_jadwal_shift'];
+                        $where['id_jadwal_shift'] = $cekrecod['id_jadwal_shift'];
                         $this->repotrjadwalshift->update($where,$dtkey);
                     }else{
                         // insert
