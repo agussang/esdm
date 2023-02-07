@@ -74,6 +74,7 @@ class LaporanPresensiController extends Controller
         }else{
             $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,$req['tipe']);
             $getDataAbsen = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
+
             foreach($rsData as $rsx=>$rx){
                 $arrData[$rx->id_sdm]['nm_sdm'] = $rx->nm_sdm;
                 $arrData[$rx->id_sdm]['nip'] = $rx->nip;
@@ -91,7 +92,7 @@ class LaporanPresensiController extends Controller
             }
             $data['jam_kerja_text'] = trim($jam_kerja_text, ", \t\n");
             $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_akhir,1);
-            //dd($data['arrData']);
+
             if($req['tipe']==1){
                 return view('content.laporan.kehadiran.cetak_data_presensi',$data);
             }
@@ -109,7 +110,7 @@ class LaporanPresensiController extends Controller
                 $thn = date('Y',strtotime($tgl_awal));
                 $data['tahun'] = $thn;
                 $data['arrAlasan'] = $arrAlasan;
-                //dd($data['arrData']);
+
                 return view('content.laporan.kehadiran.cetak_data_presensi_bulanan',$data);
             }
         }

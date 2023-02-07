@@ -93,13 +93,13 @@
                 <?php $no=1;?>
                 @foreach($arrData as $id_sdm=>$dt_sdm)
                 <?php
-                $kode = $tahun.$id_bulan;
+                $kode = $tahun.sprintf("%02d", $id_bulan);
                 $dt_presensi = $dt_sdm['data_presensi'][$kode];
                 $jmh_hari_kerja = count($dt_bln['list_tgl']) - count($dt_hari_libur[$dt_bln['tahun']."-".$id_bulan]);
                 ?>
                 <tr>
                     <td>{{$no++}}</td>
-                    <td>{{$dt_sdm['nip']}}</td>
+                    <td>{{$dt_sdm['nip']}} -- {{$kode}}</td>
                     <td>{{$dt_sdm['nm_sdm']}}</td>
                     <td align="center">{{count($dt_bln['hari_kerja'])}}</td>
                     <td align="center">{{(int)$dt_presensi['masuk']['total']}}</td>

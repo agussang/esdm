@@ -21,7 +21,7 @@ class Repotrabsenkehadiran extends Repository
             })->when($id_sdm, function ($query) use ($id_sdm) {
                 return $query->where('id_sdm',$id_sdm);
             })->when($tgl_awal, function ($query) use ($tgl_awal,$tgl_akhir) {
-                return $query->whereRaw("tgl_awal>='$tgl_awal' and tgl_akhir <='$tgl_akhir' ");
+                return $query->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) ");
             })->when($id_alasan, function ($query) use ($id_alasan) {
                 return $query->where('id_alasan',$id_alasan);
             })->when($arrIdSdm, function ($query) use ($arrIdSdm) {
