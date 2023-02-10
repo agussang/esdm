@@ -4,7 +4,9 @@ namespace App\Helper;
 
 use Session;
 use App\Models\MsStatusAktif;
+use App\Models\TrJadwalShift;
 use App\Models\TrStatusKepegawaian;
+use App\Models\MsWaktuShift;
 use App\Models\MsJabatan;
 use App\Models\MsAgama;
 use App\Models\MsPendidikan;
@@ -34,6 +36,7 @@ use DB;
 use DatePeriod;
 use DateTime;
 use DateInterval;
+use GuzzleHttp\Psr7\Request;
 
 error_reporting(0);
 function bulan($idbln){
@@ -567,6 +570,22 @@ class Fungsi
             $waktu = $dtidkatkhususx['waktu'];
             $d .= "<option value=\"$idkatkhususx\">$ketramahadhan[$idkatkhususx] -- $waktu</option>";
         }
+        $jam_kerja_shift = array();$arrjamkerjashift = array();
+        $rsDatashift = MsWaktuShift::orderBy('kode_shift','asc')->get();
+        foreach($rsDatashift as $dtshift=>$rshift){
+            $arrjamkerjashift[$rshift->id_khusus][$rshift->id]['ket'] = $rshift->nm_shift;
+            $arrjamkerjashift[$rshift->id_khusus][$rshift->id]['jam_masuk'] = $rshift->jam_masuk;
+            $arrjamkerjashift[$rshift->id_khusus][$rshift->id]['jam_keluar'] = $rshift->jam_pulang;
+        }
+        foreach($arrjamkerjashift as $idkhusus=>$dtkhusus){
+            foreach($dtkhusus as $idmastershift=>$dtshift){
+                $jam_kerja_shift[$idkhusus]['waktu'] .= $dtshift['ket']." ( ".$dtshift['jam_masuk']."-".$dtshift['jam_keluar']." ), ";
+            }
+        }
+        foreach($jam_kerja_shift as $idkatkhususshift=>$dtidkatkhususshift){
+            $waktu = $dtidkatkhususshift['waktu'];
+            $d .= "<option value=\"$idkatkhususshift\">Jam Kerja Shift -- $waktu</option>";
+        }
         return $d;
     }
 
@@ -1004,6 +1023,339 @@ class Fungsi
         $rsData = tgl_ramadhan($tahun);
         return $rsData;
     }
+    public static function jamkerjashift(){
+        $rsData = MsWaktuShift::get();
+        $arrData = array();
+        foreach($rsData as $rs=>$r){
+            $arrData[$r->kode_shift]['nm_shift'] = $r->nm_shift;
+            $arrData[$r->kode_shift]['jam_masuk'] = $r->jam_masuk;
+            $arrData[$r->kode_shift]['jam_pulang'] = $r->jam_pulang;
+        }
+        return $arrData;
+    }
+    public static function getRekapDataAbsenPoli($tgl_awal,$tgl_akhir,$arrIdSdm,$tipe){
+        $arrKategoriJustifikasi = array("0"=>"Tidak mengganggu layanan",'1'=>"Mengganggu Layanan");
+        $rsDataAbsen = RiwayatPresensi::whereIn("id_sdm",$arrIdSdm)
+                        ->whereRaw(" tanggal_absen >= '$tgl_awal' and tanggal_absen <= '$tgl_akhir'")
+                        ->orderBy('tanggal_absen','asc')
+                        ->orderBy('jam_absen','asc')
+                        ->get();
+        $arrAbsen = array();$justifikasi = array();
+        foreach($rsDataAbsen as $rsA=>$rA){
+            $tgl = Fungsi::formatDate($rA->tanggal_absen);
+            $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['ket_tgl'] = $tgl;
+            $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['jam_absen'][] = $rA->jam_absen;
+            if((int)$rA->justifikasi_atasan>0){
+                $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['alasan'] = $rA->alasan;
+                $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['tgl_justifikasi'] = $rA->tgl_justifikasi;
+                $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['ket_justifikasi'] = $rA->ket_justifikasi;
+                $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['durasi_justifikasi'] = $rA->durasi_justifikasi;
+                $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['kategori_justifikasi'] = $arrKategoriJustifikasi[$rA->kategori_justifikasi];
+
+            }
+            $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['justifikasi'] = $justifikasi[$rA->id_sdm][$rA->tanggal_absen];
+        }
+        // khusus untuk tidak hadir saja
+
+        $tahunbulan = date('Y-m',strtotime($tgl_awal));
+        $rsJustifikasi = TrJustifikasi::whereIn('id_sdm',$arrIdSdm)
+                        ->whereRaw(" SUBSTRING(CAST(tanggal_absen AS VARCHAR(19)), 0, 8) = '$tahunbulan' ")
+                        ->get();
+        $arrJustifikasi = array();
+        foreach($rsJustifikasi as $rsjus=>$rjus){
+            $tahunbulan = date('Y-m',strtotime($rjus->tanggal_absen));
+            $tglabsennya = date('d',strtotime($rjus->tanggal_absen));
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['justifikasi_atasan'] = $rjus->justifikasi_atasan;
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['alasan'] = $rjus->alasan;
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['durasi_justifikasi'] = $rjus->durasi_justifikasi;
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['kategori_justifikasi'] = $arrKategoriJustifikasi[$rjus->kategori_justifikasi];
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['ket_justifikasi'] = $rjus->ket_justifikasi;
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['tgl_justifikasi'] = $rjus->tgl_justifikasi;
+        }
+
+        // ambil jadwal poli
+        $rsDataPoli = TrJadwalShift::with(['dtwaktuabsen'])->whereIn("id_sdm",$arrIdSdm)
+                        ->whereRaw(" tanggal_absen >= '$tgl_awal' and tanggal_absen <= '$tgl_akhir'")
+                        ->get();
+        foreach($rsDataPoli as $rsPoli=>$rPoli){
+            $arrAbsen[$rPoli->id_sdm][$rPoli->tanggal_absen]['msjadwalshift']['nm_shift'] = $rPoli->dtwaktuabsen->nm_shift;
+            $arrAbsen[$rPoli->id_sdm][$rPoli->tanggal_absen]['msjadwalshift']['kode_jadwal'] = $rPoli->dtwaktuabsen->kode_shift;
+            $arrAbsen[$rPoli->id_sdm][$rPoli->tanggal_absen]['msjadwalshift']['jam_masuk'] = $rPoli->dtwaktuabsen->jam_masuk;
+            $arrAbsen[$rPoli->id_sdm][$rPoli->tanggal_absen]['msjadwalshift']['jam_pulang'] = $rPoli->dtwaktuabsen->jam_pulang;
+        }
+
+        if($tipe!=4){
+            return $arrAbsen;
+        }else{
+            $bulan_awal = date('m',strtotime($tgl_awal));
+            $bulan_akhir = date('m',strtotime($tgl_akhir));
+            $bulan_awal = sprintf("%0d", $bulan_awal);
+            $thn = date('Y',strtotime($tgl_awal));
+            $data_bulan = array();
+            for($x=$bulan_awal;$x<=$bulan_akhir;$x++){
+                $tanggal = cal_days_in_month(CAL_GREGORIAN, $x, $thn);
+                for ($i=1; $i < $tanggal+1; $i++) {
+                    $gbng = $thn."-".sprintf("%02d", $x)."-".sprintf("%02d", $i);
+                    $tglx = Fungsi::formatDate($gbng);
+                    $hari = explode(',',$tglx);
+                    if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
+                        $data_bulan[sprintf("%02d", $x)]['nm_bulan'] = bulan($x);
+                        $data_bulan[sprintf("%02d", $x)]['tgl_bulan'][sprintf("%02d", $i)] = sprintf("%02d", $i);
+                    }
+                }
+            }
+            $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
+            $rsAlasan = DB::table('ms_alasan_absen')->get();
+            foreach($rsAlasan as $rsa=>$ralasan){
+                $arrAlasan[$ralasan->id_alasan] = $ralasan->alasan;
+            }
+            $rsDataAbsenKehadiran = DB::table('tr_absen_kehadiran')
+                ->whereIn("id_sdm",$arrIdSdm)
+                ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) ")
+                ->get();
+            $arrAbsenTanggal= array();$jmalasanabsen = array();$jmalasanabsenfirst = array();
+            foreach($rsDataAbsenKehadiran as $sen=>$senx){
+                $jm_absen = Fungsi::jumlah_absen($senx->tgl_awal,$senx->tgl_akhir,1);
+                $jmalasanabsenfirst[$senx->id_sdm][$senx->id_alasan][$senx->id_absen] = $jm_absen;
+                $tanggal_absen = daterange($senx->tgl_awal,$senx->tgl_akhir);
+                foreach($tanggal_absen as $tgl){
+                    $bulanxx = date('m',strtotime($tgl));
+                    $tglxx = date('d',strtotime($tgl));
+                    $arrAbsenTanggal[$senx->id_sdm][$bulanxx][$tglxx] = $tglxx;
+                }
+
+            }
+            foreach($jmalasanabsenfirst as $idsdmpegawai=>$dtsdmpegawai){
+                foreach($dtsdmpegawai as $idalasanabsen=>$dtalasanabsen){
+                    foreach($dtalasanabsen as $keyidabsen=>$dtkeyabsen){
+                        foreach($dtkeyabsen as $idbulanabsen=>$dtidbulanabsen){
+                            foreach($dtidbulanabsen['list_tgl'] as $dtlist_tgl=>$lst_tgl){
+                                $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['nm_bulan'] = $dtidbulanabsen['nm_bulan'];
+                                $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['list_tgl'][$dtlist_tgl] = $dtlist_tgl;
+                                $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['total']+=1;
+                                $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['tahun'] = $dtidbulanabsen['tahun'];
+                            }
+                        }
+                    }
+                }
+            }
+            $arrAbsensekali = array();
+            foreach($arrAbsen as $id_sdm=>$absen){
+                foreach($absen as $tgl_presensi=>$dt_absen){
+                    $hariabsen = explode(',',$dt_absen['ket_tgl']);
+                    // if($arrtglramadhan[$tgl_presensi]){
+                    //     $arrIdWaktuAbsen = $wakturamadhan;
+                    // }
+                    $tglpresensi = date('Y-m-d',strtotime($tgl_presensi));
+                    $explode = explode('-',$tglpresensi);
+                    $bln_presensi = sprintf("%02d", $explode[1]);
+                    $tglpresensikehadiran = sprintf("%02d", $explode[2]);
+
+                    // cek apa ada absen jika ada abaikan semua keterangan presensi
+                    if($arrAbsenTanggal[$id_sdm][$bln_presensi][$tglpresensikehadiran]==null){
+                        // if($hariabsen[0]=="Jumat"){
+                        //     $jam_kerja = $arrIdWaktuAbsen[2];
+                        // }else{
+                        //     $jam_kerja = $arrIdWaktuAbsen[1];
+                        // }
+                        //if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                            $jam_kerja = $dt_absen['msjadwalshift'];
+                        //}
+                        $jam_pulang = end($dt_absen['jam_absen']);
+                        $jam_masuk = array_shift($dt_absen['jam_absen']);
+                        if($jam_pulang==null){
+                            $jam_pulang = $jam_masuk;
+                        }
+                        if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu" && $jam_masuk == $jam_pulang){
+                            $arrDataRekap[$id_sdm][$thn.$bln_presensi]['absensekali']['list_tgl'][$tglpresensikehadiran]=1;
+                        }
+
+                        if($jam_masuk >= $jam_kerja['jam_masuk'] && $jam_masuk!=$jam_pulang){
+                            if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
+                                $jam_masukex = explode(':',$jam_masuk);
+                                $jam_telatex = explode(':',$jam_kerja['jam_masuk']);
+
+                                $j_masuk_start = $jam_masukex[0];
+                                $menit_masuk = $jam_masukex[1];
+
+                                $j_telat_masuk = $jam_telatex[0];
+                                $menit_telat_masuk = $jam_telatex[1];
+
+                                $hasil = (intVal($j_telat_masuk) - intVal($j_masuk_start)) * 60 + (intVal($menit_telat_masuk) - intVal($menit_masuk));
+                                $hasil = abs($hasil);
+
+                                $hasil = number_format($hasil,2);
+                                $hasilx = explode(".",$hasil);
+                                $depan = sprintf("%02d", $hasilx[0]);
+                                $gabung = $depan.":".$hasilx[1];
+                                $menit = ($gabung*60)+$hasilx[1];
+                                $menit = $menit/60;
+                                $durasi_terlambat = $menit;
+                                if($jam_masuk==$jam_pulang){
+                                    $menit = 0;
+                                }
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tgl'][$tglpresensikehadiran] = $durasi_terlambat;
+                                if($justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran]){
+                                    $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['justifikasi'] = $justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran];
+                                }
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['masuk'] = $jam_masuk;
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['pulang'] = $jam_pulang;
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['menit'] = $durasi_terlambat;
+                            }
+                        }
+                        if($jam_pulang <= $jam_kerja['jam_pulang'] && $jam_masuk!=$jam_pulang){
+                            if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
+                                $jam_pulangex = explode(':',$jam_pulang);
+                                $jam_ker_pulangex = explode(':',$jam_kerja['jam_pulang']);
+
+                                $j_pulang_start = $jam_pulangex[0];
+                                $menit_pulang = $jam_pulangex[1];
+
+                                $j_ker_pulang = $jam_ker_pulangex[0];
+                                $menit_ker_pulang = $jam_ker_pulangex[1];
+
+                                $hasilcpt = (intVal($j_ker_pulang) - intVal($j_pulang_start)) * 60 + (intVal($menit_ker_pulang) - intVal($menit_pulang));
+                                $hasilcpt = abs($hasilcpt);
+                                $hasilcpt = number_format($hasilcpt,2);
+                                $hasilcpt = explode(".",$hasilcpt);
+                                $depancpt = sprintf("%02d", $hasilcpt[0]);
+                                $gabungcpt = $depancpt.":".$hasilcpt[1];
+                                $menitcpt = ($gabungcpt*60)+$hasilcpt[1];
+                                $menitcpt = $menitcpt/60;
+                                if($jam_masuk==$jam_pulang){
+                                    $menitcpt = 0;
+                                }
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tgl'][$tglpresensikehadiran] = $menitcpt;
+                                if($justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran]){
+                                    $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['justifikasi'] = $justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran];
+                                }
+
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['masuk'] = $jam_masuk;
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['pulang'] = $jam_pulang;
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['menit'] = $menitcpt;
+                            }
+                        }
+                    }
+                }
+            }
+            foreach($arrDataRekap as $idpg=>$dtbul){
+                foreach($dtbul as $idbulancekkehadiran=>$dtbulancekkehadiran){
+                    foreach($dtbulancekkehadiran as $kategoricekkehadiran=>$dtkategoricekkehadiran){
+                        //if($kategoricekkehadiran!="absensekali"){
+                            foreach($dtkategoricekkehadiran['list_tgl'] as $tglcekkehadiran=>$jmlmenit){
+                                $nmkategori = $kategoricekkehadiran;
+                                $arrDataRekap[$idpg][$idbulancekkehadiran][$nmkategori]['total']+=$jmlmenit;
+                            }
+                        //}
+                    }
+                }
+            }
+            foreach($data_bulan as $idbln=>$dtbln){
+                $nm_bln_gabung = $thn.$idbln;
+                foreach($dtbln['tgl_bulan'] as $tglbln=>$tgln){
+                    foreach($arrAbsen as $idsdm=>$dtsdmx){
+                        foreach($arrAlasan as $idalasan=>$nm_alasan){
+                            $arrDataRekap[$idsdm][$nm_bln_gabung]['absen'][$idalasan]['nm_alasan'] = $nm_alasan;
+                            $arrDataRekap[$idsdm][$nm_bln_gabung]['absen'][$idalasan]['data'] = $jmalasanabsen[$idsdm][$idalasan][$idbln];
+                        }
+                        $arrDataRekap[$idsdm][$nm_bln_gabung]['hari_kerja'] = count($dtbln['tgl_bulan']);
+                        $gabungan = $thn."-".$idbln."-".$tglbln;
+                        $cek = $dtsdmx[$gabungan];
+                        if($cek!=null){
+                            $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['list_tgl'][$tglbln] = $tglbln;
+                            $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['total']+=1;
+                        }else{
+                            if($arrAbsenTanggal[$idsdm][$idbln][$tglbln]==null){
+                                if($arrJustifikasi[$idsdm][$thn."-".$idbln][$tglbln]){
+                                    $arrDataRekap[$idsdm][$nm_bln_gabung]['tidakmasuk']['list_tgl'][$tglbln]['justifikasi'] = $arrJustifikasi[$idsdm][$thn."-".$idbln][$tglbln];
+                                }else{
+                                    $arrDataRekap[$idsdm][$nm_bln_gabung]['tidakmasuk']['list_tgl'][$tglbln] = $tglbln;
+                                }
+                                $arrDataRekap[$idsdm][$nm_bln_gabung]['tidakmasuk']['total']+=1;
+                            }
+                        }
+
+                    }
+                }
+            }
+            $rsDataApel = DB::table('presensi_apel as a')
+                        ->join('ms_kegiatan_apel as b','a.id_kegiatan','=','b.id_kegiatan')
+                        ->whereRaw(" tgl_kegiatan BETWEEN '$tgl_awal' AND '$tgl_akhir'")
+                        ->whereIn("id_sdm",$arrIdSdm)
+                        ->get();
+            foreach($rsDataApel as $apl=>$dtapl){
+                $tgl_kegiatan = str_replace("-","",substr($dtapl->tgl_kegiatan,0,7));
+                if($dtapl->kehadiran=="H"){
+                    $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['hadir']['total']+=1;
+                }if($dtapl->kehadiran=="T"){
+                    $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['total']+=1;
+                    $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['justifikasi']['alasan']=$dtapl->alasan;
+                    $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['justifikasi']['tgl_justifikasi']=$dtapl->tgl_justifikasi;
+                    $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['justifikasi']['ket_justifikasi']=$dtapl->ket_justifikasi;
+                }
+                $hadirapel = $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['hadir']['total'];
+                if(count($hadirapel)<1){
+                    $hadirapel = 0;
+                }
+                $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['hadir']['total'] = $hadirapel;
+                $tidak_hadirapel = $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['total'];
+                if(count($tidak_hadirapel)<1){
+                    $tidak_hadirapel = 0;
+                }
+                $arrDataRekap[$dtapl->id_sdm][$tgl_kegiatan]['dt_apel']['tidak_hadir']['total'] = $tidak_hadirapel;
+            }
+            $arrDataRekapNew = array();
+            foreach($arrDataRekap as $id_sdmz=>$dtsdmz){
+                foreach($dtsdmz as $tglnya=>$dttglnya){
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['hari_kerja'] = $arrDataRekap[$id_sdmz][$tglnya]['hari_kerja'];
+                    $telat = $arrDataRekap[$id_sdmz][$tglnya]['telat'];
+                    if(count($telat)<1){
+                        $telat = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['telat'] = $telat;
+
+                    $pulang_cepat = $arrDataRekap[$id_sdmz][$tglnya]['pulang_cepat'];
+                    if(count($pulang_cepat)<1){
+                        $pulang_cepat = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['pulang_cepat'] = $pulang_cepat;
+
+                    $absensekali = $arrDataRekap[$id_sdmz][$tglnya]['absensekali'];
+                    if(count($absensekali)<1){
+                        $absensekali = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['absensekali'] = $absensekali;
+
+                    $tidakmasuk = $arrDataRekap[$id_sdmz][$tglnya]['tidakmasuk'];
+                    if(count($tidakmasuk)<1){
+                        $tidakmasuk = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['tidakmasuk'] = $tidakmasuk;
+
+                    $absen = $arrDataRekap[$id_sdmz][$tglnya]['absen'];
+                    if(count($absen)<1){
+                        $absen = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['absen'] = $absen;
+
+                    $dt_apel = $arrDataRekap[$id_sdmz][$tglnya]['dt_apel'];
+                    // if(count($dt_apel)<1){
+                    //     $dt_apel = 0;
+                    // }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['dt_apel'] = $dt_apel;
+
+                    $masuk = $arrDataRekap[$id_sdmz][$tglnya]['masuk'];
+                    if(count($masuk)<1){
+                        $masuk = 0;
+                    }
+                    $arrDataRekapNew[$id_sdmz][$tglnya]['masuk'] = $masuk;
+                }
+            }
+            return $arrDataRekapNew;
+        }
+
+    }
+
 
     public static function get_rekap_data_kehadiran($arrIdWaktuAbsen,$tgl_awal,$tgl_akhir,$arrIdSdm,$tipe){
         // cek ramadhan

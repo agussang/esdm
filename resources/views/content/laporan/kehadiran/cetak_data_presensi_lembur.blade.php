@@ -61,6 +61,9 @@
                     <th>Durasi Bekerja <br/>(Jam)</th>
                     <th>Durasi Bekerja<br/>(Menit)</th>
                     <th>Lembur<br/>(Jam)</th>
+                    @if($id_satker == "30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                    <th>Ket Jadwal Shift</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -79,6 +82,10 @@
                         $jamkerja = $jam_kerja[2];
                     }else{
                         $jamkerja = $jam_kerja[1];
+                    }
+
+                    if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                        $jamkerja = $presensi['msjadwalshift'];
                     }
                     $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
                     $jam_masukex = explode(':',$jam_masuk);
@@ -132,7 +139,18 @@
                         <td align="center">{{$jam_keluar}}</td>
                         <td align="center">{{$durasikerja}}</td>
                         <td align="center">{{$durasikerjamenit}}</td>
-                        <td align="center">{{sprintf("%01d",$gabung_lembur[0])}}</td>
+                        <td align="center">
+                            @if($durasikerjamenit>0)
+                            {{sprintf("%01d",$gabung_lembur[0])}}
+                            @else
+                            0
+                            @endif
+                        </td>
+                        @if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                            <td>
+                                {{$jamkerja['nm_shift']}}
+                            </td>
+                        @endif
                     </tr>
                     @endforeach
                 @endforeach

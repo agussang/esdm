@@ -160,7 +160,18 @@ $disabled = "";
                                             @endif
                                         </td>
                                         <td>
-                                            @if($r->is_valid!=1)
+                                            <?php
+                                            $bisa = 1;
+                                            if($r->is_valid!=1){
+                                                $bisa = 0;
+                                            }
+                                            if(Session::get('level')=="A"){
+                                                $bisa = 1;
+                                            }
+
+
+                                            ?>
+                                            @if($bisa==1)
                                             <div class="btn-group" role="group">
                                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     Aksi
