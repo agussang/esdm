@@ -150,7 +150,7 @@
                         <td align="center">{{$jam_masuk}}</td>
                         <td align="center">{{$jam_keluar}}</td>
                         <td align="center">{{$durasikerja}}</td>
-                        <td align="center">{{$durasikerjamenit}} - {{$masterdurasikerja}}</td>
+                        <td align="center">{{$durasikerjamenit}}</td>
                         <td align="center">
                             @if($durasikerjamenit>0)
                             {{sprintf("%01d",$gabung_lembur[0])}}
