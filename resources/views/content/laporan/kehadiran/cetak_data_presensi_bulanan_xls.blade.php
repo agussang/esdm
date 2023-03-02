@@ -1,0 +1,77 @@
+@foreach($data['data_bulan'] as $id_bulan=>$dt_bln)
+<table width="100%" border=1 cellspacing=0 cellpadding="3" style="font-size:12pt";>
+    <tr valign="top">
+        <td colspan="14"><span><b>Data Presensi Pegawai Bulanan</b></span><br/></td>
+    </tr>
+    <tr valign="top">
+        <td colspan="14"><span><b>Jam Kerja : {{$data['jam_kerja_text']}}</b></span><br/></td>
+    </tr>
+</table>
+<table width="100%" border=0 cellspacing=0 cellpadding="3" style="font-size:12pt";>
+    <thead>
+        <tr>
+            <td>Nama Bulan</td>
+            <td>:</td>
+            <td>{{$dt_bln['nm_bulan']}}</td>
+            <td>Jumlah Hari</td>
+            <td>:</td>
+            <td>{{count($dt_bln['list_tgl'])}}</td>
+        </tr>
+        <tr>
+            <td>Jumlah Hari Kerja</td>
+            <td>:</td>
+            <td>{{count($dt_bln['hari_kerja'])}}</td>
+            <td>Jumlah Hari Libur Nasional</td>
+            <td>:</td>
+            <td>{{count($dt_bln['hari_libur_nasional'])}}</td>
+        </tr>
+    </thead>
+</table>
+<table width="950" border=1 cellspacing=0 cellpadding="3" style="font-size:10pt";>
+    <thead>
+        <tr>
+            <th rowspan="2">No</th>
+            <th rowspan="2">Nip</th>
+            <th rowspan="2">Nama</th>
+            <th rowspan="2">Hari Kerja</th>
+            <th rowspan="2">Jmlh Kehadiran</th>
+            <th rowspan="2">Tidak Masuk</th>
+            <th rowspan="2">Terlambat <br/>( Menit )</th>
+            <th rowspan="2">Pulang Cepat</th>
+            <th rowspan="2">Finger 1 kali</th>
+            <th rowspan="2">Tidak Hadir Apel</th>
+            <th colspan="{{count($data['arrAlasan'])}}">Keterangan Tidak Masuk</th>
+        </tr>
+        <tr>
+            @foreach($data['arrAlasan'] as $id=>$nm_alasan)
+                <th>{{$nm_alasan}}</th>
+            @endforeach
+        </tr>
+    </thead>
+    <tbody>
+        <?php $no=1;?>
+        @foreach($data['arrData'] as $id_sdm=>$dt_sdm)
+        <?php
+        $kode = $data['tahun'].sprintf("%02d", $id_bulan);
+        $dt_presensi = $dt_sdm['data_presensi'][$kode];
+        $jmh_hari_kerja = count($dt_bln['list_tgl']) - count($data['dt_hari_libur'][$dt_bln['tahun']."-".$id_bulan]);
+        ?>
+        <tr>
+            <td>{{$no++}}</td>
+            <td>&nbsp;{{$dt_sdm['nip']}}</td>
+            <td>{{$dt_sdm['nm_sdm']}}</td>
+            <td align="center">{{count($dt_bln['hari_kerja'])}}</td>
+            <td align="center">{{(int)$dt_presensi['masuk']['total']}}</td>
+            <td align="center">{{(int)$dt_presensi['tidakmasuk']['total']}}</td>
+            <td align="center">{{(int)$dt_presensi['telat']['total']}}</td>
+            <td align="center">{{(int)$dt_presensi['pulang_cepat']['total']}}</td>
+            <td align="center">{{(int)$dt_presensi['absensekali']['total']}}</td>
+            <td align="center">{{(int)$dt_presensi['dt_apel']['tidak_hadir']['total']}}</td>
+            @foreach($data['arrAlasan'] as $id=>$nm_alasan)
+            <td align="center">{{count($data['arrjumlahabsen'][$dt_sdm['nip']][$nm_alasan])}}</td>
+            @endforeach
+        </tr>
+        @endforeach
+    </tbody>
+</table>
+@endforeach

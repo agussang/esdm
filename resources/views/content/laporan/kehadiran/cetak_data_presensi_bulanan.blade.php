@@ -97,6 +97,7 @@
                 $dt_presensi = $dt_sdm['data_presensi'][$kode];
                 $jmh_hari_kerja = count($dt_bln['list_tgl']) - count($dt_hari_libur[$dt_bln['tahun']."-".$id_bulan]);
                 ?>
+                @if(count($dt_presensi)>0)
                 <tr>
                     <td>{{$no++}}</td>
                     <td>{{$dt_sdm['nip']}} -- {{$kode}}</td>
@@ -112,6 +113,23 @@
                         <td align="center">{{$dt_presensi['absen'][$id]['data']['total']}}</td>
                     @endforeach
                 </tr>
+                @else
+                <tr>
+                    <td>{{$no++}}</td>
+                    <td>{{$dt_sdm['nip']}}</td>
+                    <td>{{$dt_sdm['nm_sdm']}}</td>
+                    <td align="center">0</td>
+                    <td align="center">0</td>
+                    <td align="center">0</td>
+                    <td align="center">0</td>
+                    <td align="center">0</td>
+                    <td align="center">0</td>
+                    <td align="center">0</td>
+                    @foreach($arrAlasan as $id=>$nm_alasan)
+                        <td align="center">{{count($arrjumlahabsen[$dt_sdm['nip']][$nm_alasan])}}</td>
+                    @endforeach
+                </tr>
+                @endif
                 @endforeach
             </tbody>
         </table>

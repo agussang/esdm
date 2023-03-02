@@ -963,7 +963,11 @@ class Fungsi
             $tgl_akhir = explode('-',$r->tgl_akhir);
             $tanggal_absen = daterange($r->tgl_awal,$r->tgl_akhir);
             foreach($tanggal_absen as $tgl){
-                $arrData[$r->id_sdm][$tgl]['alasan_absen'] = $arrAlasan[$r->id_alasan];
+                $tglx = Fungsi::formatDate($tgl);
+                $hari = explode(',',$tglx);
+                if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
+                    $arrData[$r->id_sdm][$tgl]['alasan_absen'] = $arrAlasan[$r->id_alasan];
+                }
             }
 
         }

@@ -76,7 +76,18 @@
                         <input type="date" class="form-control" name="tgl_akhir" required>
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-2">
+                    <div class="input-group mb-4">
+                        <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Format</span>
+                        </div>
+                        <select class="form-control" name="format" required>
+                            <option value="1">Html</option>
+                            <option value="2">Excel</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-2">
                     <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
                 </div>
             </div>
@@ -92,7 +103,7 @@ $(document).ready(function() {
 });
 function tmp_pegawai(){
         var satuan_kerja = document.getElementById("satuan_kerja").value;
-	
+
         var request = $.ajax ({
                url : "{{route('laporan.presensi-kehadiran.cari-pegawai')}}",
                type : "get",

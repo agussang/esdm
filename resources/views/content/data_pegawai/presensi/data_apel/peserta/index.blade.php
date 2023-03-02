@@ -130,7 +130,7 @@
                     <div class="col-md-3">
                         <span><b>Jumlah Kehadiran<hr/></b></span>
                         @foreach($kehadiran as $nm_kehadiran=>$jm)
-                            <?php 
+                            <?php
                                 $kelas = "primary";
                                 if($nm_kehadiran=="Tidak Hadir"){
                                     $kelas = "danger";
@@ -164,7 +164,7 @@
                                         $badge = "";
                                         if($r->kehadiran=="H"){
                                             $badge = "<span class=\"badge badge-primary\">Hadir</span>";
-                                        }if($r->kehadiran=="T"){
+                                        }if($r->kehadiran=="T" || $r->kehadiran=="TH"){
                                             $badge = "<span class=\"badge badge-danger\">Tidak Hadir</span>";
                                         }
                                     ?>

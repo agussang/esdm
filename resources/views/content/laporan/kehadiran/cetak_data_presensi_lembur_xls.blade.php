@@ -1,54 +1,12 @@
-<html>
-<title>{{$rsDataKetApp->nama_aplikasi}}</title>
-<head>
-    <style>
-		@media print
-		{
-		#ttd {position:fixed;bottom:1cm;}
-		}
-		@font-face {
-			font-family: MyriadPro-Regular;
-			src: url("../font/MyriadPro-Regular.otf");
-
-		}
-		@font-face {
-			font-family: MyriadPro-Cond;
-			src: url("../font/MyriadPro-Cond.otf");
-
-		}
-		#head-title{
-			font-family:MyriadPro-Regular;
-			font-weight:bold;
-		}
-		#head-big{
-			font-family:MyriadPro-Cond;
-			font-weight:bold;
-			font-size:12pt;
-		}
-		#container td{
-			font-family:MyriadPro-Regular;
-		}
-        @page { size: landscape; }
-        @page { size: "A4"; }
-        div.page { page-break-after: always; }
-        .tengah{
-            text-align:center;
-        }
-        .kiri{
-            text-align:left;
-        }
-        .kanan{
-            text-align:right;
-        }
-</style>
-</head>
-
 <div class="page" align="center" id="container">
     <body leftmargin="0" rightmargin="0" topmargin="0" bottommargin="0">
-        <span><b>Data Presensi Pegawai</b></span><br/>
-        <span><b>Jam Kerja {{$jam_kerja_text}}</b></span><br/>
-        <br/><hr style="border: 1px solid"/><br/>
-        <br/><hr style="border: 1px solid"/><br/>
+        <table width="100%" border=1 cellspacing=0 cellpadding="3" style="font-size:12pt";>
+            <thead>
+                <tr>
+                    <td colspan="14"><span><b>Jam Kerja {{$data['jam_kerja_text']}}</b></span><br/></td>
+                </tr>
+            </thead>
+        </table>
         <table width="100%" border=1 cellspacing=0 cellpadding="3" style="font-size:12pt";>
             <thead>
                 <tr>
@@ -61,14 +19,14 @@
                     <th>Durasi Bekerja <br/>(Jam)</th>
                     <th>Durasi Bekerja<br/>(Menit)</th>
                     <th>Lembur<br/>(Jam)</th>
-                    @if($id_satker == "30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                    @if($data['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0")
                     <th>Ket Jadwal Shift</th>
                     @endif
                 </tr>
             </thead>
             <tbody>
                 <?php $no=1;?>
-                @foreach($arrData as $id_sdm=>$dt_sdm)
+                @foreach($data['arrData'] as $id_sdm=>$dt_sdm)
                     @foreach($dt_sdm['data_presensi'] as $tanggal=>$presensi)
                     <?php
                     $hariabsen = explode(',',$presensi['ket_tgl']);
@@ -78,9 +36,9 @@
                         $jam_keluar = $jam_masuk;
                     }
                     if($hariabsen[0]=="Jumat"){
-                        $jamkerja = $jam_kerja[2];
+                        $jamkerja = $data['jam_kerja'][2];
                     }else{
-                        $jamkerja = $jam_kerja[1];
+                        $jamkerja = $data['jam_kerja'][1];
                     }
 
                     if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
@@ -143,7 +101,7 @@
                     ?>
                     <tr style="{{$warna}}">
                         <td>{{$no++}}</td>
-                        <td>{{$dt_sdm['nip']}}</td>
+                        <td>&nbsp;{{$dt_sdm['nip']}}</td>
                         <td>{{$dt_sdm['nm_sdm']}}</td>
                         <td>{{$presensi['ket_tgl']}}</td>
                         <td align="center">{{$jam_masuk}}</td>
@@ -169,4 +127,3 @@
         </table>
     </body>
 </div>
-</html>

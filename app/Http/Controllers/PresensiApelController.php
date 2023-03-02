@@ -19,7 +19,7 @@ class PresensiApelController extends Controller
         Request $request,
         Repomskegiatanapel $repomskegiatanapel,
         Repopresensiapel $repopresensiapel,
-        Repomspegawai $repomspegawai  
+        Repomspegawai $repomspegawai
     ){
         $this->request = $request;
         $this->repomskegiatanapel = $repomskegiatanapel;
@@ -99,7 +99,7 @@ class PresensiApelController extends Controller
         $arrGrafik = array();
         foreach($data['peserta'] as $rs=>$r){
             $text = "Hadir";
-            if($r->kehadiran=="T"){
+            if($r->kehadiran=="T" || $r->kehadiran=="TH"){
                 $text = "Tidak Hadir";
             }
             $data['kehadiran'][$text]+=1;
@@ -109,7 +109,7 @@ class PresensiApelController extends Controller
         return view('content.data_pegawai.presensi.data_apel.peserta.index',$data);
     }
 
-    
+
     public function create()
     {
         return view('content.data_pegawai.presensi.data_apel.tambah',$data);
@@ -139,7 +139,7 @@ class PresensiApelController extends Controller
         return redirect()->route('data-pegawai.data-presensi.apel.index');
     }
 
-    
+
     public function store(Request $request)
     {
         $req = $request->except('_token');
@@ -160,13 +160,13 @@ class PresensiApelController extends Controller
         }
     }
 
-    
+
     public function show($id)
     {
         //
     }
 
-    
+
     public function edit(Request $request)
     {
         $req = $request->except('_token');
@@ -174,7 +174,7 @@ class PresensiApelController extends Controller
         return view('content.data_pegawai.presensi.data_apel.edit',$data);
     }
 
-    
+
     public function update(Request $request)
     {
         $req = $request->except('_token');
@@ -197,7 +197,7 @@ class PresensiApelController extends Controller
         }
     }
 
-    
+
     public function destroy($id)
     {
         $id = Crypt::decrypt($id);
