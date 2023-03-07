@@ -325,7 +325,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         $jam_keluar = "--:--";
                                                 }
 
-                                                $absenkehadiran = $getDataAbsen[$id_sdm][$tgl]['alasan_absen'];
+                                                $absenkehadiran = $getDataAbsen[$rsData->id_sdm][$tgl]['alasan_absen'];
                                                 if($absenkehadiran!=null){
                                                         $absen_kehadiran++;
                                                         $ket = $absenkehadiran['kode_alasan'];
@@ -333,6 +333,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         $hitungdurasi_terlambat = "0";
                                                         $hitungdurasi_pulang_cepat = 0;
                                                 }
+
                                                 $durasikerja = "00:00:00";$durasikerjamenit = "0";
                                                 if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
                                                     $jamawal = $tgl." ".$jam_masuk;
@@ -360,6 +361,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         }
                                                     }
                                                 }
+
                                                 if($ket=="Terlambat Datang"){
                                                     $jterlambat++;
                                                 }

@@ -295,7 +295,9 @@ class MsPegawaiController extends Controller
         $data['rekap'] = $rekap[$rsData->id_sdm][$gbng];
         $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_terakhir,1);
         $data['getDataAbsen'] = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_terakhir);
+
         $data['dt_hari_libur'] = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_terakhir);
+
         $data['bulan'] = sprintf("%0d", $bln);
         return view('content.data_pegawai.riwayat.presensi_kehadiran.index',$data);
     }
