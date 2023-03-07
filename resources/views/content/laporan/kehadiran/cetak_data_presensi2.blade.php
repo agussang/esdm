@@ -186,7 +186,7 @@
                         }
                         $terlambat_durasi = $hitungdurasi_terlambat-$durasi_justifikasi;
                         if($terlambat_durasi == 0){
-                            $ket = "";
+                            //$ket = "";
                         }
                         ?>
                         <tr style="{{$warna}}">
