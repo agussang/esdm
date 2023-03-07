@@ -168,8 +168,6 @@ $disabled = "";
                                             if(Session::get('level')=="A"){
                                                 $bisa = 1;
                                             }
-
-
                                             ?>
                                             @if($bisa==1)
                                             <div class="btn-group" role="group">

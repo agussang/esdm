@@ -89,7 +89,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Nama Pegawai</span>
                                     </div>
-                                    <input type="text" class="form-control" name="nm_sdm" id="nm_sdm" required value="{{ $rsData->nm_sdm }}" {{$readonly}}>
+                                    <input type="text" class="form-control" name="nm_sdm" id="nm_sdm"  value="{{ $rsData->nm_sdm }}" {{$readonly}}>
                                 </div>
                             </div>
                         </div>
@@ -99,7 +99,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Tempat Lahir</span>
                                     </div>
-                                    <input type="text" class="form-control" name="tmpt_lahir" id="tmpt_lahir" required value="{{ $rsData->tmpt_lahir }}" {{$readonly}}>
+                                    <input type="text" class="form-control" name="tmpt_lahir" id="tmpt_lahir"  value="{{ $rsData->tmpt_lahir }}" {{$readonly}}>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -107,7 +107,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Tanggal Lahir</span>
                                     </div>
-                                    <input type="date" class="form-control" name="tgl_lahir" id="tgl_lahir" required value="{{ $rsData->tgl_lahir }}" {{$readonly}}>
+                                    <input type="date" class="form-control" name="tgl_lahir" id="tgl_lahir"  value="{{ $rsData->tgl_lahir }}" {{$readonly}}>
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -115,7 +115,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Jenis Kelamin</span>
                                     </div>
-                                    <select class="form-control" name="jk" id="jk" required {{$disabled}}>
+                                    <select class="form-control" name="jk" id="jk"  {{$disabled}}>
                                         {!!$pilihan_jenis_kelamin!!}
                                     </select>
                                 </div>
@@ -127,7 +127,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">NIK</span>
                                     </div>
-                                    <input type="text" class="form-control" name="nik" id="nik" required minlength="16" maxlength="16" onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->nik }}">
+                                    <input type="text" class="form-control" name="nik" id="nik"  minlength="16" maxlength="16" onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->nik }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -135,7 +135,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">No Hp</span>
                                     </div>
-                                    <input type="text" class="form-control" name="no_hp" id="no_hp" minlength="11" maxlength="13" required onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->no_hp }}">
+                                    <input type="text" class="form-control" name="no_hp" id="no_hp" minlength="11" maxlength="13"  onkeypress="return goodchars(event,'1234567890',this)" value="{{ $rsData->no_hp }}">
                                 </div>
                             </div>
                             <div class="col-md-4">
@@ -143,7 +143,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Email</span>
                                     </div>
-                                    <input type="text" class="form-control" name="email" id="email" required value="{{ $rsData->email }}">
+                                    <input type="text" class="form-control" name="email" id="email"  value="{{ $rsData->email }}">
                                 </div>
                             </div>
                         </div>
@@ -153,7 +153,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Status Perkawinan</span>
                                     </div>
-                                    <select class="form-control" name="id_stat_kawin" id="id_stat_kawin" required>
+                                    <select class="form-control" name="id_stat_kawin" id="id_stat_kawin" >
                                         {!!$pilihan_status_kawin!!}
                                     </select>
                                 </div>
@@ -163,7 +163,7 @@ if($rsData->file_foto){
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Agama</span>
                                     </div>
-                                    <select class="form-control" name="id_agama" id="id_agama" required>
+                                    <select class="form-control" name="id_agama" id="id_agama" >
                                         {!!$pilihan_agama!!}
                                     </select>
                                 </div>
@@ -261,7 +261,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Unit Kerja</span>
                             </div>
-                            <select class="form-control" name="id_satkernow" id="id_satkernow" required {{$disabled}}>
+                            <select class="form-control" name="id_satkernow" id="id_satkernow"  {{$disabled}}>
                                 {!!$pilihan_satker!!}
                             </select>
                         </div>
@@ -271,7 +271,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Kedinasan</span>
                             </div>
-                            <select class="form-control" name="id_kedinasan" id="id_kedinasan" required {{$disabled}}>
+                            <select class="form-control" name="id_kedinasan" id="id_kedinasan"  {{$disabled}}>
                                 {!!$pilihan_kedinasan!!}
                             </select>
                         </div>
@@ -336,7 +336,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Npwp</span>
                             </div>
-                            <input type="text" class="form-control" name="npwp" id="npwp" required value="{{ $rsData->npwp }}" {{$disabled}}>
+                            <input type="text" class="form-control" name="npwp" id="npwp"  value="{{ $rsData->npwp }}" {{$disabled}}>
                         </div>
                     </div>
                 </div>
@@ -346,7 +346,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Nama Bank</span>
                             </div>
-                            <select class="form-control" name="id_bank" id="id_bank" required {{$disabled}}>
+                            <select class="form-control" name="id_bank" id="id_bank"  {{$disabled}}>
                                 {!!$pilihan_absen!!}
                             </select>
                         </div>
@@ -356,7 +356,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Nama Rekening</span>
                             </div>
-                            <input type="text" class="form-control" name="nmrek" id="nmrek" required value="{{ $rsData->nmrek }}" {{$readonly}}>
+                            <input type="text" class="form-control" name="nmrek" id="nmrek"  value="{{ $rsData->nmrek }}" {{$readonly}}>
                         </div>
                     </div>
                     <div class="col-md-4">
@@ -364,7 +364,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Nomor Rekening</span>
                             </div>
-                            <input type="text" class="form-control" name="no_rekening" {{$readonly}} id="no_rekening" required value="{{ $rsData->no_rekening }}">
+                            <input type="text" class="form-control" name="no_rekening" {{$readonly}} id="no_rekening"  value="{{ $rsData->no_rekening }}">
                         </div>
                     </div>
                 </div>
@@ -383,7 +383,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Jenis Pegawai</span>
                             </div>
-                            <select class="form-control" name="id_jns_sdm" id="id_jns_sdm" onchange="tmp_jns_sdm(this)" required {{$disabled}}>
+                            <select class="form-control" name="id_jns_sdm" id="id_jns_sdm" onchange="tmp_jns_sdm(this)"  {{$disabled}}>
                                 {!!$pilihan_jns_sdm!!}
                             </select>
                         </div>
@@ -393,7 +393,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Status Kepegawaian</span>
                             </div>
-                            <select class="form-control" name="id_stat_kepegawaian" {{$disabled}} id="id_stat_kepegawaian" onchange="tmp_status_kepegawaian(this)" required>
+                            <select class="form-control" name="id_stat_kepegawaian" {{$disabled}} id="id_stat_kepegawaian" onchange="tmp_status_kepegawaian(this)" >
                                 {!!$pilihan_status_kepegawaian!!}
                             </select>
                         </div>
@@ -403,7 +403,7 @@ if($rsData->file_foto){
                             <div class="input-group-prepend">
                             <span class="input-group-text" id="inputGroup-sizing-default">Status Keaktifan</span>
                             </div>
-                            <select class="form-control" name="id_stat_aktif" id="id_stat_aktif" {{$disabled}} required>
+                            <select class="form-control" name="id_stat_aktif" id="id_stat_aktif" {{$disabled}} >
                                 {!!$pilihan_status_keaktifan!!}
                             </select>
                         </div>

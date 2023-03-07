@@ -40,6 +40,7 @@ class IndexController extends Controller
             if(count($data['ramadhan'])>0){
                 $req['id_jam_kerja'] = "347b23a9-8919-43ec-9b2d-a0c4b810b61d";
             }
+            //dd($data['ramadhan']);
             $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
             $jam_kerja_ramadhan = Fungsi::jam_kerja("347b23a9-8919-43ec-9b2d-a0c4b810b61d");
             $durasibekerja = Fungsi::durasibekerja($req['id_jam_kerja']);
@@ -78,6 +79,7 @@ class IndexController extends Controller
 
             $data['periodeaktif'] = $this->repomsperiodeskp->findWhereRaw("","status = '1'");
             $data['arrBulanPanjang'] = Fungsi::nm_bulan();
+
             return view('content.hal_pegawai.home',$data);
         }else{
             $jns_kelamin = Fungsi::arrjenis_kelamin();

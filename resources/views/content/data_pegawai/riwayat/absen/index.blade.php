@@ -79,6 +79,7 @@ $induk = explode('/',request()->path());
                                 <th>Alasan / Keterangan</th>
                                 <th>File Surat</th>
                                 <th>Status Verifikasi</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -109,6 +110,19 @@ $induk = explode('/',request()->path());
                                     @if($r->is_valid!=null)
                                         <br/>
                                         {{date('d-m-Y H:i:s',strtotime($r->tgl_verifikasi))}}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($r->is_valid!=1)
+                                    <div class="btn-group" role="group">
+                                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Aksi
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
+                                                <a class="dropdown-item" href="{{URL::to('/data-pegawai/data-presensi/data-absen/edit')}}/{{Crypt::encrypt($r->id_absen)}}"><i class="fas fa-pencil-ruler"></i> Edit</a>
+                                                <a class="dropdown-item" href="{{URL::to('/data-pegawai/data-presensi/data-absen/hapus')}}/{{Crypt::encrypt($r->id_absen)}}" onclick="return confirm('Apakah anda yakin ingin menghapus data ini ? ');"><i class="fas fa-trash"></i> Hapus</a>
+                                        </div>
+                                    </div>
                                     @endif
                                 </td>
                             </tr>

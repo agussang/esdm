@@ -422,8 +422,9 @@ class DataAbsenController extends Controller
             'alert-type' => 'success',
         ];
         if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
-            return redirect()->route('data-presensi.data-absen.index')->with($notification);
-        }else{
+            return redirect()->intended('pegawai/riwayat-absen/'.Crypt::encrypt(Session::get('id_sdm')))->with($notification);
+        }
+        else{
             return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
         }
     }

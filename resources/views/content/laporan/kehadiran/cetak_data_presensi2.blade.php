@@ -142,6 +142,8 @@
                                 $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
                             }
                         }
+
+
                         if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
                             if($ket == null && $jam_masuk==null && $jam_keluar==null){
                                 $ket = "Tidak Hadir";
@@ -172,6 +174,20 @@
                             $durasikerja = Fungsi::durasikerja($jamawal,$jamakhir);
                             $durasikerjamenit = Fungsi::konversiwaktu($durasikerja);
                         }
+                        $ketajuan = $getajuan_justifikasi[$id_sdm][$tgl];
+                        $durasi_justifikasi = 0;
+                        $kategori = "";
+                        if($ketajuan){
+                            $kategori = $arrkategorijustifikasi[$ketajuan['kategori_justifikasi']];
+                            $durasi_justifikasi = $ketajuan['durasi_justifikasi'];
+                            $durasijustifikasi = $ketajuan['durasi_justifikasi']." Menit";
+                        }else{
+                            $durasijustifikasi = "";
+                        }
+                        $terlambat_durasi = $hitungdurasi_terlambat-$durasi_justifikasi;
+                        if($terlambat_durasi == 0){
+                            $ket = "";
+                        }
                         ?>
                         <tr style="{{$warna}}">
                             <td>{{$no++}}</td>
@@ -182,7 +198,7 @@
                             <td>{{$jam_keluar}}</td>
                             <td>{{$durasikerja}}</td>
                             <td>{{$durasikerjamenit}}</td>
-                            <td>{{$hitungdurasi_terlambat}}</td>
+                            <td>{{$terlambat_durasi}}</td>
                             <td>{{$hitungdurasi_pulang_cepat}}</td>
                             <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
                             <td>{{$ket}}</td>

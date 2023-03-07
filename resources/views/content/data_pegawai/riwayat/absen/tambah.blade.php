@@ -10,7 +10,7 @@
                             <h5 class="card-label"><i class="fa fa-plus"></i> Form Tambah Data Absen Kehadiran Pegawai</h5>
                         </div>
                         <div class="col-md-3">
-                            <a href="{{route('pegawai.riwayat-absen')}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
+                            <a href="{{URL::to('pegawai/riwayat-absen')}}/{{Crypt::encrypt($id_sdm)}}" class="btn btn-danger pull-right"><i class="fas fa-backspace"></i> Kembali</a>
                         </div>
                     </div>
                 </div>

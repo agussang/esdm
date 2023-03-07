@@ -190,7 +190,10 @@ function daterange($tgl_awal,$tgl_akhir){
 
 function tgl_ramadhan($tahun){
     $rsData = SettingRamadhan::where('tahun',$tahun)->first();
-    $list_tgl = daterange($rsData->tgl_ramadhan,$rsData->tgl_ramadhan_akhir);
+    $list_tgl = array();
+    if($rsData!=null){
+        $list_tgl = daterange($rsData->tgl_ramadhan,$rsData->tgl_ramadhan_akhir);
+    }
     return $list_tgl;
 }
 
@@ -992,6 +995,25 @@ class Fungsi
         return $arrData;
     }
 
+    public static function getajuan_justifikasiall($tgl_awal,$tgl_akhir){
+        $rsJustifikasi = TrJustifikasi::whereRaw(" tanggal_absen >= '$tgl_awal' and tanggal_absen <= '$tgl_akhir'")
+                        ->get();
+        $arrData = array();
+        foreach($rsJustifikasi as $rs=>$r){
+            if($r->justifikasi_atasan==1){
+                $arrData[$r->id_sdm][$r->tanggal_absen]['jam_masuk'] = $r->jam_masuk;
+                $arrData[$r->id_sdm][$r->tanggal_absen]['jam_pulang'] = $r->jam_pulang;
+                $arrData[$r->id_sdm][$r->tanggal_absen]['ket_justifikasi'] = $r->ket_justifikasi;
+                $arrData[$r->id_sdm][$r->tanggal_absen]['kategori_justifikasi'] = $r->kategori_justifikasi;
+                $arrData[$r->id_sdm][$r->tanggal_absen]['status'] = $r->justifikasi_atasan;
+                $arrData[$r->id_sdm][$r->tanggal_absen]['ajuan_durasi_justifikasi'] = $r->ajuan_durasi_justifikasi;
+                $arrData[$r->id_sdm][$r->tanggal_absen]['tgl_justifikasi'] = $r->tgl_justifikasi;
+                $arrData[$r->id_sdm][$r->tanggal_absen]['durasi_justifikasi'] = $r->durasi_justifikasi;
+            }
+        }
+        return $arrData;
+    }
+
     public static function getajuan_justifikasiarr($arridsdm,$tgl_awal,$tgl_akhir,$kode = 1){
         $rsJustifikasi = TrJustifikasi::whereIn('id_sdm',$arridsdm)
                         ->whereRaw(" tanggal_absen >= '$tgl_awal' and tanggal_absen <= '$tgl_akhir'")
@@ -1117,7 +1139,7 @@ class Fungsi
                 ->whereIn("id_sdm",$arrIdSdm)
                 ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) ")
                 ->get();
-            $arrAbsenTanggal= array();$jmalasanabsen = array();$jmalasanabsenfirst = array();
+            $arrAbsenTanggal= array();$jmalasanabsen = array();$jmalasanabsenfirst = array();$arrtglabsen = array();
             foreach($rsDataAbsenKehadiran as $sen=>$senx){
                 $jm_absen = Fungsi::jumlah_absen($senx->tgl_awal,$senx->tgl_akhir,1);
                 $jmalasanabsenfirst[$senx->id_sdm][$senx->id_alasan][$senx->id_absen] = $jm_absen;
@@ -1126,6 +1148,7 @@ class Fungsi
                     $bulanxx = date('m',strtotime($tgl));
                     $tglxx = date('d',strtotime($tgl));
                     $arrAbsenTanggal[$senx->id_sdm][$bulanxx][$tglxx] = $tglxx;
+                    $arrtglabsen[$senx->id_sdm][$bulanxx][$tglxx] = $tglxx;
                 }
 
             }
@@ -1266,8 +1289,11 @@ class Fungsi
                         $gabungan = $thn."-".$idbln."-".$tglbln;
                         $cek = $dtsdmx[$gabungan];
                         if($cek!=null){
-                            $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['list_tgl'][$tglbln] = $tglbln;
-                            $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['total']+=1;
+                            $cekalasanabsen = $arrtglabsen[$idsdm][$idbln][$tglbln];
+                            if($cekalasanabsen==null){
+                                $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['list_tgl'][$tglbln] = $tglbln;
+                                $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['total']+=1;
+                            }
                         }else{
                             if($arrAbsenTanggal[$idsdm][$idbln][$tglbln]==null){
                                 if($arrJustifikasi[$idsdm][$thn."-".$idbln][$tglbln]){
@@ -1435,7 +1461,7 @@ class Fungsi
                 ->whereIn("id_sdm",$arrIdSdm)
                 ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) ")
                 ->get();
-            $arrAbsenTanggal= array();$jmalasanabsen = array();$jmalasanabsenfirst = array();
+            $arrAbsenTanggal= array();$jmalasanabsen = array();$jmalasanabsenfirst = array();$arrtglabsen = array();
             foreach($rsDataAbsenKehadiran as $sen=>$senx){
                 $jm_absen = Fungsi::jumlah_absen($senx->tgl_awal,$senx->tgl_akhir,1);
                 $jmalasanabsenfirst[$senx->id_sdm][$senx->id_alasan][$senx->id_absen] = $jm_absen;
@@ -1444,9 +1470,11 @@ class Fungsi
                     $bulanxx = date('m',strtotime($tgl));
                     $tglxx = date('d',strtotime($tgl));
                     $arrAbsenTanggal[$senx->id_sdm][$bulanxx][$tglxx] = $tglxx;
+                    $arrtglabsen[$senx->id_sdm][$bulanxx][$tglxx] = $tglxx;
                 }
 
             }
+
             foreach($jmalasanabsenfirst as $idsdmpegawai=>$dtsdmpegawai){
                 foreach($dtsdmpegawai as $idalasanabsen=>$dtalasanabsen){
                     foreach($dtalasanabsen as $keyidabsen=>$dtkeyabsen){
@@ -1557,11 +1585,13 @@ class Fungsi
                     }
                 }
             }
+            $arrtglabsenkehadiran = array();
             foreach($arrDataRekap as $idpg=>$dtbul){
                 foreach($dtbul as $idbulancekkehadiran=>$dtbulancekkehadiran){
                     foreach($dtbulancekkehadiran as $kategoricekkehadiran=>$dtkategoricekkehadiran){
                         //if($kategoricekkehadiran!="absensekali"){
                             foreach($dtkategoricekkehadiran['list_tgl'] as $tglcekkehadiran=>$jmlmenit){
+                                $arrtglabsenkehadiran[$idpg][$tglcekkehadiran] = $tglcekkehadiran;
                                 $nmkategori = $kategoricekkehadiran;
                                 $arrDataRekap[$idpg][$idbulancekkehadiran][$nmkategori]['total']+=$jmlmenit;
                             }
@@ -1581,8 +1611,11 @@ class Fungsi
                         $gabungan = $thn."-".$idbln."-".$tglbln;
                         $cek = $dtsdmx[$gabungan];
                         if($cek!=null){
-                            $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['list_tgl'][$tglbln] = $tglbln;
-                            $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['total']+=1;
+                            $cekalasanabsen = $arrtglabsen[$idsdm][$idbln][$tglbln];
+                            if($cekalasanabsen==null){
+                                $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['list_tgl'][$tglbln] = $tglbln;
+                                $arrDataRekap[$idsdm][$nm_bln_gabung]['masuk']['total']+=1;
+                            }
                         }else{
                             if($arrAbsenTanggal[$idsdm][$idbln][$tglbln]==null){
                                 if($arrJustifikasi[$idsdm][$thn."-".$idbln][$tglbln]){

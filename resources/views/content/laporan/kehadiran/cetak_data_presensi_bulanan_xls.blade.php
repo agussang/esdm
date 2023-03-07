@@ -35,16 +35,16 @@
             <th rowspan="2">Nama</th>
             <th rowspan="2">Hari Kerja</th>
             <th rowspan="2">Jmlh Kehadiran</th>
-            <th rowspan="2">Tidak Masuk</th>
             <th rowspan="2">Terlambat <br/>( Menit )</th>
             <th rowspan="2">Pulang Cepat</th>
             <th rowspan="2">Finger 1 kali</th>
             <th rowspan="2">Tidak Hadir Apel</th>
-            <th colspan="{{count($data['arrAlasan'])}}">Keterangan Tidak Masuk</th>
+            <th colspan="{{count($data['arrAlasan'])+1}}">Keterangan Tidak Masuk</th>
         </tr>
         <tr>
+            <th>Tidak Masuk Tanpa Keterangan</th>
             @foreach($data['arrAlasan'] as $id=>$nm_alasan)
-                <th>{{$nm_alasan}}</th>
+            <th>{{$nm_alasan}}</th>
             @endforeach
         </tr>
     </thead>
@@ -68,8 +68,16 @@
             <td align="center">{{(int)$dt_presensi['absensekali']['total']}}</td>
             <td align="center">{{(int)$dt_presensi['dt_apel']['tidak_hadir']['total']}}</td>
             @foreach($data['arrAlasan'] as $id=>$nm_alasan)
-            <td align="center">{{count($data['arrjumlahabsen'][$dt_sdm['nip']][$nm_alasan])}}</td>
+            <?php
+            $absenalasan = $dt_presensi['absen'][$id]['data']['total'];
+            if($absenalasan==null){
+                $absenalasan = count($arrjumlahabsen[$dt_sdm['nip']][$nm_alasan]);
+            }
+            $total_tidak_masuk+=$absenalasan;
+            ?>
+            <td align="center">{{$absenalasan}}</td>
             @endforeach
+            <td align="center">{{$total_tidak_masuk}}</td>
         </tr>
         @endforeach
     </tbody>

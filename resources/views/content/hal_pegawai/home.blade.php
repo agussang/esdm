@@ -215,6 +215,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                             <th rowspan="2"><center>Durasi Bekerja<br/>(Menit)</center></th>
                             <th rowspan="2"><center>Durasi Terlambat<br/>(Menit)</center></th>
                             <th rowspan="2"><center>Durasi Pulang Cepat<br/>(Menit)</center></th>
+                            <th rowspan="2"><center>Lembur<br/>(Jam)</center></th>
                             <th rowspan="2">Ket Tanggal</th>
                             <th rowspan="2">Ket</th>
                             @if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
@@ -359,6 +360,24 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                             $jterlambat++;
                         }
                         $terlambat = $hitungdurasi_terlambat-$menitjustifikasi;
+                        $gabung_lembur = 0;
+                        $masterdurasikerja = Fungsi::konversiwaktu($durasi);
+                        if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
+                            if($durasikerja>$durasi){
+                                // dikurangi
+                                $durasikurangidurasikerja= abs($durasikerjamenit-$masterdurasikerja);
+                                if($durasikurangidurasikerja>60){
+                                    $jamkel = explode(':',$jamkerja['jam_pulang']);
+                                    $jamlembur = -($jamkel[0]-$j_keluar_start);
+                                    $menit_lembur = -($jamkel[1]-$menit_keluar_start);
+                                    $gabung_lembur = sprintf("%02d", $jamlembur).":".sprintf("%02d", $menit_lembur);
+                                }
+                            }
+                        }else{
+                            $gabung_lembur = $durasikerja;
+                        }
+                        $gabung_lembur = floor($durasikurangidurasikerja / 60).':'.($durasikurangidurasikerja -   floor($durasikurangidurasikerja / 60) * 60);
+                        $gabung_lembur = explode(":",$gabung_lembur);
                         ?>
                         <tr style="{{$warna}}">
                            <td>{{$no++}}</td>
@@ -381,6 +400,13 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                             @endif
                            </td>
                            <td>{{$hitungdurasi_pulang_cepat}}</td>
+                           <td>
+                            @if($durasikerjamenit>0)
+                            {{sprintf("%01d",$gabung_lembur[0])}}
+                            @else
+                            0 {{$x}}
+                            @endif
+                           </td>
                            <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
                            <td>{{$ket}}</td>
                            @if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")

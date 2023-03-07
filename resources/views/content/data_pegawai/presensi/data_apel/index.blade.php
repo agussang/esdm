@@ -51,7 +51,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}
@@ -73,14 +73,20 @@
                                 </thead>
                                 <tbody>
                                     @foreach($rsData as $rs=>$r)
+                                    <?php
+                                        $haduir = count($arrDataPesertaApel[$r->id_kegiatan]['H']);
+                                        $Thaduir = count($arrDataPesertaApel[$r->id_kegiatan]['T']);
+                                        $THhaduir = count($arrDataPesertaApel[$r->id_kegiatan]['TH']);
+                                        $jmlhtidakhadir = $Thaduir+$THhaduir;
+                                    ?>
                                     <tr>
                                         <td>{{$r->nama_kegiatan}}</td>
                                         <td>{{date('Y-m-d',strtotime($r->tgl_kegiatan))}}</td>
                                         <td>{{$r->jam_mulai}}</td>
                                         <td>{{$r->jam_selesai}}</td>
                                         <td>
-                                            <li>{{$r->peserta->where('kehadiran','H')->count()}} Hadir</li>
-                                            <li>{{$r->peserta->where('kehadiran','T')->count()}} Tidak Hadir</li>
+                                            <li> {{$haduir}} Hadir</li>
+                                            <li> {{$jmlhtidakhadir}}Tidak Hadir</li>
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
@@ -103,7 +109,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}
@@ -126,7 +132,7 @@
                 <form class="form" id="formku" action="{{route('data-pegawai.data-presensi.apel.update')}}" method="post">
 				{!! csrf_field() !!}
                     <div id="edit_kegiatan">
-                    
+
                     </div>
                 </form>
             </div>

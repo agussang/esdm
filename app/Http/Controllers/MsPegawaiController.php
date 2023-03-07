@@ -274,6 +274,7 @@ class MsPegawaiController extends Controller
         if(Session::get('tahun')!=null){
             $tahun = Session::get('tahun');
         }
+
         $terakhir = cal_days_in_month(CAL_GREGORIAN, $bln, $tahun);
         $tgl_awal = $tahun."-".$bln."-01";
         $tgl_terakhir = $tahun."-".$bln."-".$terakhir;
@@ -295,7 +296,7 @@ class MsPegawaiController extends Controller
         $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_terakhir,1);
         $data['getDataAbsen'] = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_terakhir);
         $data['dt_hari_libur'] = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_terakhir);
-        //dd($data);
+        $data['bulan'] = sprintf("%0d", $bln);
         return view('content.data_pegawai.riwayat.presensi_kehadiran.index',$data);
     }
 
@@ -466,7 +467,8 @@ class MsPegawaiController extends Controller
     {
         $id_sdm = Session::get('id_sdm');
         $data['pilihan_sdm'] = Fungsi::pilihan_sdm($id_sdm,"","","");
-        $data['alasan_absen'] = MsAlasanAbsen::whereRaw("id_alasan in ('fe89a6ef-f462-4056-aeed-feba7aa5b13c','c899c42c-742a-4c70-861e-bc093596a966','7bd5db1b-ce78-4b5d-93ea-5cc5c20ff580','047a6862-b00d-4d58-9b57-d9448e8b5996')")->orderBy('alasan','asc')->get();
+        $data['id_sdm'] = $id_sdm;
+        $data['alasan_absen'] = MsAlasanAbsen::whereRaw("id_alasan in ('fe89a6ef-f462-4056-aeed-feba7aa5b13c','c899c42c-742a-4c70-861e-bc093596a966','7bd5db1b-ce78-4b5d-93ea-5cc5c20ff580','047a6862-b00d-4d58-9b57-d9448e8b5996','868fe0e9-c664-4aef-95ed-09e880d5c060')")->orderBy('alasan','asc')->get();
         return view('content.data_pegawai.riwayat.absen.tambah',$data);
     }
 

@@ -231,7 +231,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                             </thead>
                                             <tbody>
                                                <?php
-                                               $bulanx = sprintf("%0d", date('m'));
+                                               $bulanx = $bulan;
+
                                                 $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
                                                 @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                                                 <?php

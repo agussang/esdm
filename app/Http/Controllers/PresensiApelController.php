@@ -32,11 +32,20 @@ class PresensiApelController extends Controller
         $text = Session::get('cari_kegiatan');
         $tgl_kegiatan = Session::get('tgl_kegiatan');
         $rsData= $this->repomskegiatanapel->paginate(['peserta'],$tgl_kegiatan,$text);
+        $arrDataPesertaApel = array();
+        foreach($rsData as $rs=>$r){
+            foreach($r->peserta as $rsp=>$rp){
+                if($rp->dt_pegawai->id_stat_aktif=="1"){
+                    $arrDataPesertaApel[$r->id_kegiatan][$rp->kehadiran][$rp->id_presensi] = $rp->id_presensi;
+                }
+            }
+        }
         $paging = $rsData->links();
         $totalRecord = $rsData->total();
         $data['rsData'] = $rsData;
         $data['paging'] = $paging;
         $data['totalRecord'] = $totalRecord;
+        $data['arrDataPesertaApel'] = $arrDataPesertaApel;
         return view('content.data_pegawai.presensi.data_apel.index',$data);
     }
 
@@ -117,7 +126,7 @@ class PresensiApelController extends Controller
 
     public function download_template($id){
         $id = Crypt::decrypt($id);
-        $data['rsData'] = $this->repomspegawai->get(['nm_jns_sdm','stat_kepegawaian','stat_aktif','nm_agama'],$id_stat_aktif = null);
+        $data['rsData'] = $this->repomspegawai->get(['nm_jns_sdm','stat_kepegawaian','stat_aktif','nm_agama'],1);
         $data['info_kegiatan'] = $this->repomskegiatanapel->findId("",$id,"id_kegiatan");
         return Excel::download(new TemplatePresensiApelExport($data), 'template_presensi_kegiatan.xlsx');
     }

@@ -13,7 +13,7 @@ class Repopresensiapel extends Repository
         $this->model = $model;
     }
 
-    public function get($with = null,$id_kegiatan=null,$id_sdm=null,$tahun=null,$bulan=null)
+    public function get($with = null,$id_kegiatan=null,$id_sdm=null,$tahun=null,$bulan=null,$id_stat_aktif = 1)
     {
         return $this->model
             ->when($with, function ($query) use ($with) {
@@ -29,6 +29,10 @@ class Repopresensiapel extends Repository
             })->when($bulan, function ($query) use ($bulan) {
                 $query->whereHas('nm_kegiatan_apel', function ($query) use ($bulan) {
                     return $query->whereRaw(" SUBSTRING(CAST(tgl_kegiatan AS VARCHAR(19)), 6, 2) = '$bulan' ");
+                });
+            })->when($id_stat_aktif, function ($query) use ($id_stat_aktif) {
+                $query->whereHas('dt_pegawai', function ($query) use ($id_stat_aktif) {
+                    return $query->where('id_stat_aktif',$id_stat_aktif);
                 });
             })
             ->get();
