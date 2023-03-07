@@ -53,7 +53,7 @@
                         </form>
                      </div>
                      <div class="col-lg-6 mb-lg-0 mb-4 mt-lg-0 mt-4">
-                        <img src="{{URL::to('assets/images/login_page_kepegawaian.png')}}" class="img-fluid w-80" alt="">
+                        <img src="{{URL::to('assets/images/login_page_kepegawaian_new.png')}}" class="img-fluid w-80" alt="">
                      </div>
                   </div>
                </div>
