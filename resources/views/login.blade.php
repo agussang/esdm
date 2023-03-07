@@ -39,7 +39,7 @@
                               <div class="col-lg-12">
                                  <div class="floating-label form-group">
                                     <input class="floating-input form-control" type="text" name="username" id="username" required>
-                                    <label>Email</label>
+                                    <label>Username</label>
                                  </div>
                               </div>
                               <div class="col-lg-12">
