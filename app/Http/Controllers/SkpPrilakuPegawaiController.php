@@ -94,6 +94,43 @@ class SkpPrilakuPegawaiController extends Controller
         return view('content.hal_pegawai.skp.prilaku.form-justifikasi',$data);
     }
 
+    public function simpan_penilaian_skp(Request $request){
+        $req = $request->except('_token');
+        $nilai_skp = $req['nilai_skp'];
+        $valid = $req['valid'];
+        unset($req['nilai_skp']);
+        unset($req['valid']);
+        if($valid=="on"){
+            $reqrekap['validasi']=1;
+            $reqrekap['validated_at'] = date('Y-m-d H:i:s');
+            $reqrekap['userid_validated'] = Session::get('id_pengguna');
+        }
+        if($req['ket_justifikasi']!=null){
+            $reqrekap['tgl_justifikasi'] = date('Y-m-d H:i:s');
+            $reqrekap['justifikasi'] = "1";
+            $reqrekap['ket_justifikasi'] = $req['ket_justifikasi'];
+            $reqrekap['point_justifikasi'] = $req['point_justifikasi'];
+            $reqrekap['tgl_justifikasi'] = date('Y-m-d H:i:s');
+        }
+        $reqrekap['id_sdm'] = $req['id_sdm'];
+        $reqrekap['nip'] = $req['nip'];
+        $reqrekap['nilai_skp'] = $nilai_skp;
+        $reqrekap['idperiode'] = $req['idperiode'];
+        $reqrekap['nilai_perilaku'] = $nilai_skp;
+        $cekrekapskp = $this->repotrrekapskp->findWhereRaw(""," idperiode = '$req[idperiode]' and id_sdm = '$req[id_sdm]' ");
+        if($cekrekapskp){
+            $where['id'] = $cekrekapskp->id;
+            $this->repotrrekapskp->update($where,$reqrekap);
+        }else{
+            $this->repotrrekapskp->store($reqrekap);
+        }
+        $notification = [
+            'message' => 'Berhasil, Penilaian prilaku pegawai berhasil disimpan.',
+            'alert-type' => 'success',
+        ];
+        return redirect()->back()->with($notification);
+    }
+
     public function cari(Request $request){
         $req = $request->except('_token');
         $id_sdm = Crypt::encrypt($req['id_sdm']);

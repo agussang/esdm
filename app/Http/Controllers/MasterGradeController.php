@@ -71,6 +71,7 @@ class MasterGradeController extends Controller
         $ambilnilai = $this->repoprosentase->findId("",$req,"id_prosentase");
         $nilai = $ambilnilai->nilai;
         $rsData = $this->repomsgrade->get();
+
         $arrData = array();
         foreach($rsData AS $rs=>$r){
             if($r->jobscore > 0 && $r->jobprice > 0){
@@ -80,7 +81,7 @@ class MasterGradeController extends Controller
                 $realp1 = $r->realisasi_p1;
                 $realp2 = round((($p2*$persenrealisasip2)/100),-3);
                 $arrData[$r->id]['grade'] = $r->grade;
-                $arrData[$r->id]['realisasi_p2'] = $realp1;
+                $arrData[$r->id]['realisasi_p2'] = $realp2;
                 $arrData[$r->id]['total_realisasi'] = $realp1+$realp2;
             }
         }
