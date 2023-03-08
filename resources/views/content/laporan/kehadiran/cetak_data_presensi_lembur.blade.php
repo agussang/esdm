@@ -122,6 +122,7 @@
                     $menitlemburjumat="540";
                     $menitlemburnonjumat = "510";
                     $masterdurasikerja = Fungsi::konversiwaktu($durasi);
+                    $durasikurangidurasikerja = 0;
                     if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
                         if($durasikerja>$durasi){
                             // dikurangi
