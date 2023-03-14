@@ -62,7 +62,7 @@ Route::get('/login-as/{id?}', [LoginController::class, 'loginas'])->name('logina
 Route::get('/ubahpassword', [LoginController::class, 'ubahpassword'])->name('ubahpassword');
 Route::post('/ubahpassword/simpan', [LoginController::class, 'simpan_ubah_password'])->name('ubahpassword.simpan');
 
-Route::group(['middleware' => 'role:SA_A_PI'], function () {
+Route::group(['middleware' => 'role:SA_A_PI_B'], function () {
     Route::get('home',[IndexController::class,'index'])->name('home');
     Route::group(['prefix' => 'data-master'], function () {
         Route::group(['prefix' => 'waktu-shift'], function () {
@@ -386,7 +386,7 @@ Route::group(['middleware' => 'role:SA_A_PI'], function () {
 
 
 });
-Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
+Route::group(['middleware' => 'role:P_SA_A_PI_B'], function () {
     Route::group(['prefix' => 'skp'], function () {
         Route::group(['prefix' => 'data-skp'], function () {
             Route::get('/',[DataSkpController::class,'index'])->name('skp.data-skp.index');

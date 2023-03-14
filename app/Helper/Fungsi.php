@@ -574,7 +574,7 @@ class Fungsi
             $d .= "<option value=\"$idkatkhususx\">$ketramahadhan[$idkatkhususx] -- $waktu</option>";
         }
         $jam_kerja_shift = array();$arrjamkerjashift = array();
-        $rsDatashift = MsWaktuShift::orderBy('kode_shift','asc')->get();
+        $rsDatashift = MsWaktuShift::orderBy('kode_shift','asc')->where('id_khusus','<>',null)->get();
         foreach($rsDatashift as $dtshift=>$rshift){
             $arrjamkerjashift[$rshift->id_khusus][$rshift->id]['ket'] = $rshift->nm_shift;
             $arrjamkerjashift[$rshift->id_khusus][$rshift->id]['jam_masuk'] = $rshift->jam_masuk;
@@ -1050,7 +1050,7 @@ class Fungsi
         return $rsData;
     }
     public static function jamkerjashift(){
-        $rsData = MsWaktuShift::get();
+        $rsData = MsWaktuShift::where('id_khusus','<>',null)->get();
         $arrData = array();
         foreach($rsData as $rs=>$r){
             $arrData[$r->kode_shift]['nm_shift'] = $r->nm_shift;

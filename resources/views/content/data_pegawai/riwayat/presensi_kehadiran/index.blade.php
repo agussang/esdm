@@ -224,9 +224,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                    <th><center>Durasi Pulang Cepat<br/>(Menit)</center></th>
                                                    <th>Ket Tanggal</th>
                                                    <th>Ket</th>
-                                                   @if(Session::get('level')=="A" || Session::get('level')=="SA")
+
                                                    <th>Aksi</th>
-                                                   @endif
+
                                                </tr>
                                             </thead>
                                             <tbody>
@@ -390,7 +390,6 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     <td>{{$hitungdurasi_pulang_cepat}}</td>
                                                     <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
                                                     <td>{{$ket}}</td>
-                                                    @if(Session::get('level')=="A" || Session::get('level')=="SA")
                                                     @if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
                                                     <td>
                                                         @if($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
@@ -405,7 +404,6 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                             @endif
                                                         @endif
                                                     </td>
-                                                    @endif
                                                     @endif
                                                 </tr>
                                                 @endforeach

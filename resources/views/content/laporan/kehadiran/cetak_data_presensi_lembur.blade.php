@@ -139,7 +139,10 @@
                     }
                     $gabung_lembur = floor($durasikurangidurasikerja / 60).':'.($durasikurangidurasikerja -   floor($durasikurangidurasikerja / 60) * 60);
                     $gabung_lembur = explode(":",$gabung_lembur);
-
+                    if($jamkerja['nm_shift']=="Libur"){
+                        $ket = "";
+                        $warna = "background-color: #F98686;";
+                    }
 
                     ?>
                     <tr style="{{$warna}}">

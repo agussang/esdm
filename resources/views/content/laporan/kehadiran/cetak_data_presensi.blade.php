@@ -217,6 +217,10 @@
                     if($terlambat_durasi == 0){
                         //$ket = "";
                     }
+                    if($jamkerja['nm_shift']=="Libur"){
+                        $ket = "";
+                        $warna = "background-color: #F98686;";
+                    }
                     ?>
                     <tr style="{{$warna}}">
                         <td>{{$no++}}</td>
