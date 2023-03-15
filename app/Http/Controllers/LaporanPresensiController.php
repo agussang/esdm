@@ -201,7 +201,6 @@ class LaporanPresensiController extends Controller
             }else{
                 $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,$req['tipe']);
                 $getDataAbsen = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
-
                 foreach($rsData as $rsx=>$rx){
                     $arrData[$rx->id_sdm]['nm_sdm'] = $rx->nm_sdm;
                     $arrData[$rx->id_sdm]['nip'] = $rx->nip;
@@ -218,6 +217,7 @@ class LaporanPresensiController extends Controller
                     $jam_kerja_text .= $kategoriwaktuabsen[$id_hr_kerja]." ( ".$dt_hr_kerja['jam_masuk']." - ".$dt_hr_kerja['jam_pulang']." ), ";
                 }
                 $data['jam_kerja_text'] = trim($jam_kerja_text, ", \t\n");
+
                 if($req['format']==1){
                     if($req['tipe']==1){
                         return view('content.laporan.kehadiran.cetak_data_presensi',$data);

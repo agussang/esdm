@@ -91,7 +91,9 @@
                 </tr>
             </thead>
             <tbody>
-                <?php $no=1;?>
+                <?php $no=1;
+
+                ?>
                 @foreach($arrData as $id_sdm=>$dt_sdm)
                 <?php
                 $kode = $tahun.sprintf("%02d", $id_bulan);
