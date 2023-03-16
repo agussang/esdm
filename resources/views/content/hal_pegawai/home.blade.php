@@ -229,10 +229,20 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                             $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
                         @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                         <?php
+                        $kode_justifikasi = 0;
                         $presensi = $getRekapDataAbsen[$id_sdm][$tgl];
                         $hariabsen = explode(',',$dtgl['tgl']);
                         $jam_masuk = array_shift($presensi['jam_absen']);
                         $jam_keluar = end($presensi['jam_absen']);
+                        $ketajuanall = $getajuan_justifikasiall[$id_sdm][$tgl];
+                        if($ketajuanall){
+                            if($ketajuanall['kategori_justifikasi']=="4" && $ketajuanall['status']=="1"){
+                                $jam_masuk = $ketajuanall['jam_masuk'];
+                                $jam_keluar = $ketajuanall['jam_pulang'];
+
+                            }
+                            $kode_justifikasi = $ketajuanall['kategori_justifikasi'];
+                        }
                         if($jam_keluar==null){
                               $jam_keluar = $jam_masuk;
                         }
@@ -263,7 +273,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                         $j_keluar_start = $jam_keluarex[0];
                         $menit_keluar_start = $jam_keluarex[1];
                         $gabung = 0;$menit = 0;$hitungdurasi_terlambat = 0;
-                        $warna = "";$kode_justifikasi = 0;
+                        $warna = "";
                         $hitungdurasi_pulang_cepat = 0;
                         if($jam_masuk!=null){
 

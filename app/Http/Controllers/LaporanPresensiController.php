@@ -184,7 +184,6 @@ class LaporanPresensiController extends Controller
             }
         }else{
             $rsData = $this->repomspegawai->get("","",$req['satuan_kerja'],$req['id_sdm']);
-
             $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
             $arrIdSdm = array();
             foreach($rsData as $rs=>$r){
@@ -223,6 +222,7 @@ class LaporanPresensiController extends Controller
                         return view('content.laporan.kehadiran.cetak_data_presensi',$data);
                     }
                     if($req['tipe']==2){
+
                         return view('content.laporan.kehadiran.cetak_data_presensi2',$data);
                     }
                     if($req['tipe']==3){

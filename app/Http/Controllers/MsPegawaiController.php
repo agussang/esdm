@@ -297,6 +297,9 @@ class MsPegawaiController extends Controller
         $data['getDataAbsen'] = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_terakhir);
 
         $data['dt_hari_libur'] = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_terakhir);
+        $getajuan_justifikasiall = Fungsi::getajuan_justifikasiall($tgl_awal,$tgl_terakhir);
+        $data['getajuan_justifikasiall'] = $getajuan_justifikasiall;
+
 
         $data['bulan'] = sprintf("%0d", $bln);
         return view('content.data_pegawai.riwayat.presensi_kehadiran.index',$data);

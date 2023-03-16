@@ -40,6 +40,13 @@
                 $hariabsen = explode(',',$dtgl['tgl']);
                 $jam_masuk = array_shift($presensi['jam_absen']);
                 $jam_keluar = end($presensi['jam_absen']);
+                $ketajuan = $data['getajuan_justifikasi'][$id_sdm][$tgl];
+                if($ketajuan){
+                    if($ketajuan['kategori_justifikasi']=="4" && $ketajuan['status']=="1"){
+                        $jam_masuk = $ketajuan['jam_masuk'];
+                        $jam_keluar = $ketajuan['jam_pulang'];
+                    }
+                }
                 if($jam_keluar==null){
                     $jam_keluar = $jam_masuk;
                 }
@@ -128,13 +135,15 @@
                     $durasikerja = Fungsi::durasikerja($jamawal,$jamakhir);
                     $durasikerjamenit = Fungsi::konversiwaktu($durasikerja);
                 }
-                $ketajuan = $getajuan_justifikasi[$id_sdm][$tgl];
+                $ketajuan = $data['getajuan_justifikasi'][$id_sdm][$tgl];
                 $durasi_justifikasi = 0;
                 $kategori = "";
                 if($ketajuan){
-                    $kategori = $arrkategorijustifikasi[$ketajuan['kategori_justifikasi']];
-                    $durasi_justifikasi = $ketajuan['durasi_justifikasi'];
-                    $durasijustifikasi = $ketajuan['durasi_justifikasi']." Menit";
+                    $kategori = $data['arrkategorijustifikasi'][$ketajuan['kategori_justifikasi']];
+                    if($ketajuan['kategori_justifikasi']!="4" && $ketajuan['status']=="1"){
+                        $durasi_justifikasi = $ketajuan['durasi_justifikasi'];
+                        $durasijustifikasi = $ketajuan['durasi_justifikasi']." Menit";
+                    }
                 }else{
                     $durasijustifikasi = "";
                 }

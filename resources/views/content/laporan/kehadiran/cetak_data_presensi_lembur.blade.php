@@ -74,6 +74,13 @@
                     $hariabsen = explode(',',$presensi['ket_tgl']);
                     $jam_masuk = array_shift($presensi['jam_absen']);
                     $jam_keluar = end($presensi['jam_absen']);
+                    $ketajuan = $getajuan_justifikasi[$id_sdm][$tanggal];
+                    if($ketajuan){
+                        if($ketajuan['kategori_justifikasi']=="4" && $ketajuan['status']=="1"){
+                            $jam_masuk = $ketajuan['jam_masuk'];
+                            $jam_keluar = $ketajuan['jam_pulang'];
+                        }
+                    }
                     if($jam_keluar==null){
                         $jam_keluar = $jam_masuk;
                     }
@@ -123,6 +130,7 @@
                     $menitlemburnonjumat = "510";
                     $masterdurasikerja = Fungsi::konversiwaktu($durasi);
                     $durasikurangidurasikerja = 0;
+                    $durasi_justifikasi = 0;
                     if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
                         if($durasikerja>$durasi){
                             // dikurangi
@@ -137,7 +145,7 @@
                     }else{
                         $gabung_lembur = $durasikerja;
                     }
-                    $gabung_lembur = floor($durasikurangidurasikerja / 60).':'.($durasikurangidurasikerja -   floor($durasikurangidurasikerja / 60) * 60);
+                    //$gabung_lembur = floor($durasikurangidurasikerja / 60).':'.($durasikurangidurasikerja -   floor($durasikurangidurasikerja / 60) * 60);
                     $gabung_lembur = explode(":",$gabung_lembur);
                     if($jamkerja['nm_shift']=="Libur"){
                         $ket = "";
@@ -153,7 +161,7 @@
                         <td align="center">{{$jam_masuk}}</td>
                         <td align="center">{{$jam_keluar}}</td>
                         <td align="center">{{$durasikerja}}</td>
-                        <td align="center">{{$durasi}}</td>
+                        <td align="center">{{$durasikerjamenit}}</td>
                         <td align="center">
                             @if($durasikerjamenit>0)
                             {{sprintf("%01d",$gabung_lembur[0])}}

@@ -1428,8 +1428,10 @@ class Fungsi
             $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['justifikasi_atasan'] = $rjus->justifikasi_atasan;
             $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['alasan'] = $rjus->alasan;
             $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['durasi_justifikasi'] = $rjus->durasi_justifikasi;
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['kode_justifikasi'] = $rjus->kategori_justifikasi;
             $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['kategori_justifikasi'] = $arrKategoriJustifikasi[$rjus->kategori_justifikasi];
             $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['ket_justifikasi'] = $rjus->ket_justifikasi;
+            $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['status'] = $rjus->justifikasi_atasan;
             $arrJustifikasi[$rjus->id_sdm][$tahunbulan][$tglabsennya]['tgl_justifikasi'] = $rjus->tgl_justifikasi;
         }
         if($tipe!=4){
@@ -1514,7 +1516,10 @@ class Fungsi
                             $jam_pulang = $jam_masuk;
                         }
                         if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu" && $jam_masuk == $jam_pulang){
-                            $arrDataRekap[$id_sdm][$thn.$bln_presensi]['absensekali']['list_tgl'][$tglpresensikehadiran]=1;
+                            $cekjustifikasiabsensekali = $arrJustifikasi[$id_sdm][$thn."-".$bln_presensi][$tglpresensikehadiran];
+                            if($cekjustifikasiabsensekali['kode_justifikasi'] != "4"){
+                                $arrDataRekap[$id_sdm][$thn.$bln_presensi]['absensekali']['list_tgl'][$tglpresensikehadiran]=1;
+                            }
                         }
 
                         if($jam_masuk >= $jam_kerja['jam_masuk'] && $jam_masuk!=$jam_pulang){

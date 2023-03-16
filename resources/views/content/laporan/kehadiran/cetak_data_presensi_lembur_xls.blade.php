@@ -32,6 +32,13 @@
                     $hariabsen = explode(',',$presensi['ket_tgl']);
                     $jam_masuk = array_shift($presensi['jam_absen']);
                     $jam_keluar = end($presensi['jam_absen']);
+                    $ketajuan = $data['getajuan_justifikasi'][$id_sdm][$tanggal];
+                    if($ketajuan){
+                        if($ketajuan['kategori_justifikasi']=="4" && $ketajuan['status']=="1"){
+                            $jam_masuk = $ketajuan['jam_masuk'];
+                            $jam_keluar = $ketajuan['jam_pulang'];
+                        }
+                    }
                     if($jam_keluar==null){
                         $jam_keluar = $jam_masuk;
                     }
@@ -94,7 +101,7 @@
                     }else{
                         $gabung_lembur = $durasikerja;
                     }
-                    $gabung_lembur = floor($durasikurangidurasikerja / 60).':'.($durasikurangidurasikerja -   floor($durasikurangidurasikerja / 60) * 60);
+                    //$gabung_lembur = floor($durasikurangidurasikerja / 60).':'.($durasikurangidurasikerja -   floor($durasikurangidurasikerja / 60) * 60);
                     $gabung_lembur = explode(":",$gabung_lembur);
 
 

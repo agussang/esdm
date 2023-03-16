@@ -36,7 +36,11 @@ class IndexController extends Controller
             $tgl_akhir = date('Y')."-".date('m')."-".$data['tanggal_terakhir'];
             $getajuan_justifikasi = Fungsi::getajuan_justifikasi($id_sdm,$tgl_awal,$tgl_akhir);
             $data['getajuan_justifikasi'] = $getajuan_justifikasi;
-            //dd($data);
+
+            $getajuan_justifikasiall = Fungsi::getajuan_justifikasiall($tgl_awal,$tgl_akhir);
+            $data['getajuan_justifikasiall'] = $getajuan_justifikasiall;
+
+
             $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
             if(count($data['ramadhan'])>0){
                 $req['id_jam_kerja'] = "347b23a9-8919-43ec-9b2d-a0c4b810b61d";
