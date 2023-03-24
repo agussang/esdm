@@ -280,20 +280,28 @@ class MsPegawaiController extends Controller
         $tgl_terakhir = $tahun."-".$bln."-".$terakhir;
         $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
         $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
-        $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_terakhir,$arrIdSdm,1);
+        if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+            $getRekapDataAbsen = Fungsi::getRekapDataAbsenPoli($tgl_awal,$tgl_terakhir,$arrIdSdm,1);
+        }else{
+            $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_terakhir,$arrIdSdm,1);
+        }
         $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
         $data['pilihan_bulan_presensi'] = Fungsi::pilihan_bulan_presensi($bln);
         $getajuan_justifikasi = Fungsi::getajuan_justifikasi($id_sdm,$tgl_awal,$tgl_terakhir);
         $data['getajuan_justifikasi'] = $getajuan_justifikasi;
         $data['jam_kerja'] = $jam_kerja;
+        $data['jamkerjashift'] = Fungsi::jamkerjashift();
+
         $data['kategoriwaktuabsen'] = Fungsi::kategoriwaktuabsen();
         $arrAbsen = array();$data_bul = array();
         $data['arrData'] = $getRekapDataAbsen[$rsData->id_sdm];
+        //dd($data);
         $rekap = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_terakhir,$arrIdSdm,4);
         $data['thn_bulan'] = $tahun."-".$bln;
         $gbng = $tahun.$bln;
         $data['rekap'] = $rekap[$rsData->id_sdm][$gbng];
         $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_terakhir,1);
+
         $data['getDataAbsen'] = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_terakhir);
 
         $data['dt_hari_libur'] = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_terakhir);

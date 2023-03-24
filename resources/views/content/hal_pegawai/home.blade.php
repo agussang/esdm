@@ -129,6 +129,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
         </div>
     </div>
 </div>
+@if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
 <div class="row">
     <div class="col-md-6">
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
@@ -177,6 +178,39 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
         </div>
     </div>
 </div>
+@else
+<div class="row">
+    <div class="col-md-12">
+        <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
+            <div class="card-body">
+                <center><h6>Jam Kerja Shift</h6><hr/><br/></center>
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-bordered" style="font-size:12pt";>
+                            <thead>
+                                <tr>
+                                    <th>Nama Shift</th>
+                                    <th>Jam Masuk</th>
+                                    <th>Jam Pulang</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach($jamkerjashift as $idshift=>$rshift)
+                                <tr>
+                                    <td>{{$rshift['nm_shift']}}</td>
+                                    <td>{{$rshift['jam_masuk']}}</td>
+                                    <td>{{$rshift['jam_pulang']}}</td>
+                                </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@endif
 <div class="row">
     <div class="card card-block card-stretch card-height iq-border-box iq-border-box-2 text-warning">
         <div class="card-body">
@@ -225,8 +259,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                      </thead>
                      <tbody>
                         <?php
-                            $bulanx = sprintf("%0d", date('m'));
-                            $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
+                        $bulanx = sprintf("%0d", date('m'));
+                        $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
                         @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                         <?php
                         $kode_justifikasi = 0;
@@ -262,6 +296,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                 $lama_kerja = $durasibekerja_ramadhan[1]['lama_kerja'];
                               }
 
+                        }
+                        if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                            $jamkerja = $presensi['msjadwalshift'];
                         }
                         $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
                         $jam_masukex = explode(':',$jam_masuk);

@@ -40,7 +40,6 @@ class IndexController extends Controller
             $getajuan_justifikasiall = Fungsi::getajuan_justifikasiall($tgl_awal,$tgl_akhir);
             $data['getajuan_justifikasiall'] = $getajuan_justifikasiall;
 
-
             $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
             if(count($data['ramadhan'])>0){
                 $req['id_jam_kerja'] = "347b23a9-8919-43ec-9b2d-a0c4b810b61d";
@@ -50,10 +49,14 @@ class IndexController extends Controller
             $jam_kerja_ramadhan = Fungsi::jam_kerja("347b23a9-8919-43ec-9b2d-a0c4b810b61d");
             $durasibekerja = Fungsi::durasibekerja($req['id_jam_kerja']);
             $durasibekerja_ramadhan = Fungsi::durasibekerja("347b23a9-8919-43ec-9b2d-a0c4b810b61d");
-            $data['getRekapDataAbsen'] = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,1);
+            if($data['info_pegawai']->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                $data['getRekapDataAbsen'] = Fungsi::getRekapDataAbsenPoli($tgl_awal,$tgl_akhir,$arrIdSdm,1);
+            }else{
+                $data['getRekapDataAbsen'] = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,1);
+            }
 
             $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_akhir,1);
-
+            $data['jamkerjashift'] = Fungsi::jamkerjashift();
             $data['getDataAbsen'] = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
 
             $data['dt_hari_libur'] = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_akhir);

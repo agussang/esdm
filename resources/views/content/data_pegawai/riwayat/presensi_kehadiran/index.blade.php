@@ -83,6 +83,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-warning">
             <div class="card-body">
                 <span class="text-dark">Informasi Setting Durasi / Waktu Bekerja<hr/></span>
+                @if($rsData->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -107,6 +108,28 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                         </tbody>
                     </table>
                 </div>
+                @else
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nama Shift</th>
+                                <th>Jam Masuk</th>
+                                <th>Jam Pulang</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($jamkerjashift as $idshift=>$rshift)
+                            <tr>
+                                <td>{{$rshift['nm_shift']}}</td>
+                                <td>{{$rshift['jam_masuk']}}</td>
+                                <td>{{$rshift['jam_pulang']}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -224,7 +247,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                    <th><center>Durasi Pulang Cepat<br/>(Menit)</center></th>
                                                    <th>Ket Tanggal</th>
                                                    <th>Ket</th>
-
+                                                   @if($rsData->id_satkernow == "30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                                                   <th>Ket Jadwal Shift</th>
+                                                   @endif
                                                    <th>Aksi</th>
 
                                                </tr>
@@ -232,7 +257,6 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                             <tbody>
                                                <?php
                                                $bulanx = $bulan;
-
                                                 $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
                                                 @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                                                 <?php
@@ -257,6 +281,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         $jamkerja = $jam_kerja[2];
                                                 }else{
                                                         $jamkerja = $jam_kerja[1];
+                                                }
+                                                if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                                                    $jamkerja = $presensi['msjadwalshift'];
                                                 }
                                                 $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
                                                 $jam_masukex = explode(':',$jam_masuk);
@@ -400,6 +427,11 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     <td>{{$hitungdurasi_pulang_cepat}}</td>
                                                     <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
                                                     <td>{{$ket}}</td>
+                                                    @if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                                                        <td>
+                                                            {{$jamkerja['nm_shift']}}
+                                                        </td>
+                                                    @endif
                                                     @if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
                                                     <td>
                                                         @if($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
