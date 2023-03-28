@@ -13,7 +13,7 @@ class TrAbsenKehadiran extends Model
     public $incrementing = false;
     protected $table = 'tr_absen_kehadiran';
     protected $primaryKey = 'id_absen';
-    public $keyType = 'string'; 
+    public $keyType = 'string';
     protected $guarded = [];
 
     public function dt_pegawai()
@@ -21,7 +21,7 @@ class TrAbsenKehadiran extends Model
         return $this->belongsTo(MsPegawai::class, 'id_sdm', 'id_sdm');
     }
 
-    public function alasan()
+    public function r_alasan()
     {
         return $this->belongsTo(MsAlasanAbsen::class, 'id_alasan', 'id_alasan');
     }

@@ -44,21 +44,39 @@
                     <table class="table table-bordered">
                         <thead>
                             <tr>
-                                <th>No</th>
-                                <th>Kode</th>
-                                <th>Bulan</th>
-                                <th>Tahun</th>
-                                <th>Aktif ?</th>
+                                <th rowspan="2">No</th>
+                                <th rowspan="2">Kode</th>
+                                <th rowspan="2">Bulan</th>
+                                <th rowspan="2">Tahun</th>
+                                <th colspan="3">Batas Pengumpulan Skp</th>
+                                <th rowspan="2">Aktif ?</th>
+                            </tr>
+                            <tr>
+                                <th>Tanggal Batas</th>
+                                <th>Point Disiplin 3%</th>
+                                <th>Aksi ?</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $no=1;?>
                             @foreach($rsData as $rs=>$r)
+                            <form class="form" action="{{route('skp.setting-skp.update-batas-skp')}}" method="post">
+                            {!! csrf_field() !!}
+                            <input type="hidden" name="id" value="{{$r->id}}">
                             <tr>
                                 <td>{{$no++}}</td>
                                 <td>{{$r->kode}}</td>
                                 <td>{{$arrBulan[$r->bulan]}}</td>
                                 <td>{{$r->tahun}}</td>
+                                <td>
+                                    <input type="date" class="form-control" name="tgl_batas_skp" value="{{$r->tgl_batas_skp}}" required>
+                                </td>
+                                <td>
+                                    <input type="date" class="form-control" name="tgl_potongan3persen" value="{{$r->tgl_potongan3persen}}" required>
+                                </td>
+                                <td>
+                                    <button class="btn btn-primary"><i class="fas fa-save"></i> Update</button>
+                                </td>
                                 <td>
                                     <div class="custom-control custom-switch custom-switch-text custom-control-inline">
                                         <div class="custom-switch-inner">
@@ -69,6 +87,7 @@
                                     </div>
                                 </td>
                             </tr>
+                            </form>
                             @endforeach
                         </tbody>
                     </table>

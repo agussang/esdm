@@ -65,7 +65,10 @@ class ManajemenUserController extends Controller
                 $req['hidden_password'] = $r->nip;
                 $req['id_sdm'] = $r->id_sdm;
                 $req['password_change'] = 1;
-                $this->repouser->store($req);    
+                $cek = $this->repouser->findId("",$r->nip,"username");
+                if($cek==null){
+                    $this->repouser->store($req);
+                }
             }
         }
         $notification = [
@@ -126,7 +129,7 @@ class ManajemenUserController extends Controller
         }else{
             if($req['password']!=null){
                 $req['hidden_password'] = $req['password'];
-                $req['password'] = bcrypt($req['password']);   
+                $req['password'] = bcrypt($req['password']);
             }
             $statment = $req['statment'];
             unset($req['statment']);
@@ -137,7 +140,7 @@ class ManajemenUserController extends Controller
                     $req['is_aktif'] = 0;
                 }
             }
-            
+
             $where['id_user'] = $req['id_user'];
             unset($req['id_user']);
             if($statment==1){

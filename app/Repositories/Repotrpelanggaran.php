@@ -30,8 +30,9 @@ class Repotrpelanggaran extends Repository
                     return $query->whereRaw(" nip  = '$nip' ");
                 });
             })->when($bulan, function ($query) use ($bulan,$tahun) {
-                $gabung = $tahun.'-'.$bulan;
-                return $query->whereRaw(" SUBSTRING(CAST(tgl_berakhir AS VARCHAR(19)), 0, 8) >= '$gabung' ");
+                $tgl_terakhir = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
+                $gabung = $tahun.'-'.$bulan.'-%';
+                return $query->whereRaw(" SUBSTRING(CAST(tgl_berlaku AS VARCHAR(19)), 0, 8) <= '2022-09-%' and SUBSTRING(CAST(tgl_berakhir AS VARCHAR(19)), 0, 8) >= '2022-09-%'");
             })
             ->get();
     }

@@ -14,7 +14,7 @@ class MsPegawai extends Model
     protected $table = 'ms_pegawai';
     protected $primaryKey = 'id_sdm';
     public $keyType = 'string';
-    
+
     protected $guarded = [];
     public function nm_atasan(){
         return $this->belongsTo(MsPegawai::class, 'id_sdm_atasan', 'id_sdm');
@@ -48,12 +48,12 @@ class MsPegawai extends Model
 
     public function nm_jab_fung()
     {
-        return $this->belongsTo(MsJabatan::class, 'id_jabatan_fungsional_now', 'id');
+        return $this->belongsTo(MsJabatan::class, 'id_jabatan_fungsional_now', 'id')->with(['ms_grade']);
     }
 
     public function nm_jab_struk()
     {
-        return $this->belongsTo(MsJabatan::class, 'id_jabatan_struktural_now', 'id');
+        return $this->belongsTo(MsJabatan::class, 'id_jabatan_struktural_now', 'id')->with(['ms_grade']);
     }
 
     public function stat_aktif()

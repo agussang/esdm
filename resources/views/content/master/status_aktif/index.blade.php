@@ -14,30 +14,115 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="table-reponsive">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr>
-                                        <th>Kode Status</th>
-                                        <th>Nama Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($rsData as $rs=>$r)
-                                    <tr>
-                                        <td>{{$r->idstatusaktif}}</td>
-                                        <td>{{$r->namastatusaktif}}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                <span class="text-dark">Form Tambah Data Master Status Keaktifan</span><br/><br/>
+                <form class="form" action="{{route('data-master.status-aktif.simpan')}}" method="post">
+                    {!! csrf_field() !!}
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Kode Status</span>
+                                </div>
+                                <input type="text" class="form-control" maxlength="2" aria-label="Default" name="idstatusaktif" aria-describedby="inputGroup-sizing-default" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Nama Status Keaktifan</span>
+                                </div>
+                                <input type="text" class="form-control" aria-label="Default" name="namastatusaktif" aria-describedby="inputGroup-sizing-default" required>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="hidden" name="id" id="id" value={{$rsData->max('id')+1}}>
+                            <button class="btn btn-primary"><i class="fas fa-save"></i> Simpan</button>
                         </div>
                     </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-reponsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Kode Status</th>
+                                <th>Nama Status</th>
+                                <th>Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($rsData as $rs=>$r)
+                            <tr>
+                                <td>{{$r->idstatusaktif}}</td>
+                                <td>{{$r->namastatusaktif}}</td>
+                                <td>
+                                    <a onclick="edit('<?php echo $r->id;?>');" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary text-white"><i class="fas fa-pencil-ruler text-white"></i> Edit</a>
+                                    <a href="{{URL::to('/data-master/status-aktif/hapus')}}/{{Crypt::encrypt($r->id)}}" onclick="return confirm('Apakah anda yakin ingin menghapus data ini ? ');" class="btn btn-danger"><i class="fas fa-trash"></i> Hapus</a>
+                                </td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<div class="modal fade bd-example-modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaledit">Form Edit Data Master Status Keaktifan</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="formku" method="post">
+				{!! csrf_field() !!}
+                    <div id="form-edit">
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="balik"></div>
+<meta name="csrf_token" content="{{ csrf_token() }}" />
+<script type="text/javascript">
+function edit(id)
+{
+    var request = $.ajax ({
+       url : "{{ route('data-master.status-aktif.edit') }}",
+       data:"id="+id,
+       type : "get",
+       dataType: "html"
+   });
+   $('#form-edit').html('Sedang Melakukan Proses Pencarian Data...');
+   request.done(function(output) {
+       $('#form-edit').html(output);
+   });
+}
+function simpan_edit()
+{
+    var x=$('#formku').serialize();
+    var request = $.ajax ({
+           url : "{{ route('data-master.status-aktif.update') }}",
+           type : "post",
+           dataType: "html",
+           data: x
+       });
+       request.done(function(output) {
+        $('#balik').html(output);
+       });
+}
+</script>
 @stop

@@ -11,6 +11,10 @@ if($rekap_skp){
 }
 if(Session::get('atasan_penilai')==null){
     $readonly = "readonly=\"true\"";
+}else{
+    if(Session::get('id_sdm_pengguna') != $dtpegawai->id_sdm_atasan){
+        $readonly = "readonly=\"true\"";
+    }
 }
 
 $induk = explode('/',request()->path());
@@ -71,12 +75,21 @@ $induk = explode('/',request()->path());
                             <input type="text" class="form-control" aria-label="Default" readonly="true" value="{{$periodeaktif->tahun}}" aria-describedby="inputGroup-sizing-default" required>
                         </div>
                     </div>
+                    <div class="col-md-4">
+                        <div class="input-group mb-4">
+                            <div class="input-group-prepend">
+                            <span class="input-group-text" id="inputGroup-sizing-default">Batas Pengumpulan SKP</span>
+                            </div>
+                            <input type="text" class="form-control" aria-label="Default" readonly="true" value="{{date('d-m-Y',strtotime($periodeaktif->tgl_batas_skp))}}" aria-describedby="inputGroup-sizing-default" required>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-@if($cek_file==0 && Session::get('id_sdm_pengguna') != Session::get('id_sdm_atasan'))
+
+@if($cek_file==0 && Session::get('id_sdm_pengguna') != $dtpegawai->id_sdm_atasan)
 <div class="row">
     <div class="col-md-12">
         <form class="form" action="{{route('skp-pegawai.skp.unggah_skp')}}" method="post" enctype="multipart/form-data">
@@ -148,7 +161,7 @@ $induk = explode('/',request()->path());
                                     <div class="input-group-prepend">
                                     <span class="input-group-text" id="inputGroup-sizing-default">Nilai Realisasi Skp</span>
                                     </div>
-                                    <input type="text" id="nilai_skp" name="nilai_skp" class="form-control" aria-label="Default" value="{{$rekap_skp->nilai_skp}}" aria-describedby="inputGroup-sizing-default" required onkeypress="return goodchars(event,'1234567890.',this)" {{$readonly}}>
+                                    <input type="text" @if($dtpegawai->id_sdm_atasan != $dtpegawai->id_sdm) readonly="true" @endif id="nilai_skp" name="nilai_skp" class="form-control" aria-label="Default" value="{{$rekap_skp->nilai_skp}}" aria-describedby="inputGroup-sizing-default" required onkeypress="return goodchars(event,'1234567890.',this)" {{$readonly}}>
                                 </div>
                             </div>
                             <div class="col-md-2">
@@ -159,82 +172,14 @@ $induk = explode('/',request()->path());
                                 <a class="btn btn-success text-white"> Valid pada tanggal : {{date('Y-m-d H:i:s',strtotime($rekap_skp->validated_at))}}</a>
                             </div>
                             @endif
-                        </div>               
+                        </div>
                         <div class="row">
                             <div class="col-md-12">
-                                <hr/>
-                                <span><b>Nilai Realisasi Prilaku Pegawai</b></span>
-                                <input type="hidden" value="{{$dtpegawai->id_sdm}}" name="id_sdm" id="id_sdm">
-                                <input type="hidden" value="{{$dtpegawai->nip}}" name="nip" id="nip">
-                                <input type="hidden" value="{{$periodeaktif->id}}" name="idperiode" id="idperiode">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th rowspan="2">No</th>
-                                                <th rowspan="2">Nama Aspek</th>
-                                                <th colspan="2"><center>Penilaian</center></th>
-                                            </tr>
-                                            <tr>
-                                                <th>Nilai</th>
-                                                <th>Keterangan</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php $no=1;$ttl_nilai = 0;$jumlahkom=0;?>
-                                            @foreach($dtprilaku as $rs=>$r)
-                                            <?php $jumlahkom++;?>
-                                            <tr>
-                                                <td>{{$no++}}</td>
-                                                <td>{{$r->nama}}</td>
-                                                <td>
-                                                    <input value="{{$arrPenilaian[$r->id]['nilai']}}" onkeyup="getNilaiHuruf(this);calculateSum();" type="text" class="form-control" name="nilai_{{$r->id}}" id="nilai_{{$r->id}}" onkeypress="return goodchars(event,'1234567890.',this)" {{$readonly}}>
-                                                </td>
-                                                <td>
-                                                    <input value="{{$arrPenilaian[$r->id]['keterangan']}}" type="text" readonly="true" class="form-control" name="keterangan_{{$r->id}}" id="keterangan_row_nilai_{{$r->id}}" {{$readonly}}>
-                                                </td>
-                                            </tr>
-                                            <?php
-                                            $ttl_nilai+=$arrPenilaian[$r->id]['nilai'];
-                                            ?>
-                                            @endforeach
-                                            <?php
-                                            $jmkom = count((array)$arrPenilaian);
-                                            $ratnilai = $ttl_nilai/$jumlahkom;
-                                            ?>
-                                            @if($jmkom>0)
-                                            <tr>
-                                                <td colspan="2">Total Nilai</td>
-                                                <td>
-                                                    <input type="text" id="ttl_nilai" name="ttl_nilai" value="{{$ttl_nilai}}" readonly="true" class="form-control">
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td colspan="2">Nilai Rata-rata (Total Nilai / Jumlah Komponen Perilaku)</td>
-                                                <td colspan="2">
-                                                    <input type="text" id="ttl_nilai" name="ttl_nilai" value="{{$ratnilai}}" readonly="true" class="form-control">
-                                                </td>
-                                            </tr>
-                                            @endif
-                                        </tbody>
-                                    </table>
+                                <div class="card text-white bg-primary">
+                                    <div class="card-body">
+                                        <span>File SKP diunggah pada tanggal : {{date('d-m-Y H:i:s',strtotime($rekap_skp->created_at))}}</span>
+                                    </div>
                                 </div>
-                                <br/>
-                                @if($rekap_skp->validasi!=1)
-                                    @if(Session::get('atasan_penilai')!=null)
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <center>
-                                                <div class="checkbox d-inline-block mr-3 rtl-mr-0">
-                                                    <input type="checkbox" class="checkbox-input" id="checkbox1" name="valid" required>
-                                                    <label for="checkbox1">Data skp atas nama <b>{{$rsData->nm_sdm}} pada bulan {{$arrBulan[$periodeaktif->bulan]}} tahun {{$periodeaktif->tahun}} sudah saya nilai dan saya nyatakan valid.</b></label>
-                                                </div><br/>
-                                                <button class="btn btn-primary text-white"><i class="fas fa-save"></i> Simpan</button>
-                                            </center>
-                                        </div>
-                                    </div>    
-                                    @endif                            
-                                @endif
                             </div>
                         </div>
                     </div>
@@ -245,7 +190,7 @@ $induk = explode('/',request()->path());
     @else
         <div class="alert alert-warning" role="alert">
             <div class="iq-alert-text">
-                <center><span>Anda Belum unggah File Dokumen SKP</span></center>
+                <center><span>Belum unggah File Dokumen SKP</span></center>
             </div>
         </div>
     @endif
@@ -253,7 +198,7 @@ $induk = explode('/',request()->path());
 <script>
 
 function calculateSum() {
-        
+
 }
 function getNilaiHuruf(arg)
 {

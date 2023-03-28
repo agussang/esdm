@@ -23,7 +23,6 @@ class TemplatePresensiApelExport implements FromView, ShouldAutoSize, WithColumn
 
     public function view(): View
     {
-        
         return view('content.data_pegawai.presensi.data_apel.peserta.template', [
             'data' => $this->data
         ]);

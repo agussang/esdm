@@ -6,7 +6,12 @@ use Illuminate\Http\Request;
 use App\Repositories\Reposettingapp;
 use App\Repositories\Repouser;
 use App\Repositories\Repomspegawai;
+use App\Models\Iclocktransaction;
+use App\Repositories\Repotrloglogin;
+use App\Repositories\Reporiwayatpresensi;
+use App\Repositories\Repoclocktransaction;
 use Session;
+use Fungsi;
 use Crypt;
 
 class LoginController extends Controller
@@ -15,25 +20,74 @@ class LoginController extends Controller
         Request $request,
         Reposettingapp $reposettingapp,
         Repouser $repouser,
-        Repomspegawai $repomspegawai
+        Repomspegawai $repomspegawai,
+        Repotrloglogin $repotrloglogin,
+        Reporiwayatpresensi $reporiwayatpresensi,
+        Repoclocktransaction $repoclocktransaction
     ){
         $this->request = $request;
         $this->reposettingapp = $reposettingapp;
         $this->repouser = $repouser;
         $this->repomspegawai = $repomspegawai;
+        $this->repotrloglogin = $repotrloglogin;
+        $this->reporiwayatpresensi = $reporiwayatpresensi;
+        $this->repoclocktransaction = $repoclocktransaction;
+    }
+
+    public function sync_semi_auto(){
+        $rsPeg = $this->repomspegawai->get();
+        $arrNip = array();$arrIdSdm = array();
+        foreach($rsPeg as $rs=>$r){
+            $arrNip[$r->nip] = $r->nip;
+            $arrIdSdm[$r->nip] = $r->id_sdm;
+        }
+        $tgl_saiki = date('Y-m-d');
+        $sync = $this->repoclocktransaction->getsyncabsen($tgl_saiki,$arrNip);
+        foreach($sync as $empcode => $dt_tgl){
+            $id_sdm = $arrIdSdm[$empcode];
+            if($id_sdm){
+                foreach($dt_tgl as $tgl_absen => $dttglabsen){
+                    foreach($dttglabsen as $jam_absen => $dt_jam_absen){
+                        $id_finger = $dt_jam_absen['id'];
+                        unset($dt_jam_absen['emp_code']);
+                        unset($dt_jam_absen['id']);
+                        $dt_jam_absen['tanggal_scan'] = date('Y-m-d H:i:s');
+                        $dt_jam_absen['id_sdm'] = $id_sdm;
+                        $this->reporiwayatpresensi->store($dt_jam_absen);
+                        $upfinger['csf'] = "1";
+                        $where['id'] = $id_finger;
+                        $update_finger = Iclocktransaction::where('id',$id_finger)->update(['csf'=>1]);
+                    }
+                }
+            }
+        }
     }
 
     public function index(Request $request)
     {
+
         $rsData = $this->reposettingapp->findId("","cb6020d6-e8a7-4240-ab2c-dffd30d31892","id_setting");
         $request->session()->put('nama_aplikasi',$rsData->nama_aplikasi);
         $data['rsData'] = $rsData;
+        $this->sync_semi_auto();
         return view('login',$data);
     }
 
     public function ceklogin($username,$password){
         if(auth()->attempt(array('username' => $username, 'password' => $password))){
             $dtUser = auth()->user()->load(['roleuser']);
+            // catat log
+            $getip = Fungsi::get_client_ip();
+            $getbrowser = Fungsi::get_client_browser();
+
+            $reqlog['tgl_login'] = date('Y-m-d H:i:s');
+            $reqlog['ip'] = $getip;
+            $reqlog['browser'] = $getbrowser;
+            $reqlog['id_user'] = $dtUser->id_user;
+            $reqlog['username'] = $dtUser->username;
+            $reqlog['nama_user'] = $dtUser->nama_user;
+            $this->repotrloglogin->store($reqlog);
+
             $this->request->session()->put('id_pengguna',$dtUser->id_user);
             $this->request->session()->put('username',$dtUser->username);
             $this->request->session()->put('nama_pengguna',$dtUser->nama_user);
@@ -65,6 +119,28 @@ class LoginController extends Controller
         }
     }
 
+    public function ubahpassword(){
+        $id = Session::get('id_pengguna');
+        $data['rsData'] = $this->repouser->findId("",$id,"id_user");
+        return view('content.change_password',$data);
+    }
+
+    public function simpan_ubah_password(Request $request){
+        $req = $request->except('_token');
+        if($req['password']!=null){
+            $req['hidden_password'] = $req['password'];
+            $req['password'] = bcrypt($req['password']);
+        }
+        $id = Session::get('id_pengguna');
+        $where['id_user'] = $id;
+        $this->repouser->update($where,$req);
+        $notification = [
+            'message' => 'Data berhasil disimpan, silahkan login ulang.',
+            'alert-type' => 'error',
+        ];
+        return redirect()->route('logout')->with($notification);
+    }
+
     public function proses_login(Request $request){
         $req = $request->except('_token');
         return $this->ceklogin($req['username'],$req['password']);
@@ -82,7 +158,7 @@ class LoginController extends Controller
         }else{
             return $this->ceklogin($cekuser->username,$cekuser->hidden_password);
         }
-        
+
     }
 
     public function logout()
@@ -91,37 +167,37 @@ class LoginController extends Controller
         Session::flush();
         return redirect()->intended('/');
     }
-    
+
     public function create()
     {
         //
     }
 
-    
+
     public function store(Request $request)
     {
         //
     }
 
-    
+
     public function show($id)
     {
         //
     }
 
-    
+
     public function edit($id)
     {
         //
     }
 
-    
+
     public function update(Request $request, $id)
     {
         //
     }
 
-    
+
     public function destroy($id)
     {
         //

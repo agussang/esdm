@@ -2,13 +2,18 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MsKedinasan extends Model
 {
+    use Uuid;
+    use SoftDeletes;
     public $incrementing = false;
     protected $table = 'ms_kedinasan';
-    protected $primaryKey = 'id';
+    protected $primaryKey = 'id_kedinasan';
     public $keyType = 'string';
+
+    protected $guarded = [];
 }

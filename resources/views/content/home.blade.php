@@ -1,5 +1,8 @@
 @extends('layouts.layout')
 @section('content')
+<?php
+ksort($nm_golongan);
+?>
 <div class="row">
     <div class="col-md-9">
         <div class="card">
@@ -37,14 +40,14 @@
                                         <th colspan="2">Jenis Kelamin</th>
                                         <th rowspan="2">Jumlah</th>
                                     </tr>
-                                    <tr>    
+                                    <tr>
                                         @foreach($dtjmpegawaijk as $nmjk=>$dtjk)
                                         <th>{{$nmjk}}</th>
                                         @endforeach
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php 
+                                    <?php
                                     ksort($jm_by_golongan);
                                     ?>
                                     @foreach($jm_by_golongan as $kodegolongan=>$dtgolongan)
@@ -86,7 +89,7 @@
             </div>
         </div>
     </div>
-</div>  
+</div>
 {{--  <div class="row">
     <div class="col-md-12">
         <div class="card">

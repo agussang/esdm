@@ -13,7 +13,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <span class="text-dark">Form Tambah Data Presensi</span><hr/>
+                {{-- <span class="text-dark">Form Tambah Data Presensi</span><hr/> --}}
                 <form class="form" action="{{route('data-master.waktu-presensi.simpan')}}" method="post">
 				{!! csrf_field() !!}
                 {{--  <div class="row">
@@ -69,35 +69,33 @@
                         <thead>
                             <tr>
                                 <th>No</th>
-                                <th>Keterangan</th>
+                                <th>Hari</th>
                                 <th>Jam Masuk</th>
                                 <th>Jam Pulang</th>
-                                <th>Jam Masuk Telat</th>
-                                <th>Jam Pulang Telat</th>
                                 <th>Durasi Bekerja</th>
+                                <th>Keterangan</th>
                                 <th>Aksi ?</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $no=1;?>
                             @foreach($arrData as $idkatkhusus=>$dtidkatkhusus)
-                                <?php 
+                                <?php
                                     $cont = count($dtidkatkhusus);
                                     $n=0;
-                                    
+
                                 ?>
                                 @foreach($dtidkatkhusus as $id_hari_biasa=>$dt_hari_biasa)
                                     @foreach($dt_hari_biasa as $idwaktu=>$dtwaktu)
-                                    <tr>        
+                                    <tr>
                                         <?php $n++;if($n==1){?>
                                         <td rowspan="{{$cont}}">{{$no++}}</td>
                                         <?php }?>
                                         <td>{{$dtwaktu['ket']}}</td>
                                         <td>{{$dtwaktu['jam_masuk']}}</td>
                                         <td>{{$dtwaktu['jam_keluar']}}</td>
-                                        <td>{{$dtwaktu['masuk_telat']}}</td>
-                                        <td>{{$dtwaktu['pulang_telat']}}</td>
                                         <td>{{$dtwaktu['lama_kerja']}}</td>
+                                        <td>{{$ketramahadhan[$idkatkhusus]}}</td>
                                         <td>
                                             <a onclick="edit('<?php echo $idwaktu;?>');" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary text-white"><i class="fas fa-pencil-ruler text-white"></i> Edit</a>
                                         </td>
@@ -125,7 +123,7 @@
                 <form class="form" id="formku" method="post">
 				{!! csrf_field() !!}
                     <div id="form-edit">
-                    
+
                     </div>
                 </form>
             </div>

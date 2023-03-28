@@ -19,7 +19,7 @@ class PresensiApelController extends Controller
         Request $request,
         Repomskegiatanapel $repomskegiatanapel,
         Repopresensiapel $repopresensiapel,
-        Repomspegawai $repomspegawai  
+        Repomspegawai $repomspegawai
     ){
         $this->request = $request;
         $this->repomskegiatanapel = $repomskegiatanapel;
@@ -32,11 +32,20 @@ class PresensiApelController extends Controller
         $text = Session::get('cari_kegiatan');
         $tgl_kegiatan = Session::get('tgl_kegiatan');
         $rsData= $this->repomskegiatanapel->paginate(['peserta'],$tgl_kegiatan,$text);
+        $arrDataPesertaApel = array();
+        foreach($rsData as $rs=>$r){
+            foreach($r->peserta as $rsp=>$rp){
+                if($rp->dt_pegawai->id_stat_aktif=="1"){
+                    $arrDataPesertaApel[$r->id_kegiatan][$rp->kehadiran][$rp->id_presensi] = $rp->id_presensi;
+                }
+            }
+        }
         $paging = $rsData->links();
         $totalRecord = $rsData->total();
         $data['rsData'] = $rsData;
         $data['paging'] = $paging;
         $data['totalRecord'] = $totalRecord;
+        $data['arrDataPesertaApel'] = $arrDataPesertaApel;
         return view('content.data_pegawai.presensi.data_apel.index',$data);
     }
 
@@ -99,7 +108,7 @@ class PresensiApelController extends Controller
         $arrGrafik = array();
         foreach($data['peserta'] as $rs=>$r){
             $text = "Hadir";
-            if($r->kehadiran=="T"){
+            if($r->kehadiran=="T" || $r->kehadiran=="TH"){
                 $text = "Tidak Hadir";
             }
             $data['kehadiran'][$text]+=1;
@@ -109,7 +118,7 @@ class PresensiApelController extends Controller
         return view('content.data_pegawai.presensi.data_apel.peserta.index',$data);
     }
 
-    
+
     public function create()
     {
         return view('content.data_pegawai.presensi.data_apel.tambah',$data);
@@ -117,7 +126,7 @@ class PresensiApelController extends Controller
 
     public function download_template($id){
         $id = Crypt::decrypt($id);
-        $data['rsData'] = $this->repomspegawai->get(['nm_jns_sdm','stat_kepegawaian','stat_aktif','nm_agama'],$id_stat_aktif = null);
+        $data['rsData'] = $this->repomspegawai->get(['nm_jns_sdm','stat_kepegawaian','stat_aktif','nm_agama'],1);
         $data['info_kegiatan'] = $this->repomskegiatanapel->findId("",$id,"id_kegiatan");
         return Excel::download(new TemplatePresensiApelExport($data), 'template_presensi_kegiatan.xlsx');
     }
@@ -139,7 +148,7 @@ class PresensiApelController extends Controller
         return redirect()->route('data-pegawai.data-presensi.apel.index');
     }
 
-    
+
     public function store(Request $request)
     {
         $req = $request->except('_token');
@@ -160,13 +169,13 @@ class PresensiApelController extends Controller
         }
     }
 
-    
+
     public function show($id)
     {
         //
     }
 
-    
+
     public function edit(Request $request)
     {
         $req = $request->except('_token');
@@ -174,7 +183,7 @@ class PresensiApelController extends Controller
         return view('content.data_pegawai.presensi.data_apel.edit',$data);
     }
 
-    
+
     public function update(Request $request)
     {
         $req = $request->except('_token');
@@ -197,7 +206,7 @@ class PresensiApelController extends Controller
         }
     }
 
-    
+
     public function destroy($id)
     {
         $id = Crypt::decrypt($id);

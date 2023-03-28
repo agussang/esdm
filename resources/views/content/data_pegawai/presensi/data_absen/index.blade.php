@@ -59,7 +59,7 @@ $disabled = "";
                                 <input type="date" class="form-control" name="tgl_akhir" value="{{Session::get('tgl_akhir')}}" required>
                             </div>
                         </div>
-                    </div> 
+                    </div>
                     <div class="row">
                         <div class="col-md-4">
                             <div class="input-group mb-4">
@@ -71,10 +71,15 @@ $disabled = "";
                                 </select>
                             </div>
                         </div>
-                        <div class="col-md-8">
-                            <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
+                        <div class="col-md-3">
+
                         </div>
-                    </div> 
+                        <div class="col-md-5">
+                            <button class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
+                            <a class="btn btn-danger" href="{{route('data-pegawai.data-presensi.data-absen.import')}}"><i class="fas fa-upload"></i> Import Data Absen</a>
+                            <a href="{{route('data-pegawai.data-presensi.data-absen.unggah-sk')}}" class="btn btn-warning text-dark"><i class="fas fa-file text-dark"></i> Unggah Sk</a>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
@@ -86,7 +91,7 @@ $disabled = "";
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}
@@ -98,27 +103,47 @@ $disabled = "";
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
-                                        <th>Nip</th>
-                                        <th>Nama Pegawai</th>
-                                        <th>Tanggal Absen</th>
-                                        <th>Jmlh Absen<br/>(Hari)</th>
-                                        <th>Alasan</th>
-                                        <th>File Bukti</th>
-                                        <th>Setujui?</th>
-                                        <th>Aksi</th>
+                                        <th rowspan="2">Nip / Nama</th>
+                                        <th rowspan="2">Tanggal Absen</th>
+                                        <th rowspan="2">Jmlh Absen<br/>(Hari)</th>
+                                        <th rowspan="2">Alasan</th>
+                                        <th colspan="3">File Bukti</th>
+                                        <th rowspan="2">Setujui?</th>
+                                        <th rowspan="2">Aksi</th>
+                                    </tr>
+                                    <tr>
+                                        <th>File</th>
+                                        <th>No Sk</th>
+                                        <th>Tgl Sk</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($rsData as $rs=>$r)
+                                    <?php
+                                    $no_sk = "-";
+                                    $tgl_sk = "-";
+                                    if($r->no_sk){
+                                        $no_sk = $r->no_sk;
+                                    }
+                                    if($r->tgl_sk){
+                                        $tgl_sk = date('d-m-Y',strtotime($r->tgl_sk));
+                                    }
+                                    ?>
                                     <tr>
-                                        <td>{{$r->dt_pegawai->nip}}</td>
-                                        <td>{{$r->dt_pegawai->nm_sdm}}</td>
+                                        <td>{{$r->dt_pegawai->nip}}<br/>{{$r->dt_pegawai->nm_sdm}}</td>
                                         <td align="center">{{date('d-m-Y',strtotime($r->tgl_awal))}} <br/>Sampai<br/> {{date('d-m-Y',strtotime($r->tgl_akhir))}}</td>
                                         <td align="center">{{$r->lama_hari}}<br/>(hari)</td>
-                                        <td align="center">{{$r->alasan->alasan}}</td>
+                                        <td align="center">{{$r->r_alasan->alasan}}</td>
                                         <td align="center">
+                                            @if($r->file_bukti!=null)
                                             <a href="{{URL::to('assets/file_bukti_absen')}}/{{$r->file_bukti}}" target="_blank"><i class="fas fa-file-pdf" style="font-size:50px;"></i></a>
+                                            @else
+                                            File Tidak ada.
+                                            @endif
+
                                         </td>
+                                        <td>{{$no_sk}}</td>
+                                        <td>{{$tgl_sk}}</td>
                                         <td align="center">
                                             <?php
                                                 $setujui = "<span class=\"badge badge-warning\">Belum Disetujui</span>";
@@ -135,7 +160,16 @@ $disabled = "";
                                             @endif
                                         </td>
                                         <td>
-                                            @if($r->is_valid!=1)
+                                            <?php
+                                            $bisa = 1;
+                                            if($r->is_valid!=1){
+                                                $bisa = 0;
+                                            }
+                                            if(Session::get('level')=="A"){
+                                                $bisa = 1;
+                                            }
+                                            ?>
+                                            @if($bisa==1)
                                             <div class="btn-group" role="group">
                                                 <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                                     Aksi
@@ -162,7 +196,7 @@ $disabled = "";
                 </div>
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}

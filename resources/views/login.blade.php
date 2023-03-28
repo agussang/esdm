@@ -3,6 +3,7 @@
 <head>
    <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+      <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
       <title>{{$rsData->nama_aplikasi}} - {{$rsData->nama_instansi}}</title>
       <link rel="stylesheet" href="{{URL::to('assets/css/backend-plugin.min28b5.css?v=2.0.0')}}">
       <link rel="stylesheet" href="{{URL::to('assets/css/backend28b5.css?v=2.0.0')}}">
@@ -38,7 +39,7 @@
                               <div class="col-lg-12">
                                  <div class="floating-label form-group">
                                     <input class="floating-input form-control" type="text" name="username" id="username" required>
-                                    <label>Email</label>
+                                    <label>Username</label>
                                  </div>
                               </div>
                               <div class="col-lg-12">
@@ -52,7 +53,7 @@
                         </form>
                      </div>
                      <div class="col-lg-6 mb-lg-0 mb-4 mt-lg-0 mt-4">
-                        <img src="{{URL::to('assets/images/login/01.png')}}" class="img-fluid w-80" alt="">
+                        <img src="{{URL::to('assets/images/login_page_kepegawaian_new.png')}}" class="img-fluid w-80" alt="">
                      </div>
                   </div>
                </div>

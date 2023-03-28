@@ -14,6 +14,7 @@ $aktifexpand3="";
 $aktifexpand4="";
 $menu_aktif="";
 $induk = explode('/',request()->path());
+
 if($induk[0]=="data-master"){
     $expanded = "true";
     $collapse = "show";
@@ -35,11 +36,10 @@ if($induk[0]=="laporan"){
     $aktifexpand4="active";
 }
 if($induk[0]=="setting"){
-    $expanded3 = "true";
-    $collapse3 = "show";
-    $aktifexpand3="active";
+    $expanded5 = "true";
+    $collapse5 = "show";
+    $aktifexpand5="active";
 }
-
 ?>
 <li class="{{ $induk[0]=="home" ? 'active' : '' }}">
     <a href="{{URL::to('/home')}}"> <i class="fa fa-home"></i><span> Home</span> </a>
@@ -58,7 +58,13 @@ if($induk[0]=="setting"){
             <a href="{{route('data-master.bank')}}">  <i class="fa fa-book"></i><span> Master Bank</span> </a>
         </li>
         <li class="{{ $induk[1]=="waktu-presensi" ? 'active' : '' }}">
-            <a href="{{route('data-master.waktu-presensi')}}">  <i class="fa fa-book"></i><span> Master Waktu Presensi</span> </a>
+            <a href="{{route('data-master.waktu-presensi')}}">  <i class="dripicons dripicons-alarm"></i><span> Master Waktu Presensi</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="waktu-shift" ? 'active' : '' }}">
+            <a href="{{route('data-master.waktu-shift')}}">  <i class="dripicons dripicons-alarm"></i><span> Master Waktu Presensi Shift</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="tanggal-ramadhan" ? 'active' : '' }}">
+            <a href="{{route('data-master.tanggal-ramadhan')}}">  <i class="dripicons dripicons-alarm"></i><span> Master Tanggal Ramadhan</span> </a>
         </li>
         <li class="{{ $induk[1]=="jabatan" ? 'active' : '' }}">
             <a href="{{route('data-master.jabatan')}}">  <i class="fa fa-book"></i><span> Master Jabatan</span> </a>
@@ -66,14 +72,23 @@ if($induk[0]=="setting"){
         <li class="{{ $induk[1]=="kategori-pelanggaran" ? 'active' : '' }}">
             <a href="{{route('data-master.kategori-pelanggaran')}}">  <i class="fa fa-book"></i><span> Master Kategori Pelanggaran</span> </a>
         </li>
+        <li class="{{ $induk[1]=="alasan-absen" ? 'active' : '' }}">
+            <a href="{{route('data-master.alasan-absen')}}">  <i class="fa fa-book"></i><span> Master Alasan Absen</span> </a>
+        </li>
         {{--  <li class="{{ $induk[1]=="eselon" ? 'active' : '' }}">
             <a href="{{route('data-master.eselon')}}">  <i class="fa fa-book"></i><span> Master Eselon</span> </a>
         </li>  --}}
         <li class="{{ $induk[1]=="pendidikan" ? 'active' : '' }}">
             <a href="{{route('data-master.pendidikan')}}">  <i class="fa fa-book"></i><span> Master Pendidikan</span> </a>
         </li>
+        <li class="{{ $induk[1]=="hari-libur" ? 'active' : '' }}">
+            <a href="{{route('data-master.hari-libur')}}">  <i class="fa fa-calendar"></i><span> Master Hari Libur</span> </a>
+        </li>
         <li class="{{ $induk[1]=="grade" ? 'active' : '' }}">
             <a href="{{route('data-master.grade')}}">  <i class="fa fa-book"></i><span> Master Grade</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="prosentase" ? 'active' : '' }}">
+            <a href="{{route('data-master.prosentase')}}">  <i class="fa fa-book"></i><span> Master Prosentase Realisasi</span> </a>
         </li>
         <li class="{{ $induk[1]=="golongan" ? 'active' : '' }}">
             <a href="{{route('data-master.golongan')}}">  <i class="fa fa-book"></i><span> Master Golongan</span> </a>
@@ -123,6 +138,11 @@ if($induk[0]=="setting"){
                         <i class="las la-book"></i><span>Upload / Sync Presensi</span>
                     </a>
                 </li>
+                <li class="{{ $induk[2]=="jadwal-presensi-shift" ? 'active' : '' }}">
+                    <a href="{{route('data-pegawai.data-presensi.jadwal-presensi-shift.index')}}">
+                        <i class="las la-book"></i><span>Jadwal Presensi Shift</span>
+                    </a>
+                </li>
                 <li class="{{ $induk[2]=="apel" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.apel.index')}}">
                         <i class="las la-upload"></i><span>Upload Apel</span>
@@ -137,13 +157,13 @@ if($induk[0]=="setting"){
         </li>
     </ul>
 </li>
-<li class="{{$aktifexpand4}}">
-    <a href="#skp" class="collapsed" data-toggle="collapse" aria-expanded="{{$expanded4}}">
+<li class="{{$aktifexpand3}}">
+    <a href="#skp" class="collapsed" data-toggle="collapse" aria-expanded="{{$expanded3}}">
         <i class="lab la-wpforms"></i><span> SKP</span>
         <i class="las la-angle-right iq-arrow-right arrow-active"></i>
         <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
     </a>
-    <ul id="skp" class="iq-submenu collapse {{$collapse4}}" data-parent="#form" style="">
+    <ul id="skp" class="iq-submenu collapse {{$collapse3}}" data-parent="#form" style="">
         <li class="{{ $induk[1]=="setting-skp" ? 'active' : '' }}">
             <a href="{{route('skp.setting-skp.index')}}">
                 <i class="fas fa-cogs"></i><span>Setting Periode SKP</span>
@@ -180,14 +200,14 @@ if($induk[0]=="setting"){
         </li>
     </ul>
 </li>
-<li class="{{$aktifexpand5}}">
-    <a href="#laporan" class="collapsed" data-toggle="collapse" aria-expanded="{{$expanded5}}">
+<li class="{{$aktifexpand4}}">
+    <a href="#laporan" class="collapsed" data-toggle="collapse" aria-expanded="{{$expanded4}}">
         <i class="las la-book"></i><span> Laporan</span>
         <i class="las la-angle-right iq-arrow-right arrow-active"></i>
         <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
     </a>
-    <ul id="laporan" class="iq-submenu collapse {{$collapse5}}" data-parent="#iq-sidebar-toggle">
-        <li class="{{ $induk[0]=="laporan-kehadiran" ? 'active' : '' }}">
+    <ul id="laporan" class="iq-submenu collapse {{$collapse4}}" data-parent="#iq-sidebar-toggle">
+        <li class="{{ $induk[1]=="presensi-kehadiran" ? 'active' : '' }}">
             <a href="{{route('laporan.presensi-kehadiran.index')}}"> <i class="fa fa-users"></i><span> Laporan Kehadiran</span> </a>
         </li>
     </ul>
@@ -206,6 +226,9 @@ if($induk[0]=="setting"){
         @endif
         <li class="{{ $induk[1]=="manajemen-user" ? 'active' : '' }}">
             <a href="{{route('setting.manajemen-user.index')}}"> <i class="fa fa-users"></i><span> Manajemen User</span> </a>
+        </li>
+        <li class="{{ $induk[1]=="log-login" ? 'active' : '' }}">
+            <a href="{{route('setting.log-login.index')}}"> <i class="fa fa-eye"></i><span> Log Login</span> </a>
         </li>
     </ul>
 </li>

@@ -131,9 +131,11 @@
                                             $tgltidakmasuk = $thn_bulan."-".$tgl;
                                             $tgl_jus = "";
                                             $alasan_jus = "";
+                                            $kategori = "";
                                             if(count($presensi['justifikasi'])>0){
                                                 $tgl_jus = $presensi['justifikasi']['tgl_justifikasi'];
                                                 $alasan_jus = $presensi['justifikasi']['alasan'];
+                                                $kategori = $presensi['justifikasi']['kategori_justifikasi'];
                                             }
                                             ?>
                                             <tr>
@@ -141,7 +143,7 @@
                                                 <td>{{$nm_tgl}}</td>
                                                 <td>
                                                     <li>Tgl : {{$tgl_jus}}</li>
-                                                    <li>Alasan : {{$alasan_jus}}</li>
+                                                    <li>Kategori : {{$kategori}}</li>
                                                 </td>
                                                 <td>
                                                     @if(count($presensi['justifikasi'])<1)
@@ -178,9 +180,13 @@
                                         }
                                         $tgl_justlt = "";
                                         $alasan_justlt = "";
+                                        $kategoritelat = "";
+                                        $durasijustelat = 0;
                                         if(count($presensitlt['justifikasi'])>0){
                                             $tgl_justlt = $presensitlt['justifikasi']['tgl_justifikasi'];
                                             $alasan_justlt = $presensitlt['justifikasi']['alasan'];
+                                            $kategoritelat = $presensitlt['justifikasi']['kategori_justifikasi'];
+                                            $durasijustelat = $presensitlt['justifikasi']['durasi_justifikasi'];
                                         }
                                         ?>
                                         <tr>
@@ -190,11 +196,12 @@
                                                 <li>Masuk : {{$presensitlt['masuk']}}</li>
                                                 <li>Pulang : {{$presensitlt['pulang']}}</li>
                                             </td>
-                                            <td>{{$presensitlt['menit']}}</td>
+                                            <td>{{$presensitlt['menit']-$durasijustelat}}</td>
                                             <td>{{$ket}}</td>
                                             <td>
                                                 <li>Tgl : {{$tgl_justlt}}</li>
-                                                <li>Alasan : {{$alasan_justlt}}</li>
+                                                <li>Kategori : {{$kategoritelat}}</li>
+                                                <li>Durasi Justifikasi<i>(Menit)</i> : {{$durasijustelat}} Menit</li>
                                             </td>
                                             <td>
                                             @if(count($presensitlt['justifikasi'])<1)
@@ -225,9 +232,13 @@
                                         $tglplngcpt = $thn_bulan."-".$tglcpt;
                                         $tgl_juscpt = "";
                                         $alasan_juscpt = "";
+                                        $kategoricpt = "";
+                                        $durasijuspulang_cpt = 0;
                                         if(count($presensicpt['justifikasi'])>0){
                                             $tgl_juscpt = $presensicpt['justifikasi']['tgl_justifikasi'];
                                             $alasan_juscpt = $presensicpt['justifikasi']['alasan'];
+                                            $kategoricpt = $presensicpt['justifikasi']['kategori_justifikasi'];
+                                            $durasijuspulang_cpt = $presensicpt['justifikasi']['durasi_justifikasi'];
                                         }
                                         $ketx = "";
                                         if($presensicpt['masuk']==$presensicpt['pulang']){
@@ -241,11 +252,12 @@
                                                 <li>Masuk : {{$presensicpt['masuk']}}</li>
                                                 <li>Pulang : {{$presensicpt['pulang']}}</li>
                                             </td>
-                                            <td>{{$presensicpt['menit']}}</td>
+                                            <td>{{$presensicpt['menit']-$durasijuspulang_cpt}}</td>
                                             <td>{{$ketx}}</td>
                                             <td>
                                                 <li>Tgl : {{$tgl_juscpt}}</li>
-                                                <li>Alasan : {{$alasan_juscpt}}</li>
+                                                <li>Kategori : {{$kategoricpt}}</li>
+                                                <li>Durasi Justifikasi<i>(Menit)</i> : {{$durasi_pulang_cpt}} Menit</li>
                                             </td>
                                             <td>
                                                 @if(count($presensicpt['justifikasi'])<1)
@@ -276,7 +288,7 @@
                 <form class="form" id="formku" method="post">
 				{!! csrf_field() !!}
                     <div id="form-edit">
-                    
+
                     </div>
                 </form>
             </div>

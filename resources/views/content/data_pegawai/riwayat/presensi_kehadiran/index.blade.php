@@ -3,6 +3,10 @@
 <?php
 $induk = explode('/',request()->path());
 ?>
+<?php
+$arrnmbulan = Fungsi::nm_bulan();
+$arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Proses Persetujuan Atasan");
+?>
 <div class="row">
     <div class="col-md-12">
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
@@ -79,6 +83,7 @@ $induk = explode('/',request()->path());
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-warning">
             <div class="card-body">
                 <span class="text-dark">Informasi Setting Durasi / Waktu Bekerja<hr/></span>
+                @if($rsData->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -88,23 +93,43 @@ $induk = explode('/',request()->path());
                                 <th>Jam Maksimal Terlambat</th>
                                 <th>Jam Pulang</th>
                                 <th>Jam Maksimal Pulang</th>
-                                <th>Durasi Bekerja (Jam)</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($jam_kerja_unit as $idhari=>$r)
+                            @foreach($jam_kerja as $idhari=>$r)
                             <tr>
                                 <td>{{$kategoriwaktuabsen[$idhari]}}</td>
                                 <td>{{$r['jam_masuk']}}</td>
                                 <td>{{$r['masuk_telat']}}</td>
                                 <td>{{$r['jam_pulang']}}</td>
                                 <td>{{$r['pulang_telat']}}</td>
-                                <td>{{$r['lama_kerja']}}</td>
                             </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
+                @else
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Nama Shift</th>
+                                <th>Jam Masuk</th>
+                                <th>Jam Pulang</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($jamkerjashift as $idshift=>$rshift)
+                            <tr>
+                                <td>{{$rshift['nm_shift']}}</td>
+                                <td>{{$rshift['jam_masuk']}}</td>
+                                <td>{{$rshift['jam_pulang']}}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @endif
             </div>
         </div>
     </div>
@@ -119,7 +144,7 @@ $induk = explode('/',request()->path());
                         <li class="nav-item">
                             <a class="nav-link active" id="home-tab-two" data-toggle="tab" href="#home-two" role="tab" aria-controls="home" aria-selected="true">Riwayat Kehadiran</a>
                         </li>
-                        <li class="nav-item">
+                        {{-- <li class="nav-item">
                             <a class="nav-link" id="profile-tab-two" data-toggle="tab" href="#profile-two" role="tab" aria-controls="profile" aria-selected="false">Tanggal Tidak Hadir</a>
                         </li>
                         <li class="nav-item">
@@ -127,85 +152,310 @@ $induk = explode('/',request()->path());
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" id="pulang-tab-two" data-toggle="tab" href="#pulang-two" role="tab" aria-controls="pulang" aria-selected="false">Tanggal Pulang Cepat</a>
-                        </li>
+                        </li> --}}
                     </ul>
                     <div class="tab-content" id="myTabContent-1">
                         <div class="tab-pane fade active show" id="home-two" role="tabpanel" aria-labelledby="home-tab-two">
-                           <div class="table-responsive">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Tanggal</th>
-                                            <th>Jam Masuk</th>
-                                            <th>Jam Pulang</th>
-                                            <th>Durasi Bekerja <br/>(Jam)</th>
-                                            <th>Durasi Bekerja<br/>(Menit)</th>
-                                            <th>Ket</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php $no=1;?>
-                                        @foreach($arrData as $tgl=>$presensi)
-                                        <?php
-                                            $hariabsen = explode(',',$presensi['ket_tgl']);
-                                            $jam_masuk = array_shift($presensi['jam_absen']);
-                                            $jam_keluar = end($presensi['jam_absen']);
-                                            if($jam_keluar==null){
-                                                $jam_keluar = $jam_masuk;
-                                            }
-                                            if($hariabsen[0]=="Jumat"){
-                                                $jamkerja = $jam_kerja_unit[2];
-                                            }else{
-                                                $jamkerja = $jam_kerja_unit[1];
-                                            }
-                                            $warna = "";$ket = "";
-                                            if(end($presensi['jam_absen'])==null){
-                                                $warna = "background-color: #F78282;";
-                                                $ket = "Absen 1x";
-                                            }
-                                            $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
-                                            $jam_masukex = explode(':',$jam_masuk);
-                                            $jam_keluarex = explode(':',$jam_keluar);
+                            <div class="row">
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card card-block card-stretch card-height">
+                                       <div class="card-body bg-primary-light rounded">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="rounded iq-card-icon bg-primary"><i class="ri-user-fill"></i>
+                                             </div>
+                                             <div class="text-right">
+                                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="hadir"></div></span></h2>
+                                                <h5 class="">Kehadiran</h5>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card card-block card-stretch card-height">
+                                       <div class="card-body bg-warning-light rounded">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="rounded iq-card-icon bg-warning"><i class="ri-women-fill"></i>
+                                             </div>
+                                             <div class="text-right">
+                                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="tidak_masuk"></div></span></h2>
+                                                <h5 class="">Tidak Masuk</h5>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="card card-block card-stretch card-height">
+                                       <div class="card-body bg-info-light rounded">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="rounded iq-card-icon bg-info"><i class="ri-hospital-line"></i>
+                                             </div>
+                                             <div class="text-right">
+                                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="terlambat"></div></span></h2>
+                                                <h5 class="">Terlambat</h5>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                               <div class="col-md-6 col-lg-4">
+                                    <div class="card card-block card-stretch card-height">
+                                       <div class="card-body bg-secondary-light rounded">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="rounded iq-card-icon bg-primary"><i class="ri-user-fill"></i>
+                                             </div>
+                                             <div class="text-right">
+                                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="finger_sekali"></div></span></h2>
+                                                <h5 class="">Finger 1 kali</h5>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                               </div>
+                               <div class="col-md-6 col-lg-4">
+                                    <div class="card card-block card-stretch card-height">
+                                       <div class="card-body bg-success-light rounded">
+                                          <div class="d-flex align-items-center justify-content-between">
+                                             <div class="rounded iq-card-icon bg-primary"><i class="ri-user-fill"></i>
+                                             </div>
+                                             <div class="text-right">
+                                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="pulang_cepat"></div></span></h2>
+                                                <h5 class="">Pulang Cepat</h5>
+                                             </div>
+                                          </div>
+                                       </div>
+                                    </div>
+                               </div>
+                            </div>
 
-                                            $j_masuk_start = $jam_masukex[0];
-                                            $menit_masuk_start = $jam_masukex[1];
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered">
+                                            <thead>
+                                               <tr>
+                                                   <th>No</th>
+                                                   <th>Tanggal</th>
+                                                   <th>Jam Masuk</th>
+                                                   <th>Jam Pulang</th>
+                                                   <th><center>Durasi Bekerja <br/>(Jam)</center></th>
+                                                   <th><center>Durasi Bekerja<br/>(Menit)</center></th>
+                                                   <th><center>Durasi Terlambat<br/>(Menit)</center></th>
+                                                   <th><center>Durasi Pulang Cepat<br/>(Menit)</center></th>
+                                                   <th>Ket Tanggal</th>
+                                                   <th>Ket</th>
+                                                   @if($rsData->id_satkernow == "30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                                                   <th>Ket Jadwal Shift</th>
+                                                   @endif
+                                                   <th>Aksi</th>
 
-                                            $j_keluar_start = $jam_keluarex[0];
-                                            $menit_keluar_start = $jam_keluarex[1];
+                                               </tr>
+                                            </thead>
+                                            <tbody>
+                                               <?php
+                                               $bulanx = $bulan;
+                                                $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
+                                                @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
+                                                <?php
+                                                $kode_justifikasi = 0;
+                                                $presensi = $arrData[$tgl];
+                                                $hariabsen = explode(',',$dtgl['tgl']);
+                                                $jam_masuk = array_shift($presensi['jam_absen']);
+                                                $jam_keluar = end($presensi['jam_absen']);
+                                                $ketajuanall = $getajuan_justifikasiall[$rsData->id_sdm][$tgl];
+                                                if($ketajuanall){
+                                                    if($ketajuanall['kategori_justifikasi']=="4" && $ketajuanall['status']=="1"){
+                                                        $jam_masuk = $ketajuanall['jam_masuk'];
+                                                        $jam_keluar = $ketajuanall['jam_pulang'];
 
-                                            $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
-                                            $hasil = $hasil / 60;
-                                            $hasil = number_format($hasil,2);
-                                            $hasilx = explode(".",$hasil);
-                                            $depan = sprintf("%02d", $hasilx[0]);
-                                            $gabung = $depan.":".$hasilx[1];
-                                            
-                                            if($gabung < $durasi){
-                                                $warna = "background-color: #F78282;";
-                                            }
-                                            $hari = explode(',',$tanggal);
-                                            if($hari[0]=="Minggu" || $hari[0]=="Sabtu"){
-                                                $warna = "background-color: #E3CC6D;";
-                                            }
-                                            $menit = ($gabung*60)+$hasilx[1];
-                                            
-                                            ?>
-                                            <tr style="{{$warna}}">
-                                                <td>{{$no++}}</td>
-                                                <td>{{$presensi['ket_tgl']}}</td>
-                                                <td align="center">{{$jam_masuk}}</td>
-                                                <td align="center">{{$jam_keluar}}</td>
-                                                <td align="center">{{$gabung}}</td>
-                                                <td align="center">{{$menit}}</td>
-                                                <td align="center">{{$ket}}</td>
-                                            </tr>
-                                            @endforeach
-                                    </tbody>
-                                </table>
+                                                    }
+                                                    $kode_justifikasi = $ketajuanall['kategori_justifikasi'];
+                                                }
+                                                if($jam_keluar==null){
+                                                        $jam_keluar = $jam_masuk;
+                                                }
+                                                if($hariabsen[0]=="Jumat"){
+                                                        $jamkerja = $jam_kerja[2];
+                                                }else{
+                                                        $jamkerja = $jam_kerja[1];
+                                                }
+                                                if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                                                    $jamkerja = $presensi['msjadwalshift'];
+                                                }
+                                                $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
+                                                $jam_masukex = explode(':',$jam_masuk);
+                                                $jam_keluarex = explode(':',$jam_keluar);
+
+                                                $j_masuk_start = $jam_masukex[0];
+                                                $menit_masuk_start = $jam_masukex[1];
+                                                $ket = "";
+                                                $j_keluar_start = $jam_keluarex[0];
+                                                $menit_keluar_start = $jam_keluarex[1];
+                                                $gabung = 0;$menit = 0;$hitungdurasi_terlambat = 0;
+                                                $warna = "";$kode_justifikasi = 0;
+                                                $hitungdurasi_pulang_cepat = 0;
+                                                if($jam_masuk!=null){
+
+                                                        if(str_replace(':','',$jam_keluar) < str_replace(':','',$jamkerja['jam_pulang'])){
+                                                            if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $jam_masuk != "--:--" && $jam_keluar != "--:--"){
+
+                                                                if($jam_masuk!=$jam_keluar){
+                                                                    $ket = "Pulang Cepat";
+                                                                    $pulang_cepat++;
+                                                                    $kode_justifikasi = 3;
+                                                                    $hitungdurasi_pulang_cepat = Fungsi::hitungdurasipulangcepat($jam_keluar,$jamkerja['jam_pulang']);
+                                                                }
+                                                            }
+                                                        }
+                                                        if($jam_masuk == $jam_keluar && $hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                                                            $ket = "Absen 1x";
+                                                            $finger_sekali++;
+                                                            $kode_justifikasi = 4;
+                                                        }
+                                                    //   $hasil = (intVal($j_keluar_start) - intVal($j_masuk_start)) * 60 + (intVal($menit_keluar_start) - intVal($menit_masuk_start));
+                                                    //   $hasil = $hasil / 60;
+                                                    //   $hasil = number_format($hasil,2);
+                                                    //   $hasilx = explode(".",$hasil);
+                                                    //   $depan = sprintf("%02d", $hasilx[0]);
+                                                    //   $gabung = $depan.":".$hasilx[1];
+
+                                                        if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                                                            $hadir++;
+                                                            if($ket!="Absen 1x"){
+                                                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                                                if($hitungdurasi_terlambat>0){
+                                                                    $ket = "Terlambat Datang";
+                                                                    $kode_justifikasi = 2;
+                                                                }
+                                                            }
+                                                        }
+
+                                                        //$menit = ($gabung*60)+$hasilx[1];
+
+                                                        $kategori = "";
+                                                        $durasijustifikasi = "";
+                                                        $menitjustifikasi = 0;
+                                                        if($presensi['justifikasi']){
+                                                            $kategori = $presensi['justifikasi']['kategori_justifikasi'];
+                                                            $durasijustifikasi = $presensi['justifikasi']['durasi_justifikasi']." Menit";
+                                                            $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
+                                                        }
+                                                }
+                                                if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                                                        if($ket == null && $jam_masuk==null && $jam_keluar==null){
+                                                            $ket = "Tidak Hadir";
+                                                            $tidak_hadir++;
+                                                            $warna = "background-color: #F1E780;";
+                                                        }
+                                                }
+                                                if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu" || $dtgl['ket_nasional'] != null){
+                                                        $warna = "background-color: #f9cacb;";
+                                                        $ket = "";
+                                                }
+                                                if($jam_masuk == null){
+                                                        $jam_masuk = "--:--";
+                                                }
+                                                if($jam_keluar == null){
+                                                        $jam_keluar = "--:--";
+                                                }
+
+                                                $absenkehadiran = $getDataAbsen[$rsData->id_sdm][$tgl]['alasan_absen'];
+                                                if($absenkehadiran!=null){
+                                                        $absen_kehadiran++;
+                                                        $ket = $absenkehadiran['kode_alasan'];
+                                                        $warna = "background-color: #F1E780;";
+                                                        $hitungdurasi_terlambat = "0";
+                                                        $hitungdurasi_pulang_cepat = 0;
+                                                }
+
+                                                $durasikerja = "00:00:00";$durasikerjamenit = "0";
+                                                if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
+                                                    $jamawal = $tgl." ".$jam_masuk;
+                                                    $jamakhir = $tgl." ".$jam_keluar;
+                                                    $durasikerja = Fungsi::durasikerja($jamawal,$jamakhir);
+                                                    $durasikerjamenit = Fungsi::konversiwaktu($durasikerja);
+                                                }
+                                                $tglajuanabsenjus = date('d',strtotime($tgl));
+                                                $ketajuan = $getajuan_justifikasi[$tgl][$kode_justifikasi];
+                                                $ket_masuk = "";$ket_keluar = "";$menitjustifikasi=0;
+
+                                                if($ketajuan['status']==1){
+                                                    if($ketajuan['kategori_justifikasi']=="4"){
+                                                        if($ketajuan['ket_justifikasi']=="jam_masuk"){
+                                                            $ket_masuk = "ajuan justifikasi";
+                                                        }
+                                                        if($ketajuan['ket_justifikasi']=="jam_pulang"){
+                                                            $ket_keluar = "ajuan justifikasi";
+                                                        }
+                                                    }elseif($ketajuan['kategori_justifikasi']=="2"){
+                                                        $menitjustifikasi = $ketajuan['durasi_justifikasi'];
+                                                        $terlambat = $hitungdurasi_terlambat-$menitjustifikasi;
+                                                        if($terlambat==0){
+                                                            $ket="";
+                                                        }
+                                                    }
+                                                }
+
+                                                if($ket=="Terlambat Datang"){
+                                                    $jterlambat++;
+                                                }
+                                                $terlambat = $hitungdurasi_terlambat-$menitjustifikasi;
+                                                ?>
+                                                <tr style="{{$warna}}">
+                                                    <td>{{$no++}}</td>
+                                                    <td>{{$dtgl['tgl']}}</td>
+                                                    <td>{{$jam_masuk}}<br/>
+                                                        <i style="font-size:10px;"><p style="color:green">{{$ket_masuk}}</a></i>
+                                                    </td>
+                                                    <td>{{$jam_keluar}}<br/>
+                                                    <i style="font-size:10px;"><p style="color:green">{{$ket_keluar}}</a></i>
+                                                    </td>
+                                                    <td>{{$durasikerja}}</td>
+                                                    <td>{{$durasikerjamenit}}</td>
+                                                    <td>
+                                                        {{$terlambat}}
+                                                        @if($ketajuan['status']==1)
+                                                            @if($ketajuan['kategori_justifikasi']=="2")
+                                                                <li style="font-size:10px;color:green">Durasi Terlambat : {{$hitungdurasi_terlambat}}</li>
+                                                                <li style="font-size:10px;color:green">Durasi Justifikasi : {{$menitjustifikasi}}</li>
+                                                            @endif
+                                                        @endif
+                                                    </td>
+                                                    <td>{{$hitungdurasi_pulang_cepat}}</td>
+                                                    <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
+                                                    <td>{{$ket}}</td>
+                                                    @if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                                                        <td>
+                                                            {{$jamkerja['nm_shift']}}
+                                                        </td>
+                                                    @endif
+                                                    @if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
+                                                    <td>
+                                                        @if($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
+                                                            @if($ket!="Tidak Hadir")
+                                                                @if($ketajuan)
+                                                                    {{$arrStatusJustifikasi[$ketajuan['status']]}}
+                                                                @else
+                                                                    <a href="{{URL::to('pegawai/justifikasi-kehadiran-pegawai')}}/{{$rsData->id_sdm}}/{{$tgl}}/{{$kode_justifikasi}}" class="btn btn-primary">Justifikasi</a>
+                                                                @endif
+                                                            @else
+                                                            Tidak bisa dijustifikasi
+                                                            @endif
+                                                        @endif
+                                                    </td>
+                                                    @endif
+                                                </tr>
+                                                @endforeach
+                                                </tbody>
+                                            </table>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="tab-pane fade" id="profile-two" role="tabpanel" aria-labelledby="profile-tab-two">
+                        {{-- <div class="tab-pane fade" id="profile-two" role="tabpanel" aria-labelledby="profile-tab-two">
                             <div class="table-responsive">
                                 <table class="table table-bordered">
                                     <thead>
@@ -238,8 +488,8 @@ $induk = explode('/',request()->path());
                                     </tbody>
                                 </table>
                             </div>
-                        </div>
-                        <div class="tab-pane fade" id="contact-two" role="tabpanel" aria-labelledby="contact-tab-two">
+                        </div> --}}
+                        {{-- <div class="tab-pane fade" id="contact-two" role="tabpanel" aria-labelledby="contact-tab-two">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -266,7 +516,7 @@ $induk = explode('/',request()->path());
                                             $tgl_justlt = $presensitlt['justifikasi']['tgl_justifikasi'];
                                             $alasan_justlt = $presensitlt['justifikasi']['alasan'];
                                         }
-                                        
+
                                         ?>
                                         <tr>
                                             <td>{{$noz++}}</td>
@@ -283,8 +533,8 @@ $induk = explode('/',request()->path());
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="tab-pane fade" id="pulang-two" role="tabpanel" aria-labelledby="pulang-tab-two">
+                        </div> --}}
+                        {{-- <div class="tab-pane fade" id="pulang-two" role="tabpanel" aria-labelledby="pulang-tab-two">
                             <table class="table table-bordered">
                                 <thead>
                                     <tr>
@@ -327,11 +577,21 @@ $induk = explode('/',request()->path());
                                     @endforeach
                                 </tbody>
                             </table>
-                        </div>
+                        </div> --}}
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+<meta name="csrf_token" content="{{ csrf_token() }}" />
+<script type="text/javascript">
+document.getElementById("tidak_masuk").innerHTML = "{{$tidak_hadir}}";
+document.getElementById("hadir").innerHTML = "{{$hadir}}";
+document.getElementById("finger_sekali").innerHTML = "{{$finger_sekali}}";
+document.getElementById("terlambat").innerHTML = "{{$jterlambat}}";
+document.getElementById("pulang_cepat").innerHTML = "{{$pulang_cepat}}";
+document.getElementById("absen_kehadiran").innerHTML = "{{$absen_kehadiran}}";
+</script>
 @stop

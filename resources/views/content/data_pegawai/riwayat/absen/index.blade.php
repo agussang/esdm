@@ -55,6 +55,7 @@ $induk = explode('/',request()->path());
                     </div>
                     <div class="col-md-4">
                         <button class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
+                        <a href="{{route('pegawai.riwayat-absen.tambah')}}" class="btn btn-warning pull-right"><i class="fas fa-plus"></i> Tambah Data</a>
                     </div>
                 </div>
                 </from>
@@ -78,6 +79,7 @@ $induk = explode('/',request()->path());
                                 <th>Alasan / Keterangan</th>
                                 <th>File Surat</th>
                                 <th>Status Verifikasi</th>
+                                <th>Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,9 +89,13 @@ $induk = explode('/',request()->path());
                                 <td>{{$no++}}</td>
                                 <td align="center">{{Fungsi::formatDate($r->tgl_awal)}}<br/><b>Sampai</b><br/>{{Fungsi::formatDate($r->tgl_akhir)}}</td>
                                 <td>{{$r->lama_hari}} Hari</td>
-                                <td>{{$r->alasan->alasan}}</td>
+                                <td>{{$r->r_alasan->alasan}}</td>
                                 <td>
+                                    @if($r->file_bukti!=null)
                                     <a href="{{URL::to('assets/file_bukti_absen')}}/{{$r->file_bukti}}" target="_blank"><i class="fas fa-file-pdf" style="font-size:50px;"></i></a>
+                                    @else
+                                    File Tidak ada.
+                                    @endif
                                 </td>
                                 <td align="center">
                                     <?php
@@ -104,6 +110,19 @@ $induk = explode('/',request()->path());
                                     @if($r->is_valid!=null)
                                         <br/>
                                         {{date('d-m-Y H:i:s',strtotime($r->tgl_verifikasi))}}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($r->is_valid!=1)
+                                    <div class="btn-group" role="group">
+                                        <button id="btnGroupDrop1" type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                            Aksi
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
+                                                <a class="dropdown-item" href="{{URL::to('/data-pegawai/data-presensi/data-absen/edit')}}/{{Crypt::encrypt($r->id_absen)}}"><i class="fas fa-pencil-ruler"></i> Edit</a>
+                                                <a class="dropdown-item" href="{{URL::to('/data-pegawai/data-presensi/data-absen/hapus')}}/{{Crypt::encrypt($r->id_absen)}}" onclick="return confirm('Apakah anda yakin ingin menghapus data ini ? ');"><i class="fas fa-trash"></i> Hapus</a>
+                                        </div>
+                                    </div>
                                     @endif
                                 </td>
                             </tr>

@@ -6,10 +6,11 @@
             <div class="card-header">
                 <div class="card-title">
                     <div class="row">
-                        <div class="col-md-9">
+                        <div class="col-md-8">
                             <h5 class="card-label"><i class="fa fa-list"></i> Data Master Pegawai</h5>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-4">
+                            <a href="{{route('data-pegawai.master-pegawai.import')}}" class="btn btn-danger"><i class="fas fa-upload"></i> Import Data Pegawai</a>
                             <a href="{{route('data-pegawai.master-pegawai.tambah')}}" class="btn btn-warning pull-right"><i class="fas fa-plus"></i> Tambah Data</a>
                         </div>
                     </div>
@@ -70,7 +71,8 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <button class="btn btn-primary pull-right">Tampilkan Data</button>
+                        <a href="{{route('data-pegawai.master-pegawai.import-rekening')}}" class="btn btn-success"><i class="fas fa-upload"></i> Import No Rekening</a>
+                        <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
                     </div>
                 </div>
                 </form>
@@ -85,7 +87,7 @@
             <div class="card-body">
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}
@@ -101,11 +103,21 @@
                                 <th width="10%">Status <br/>Kepegawaian</th>
                                 <th width="20%">Jab. Fung</th>
                                 <th width="20%">Jab. Struk</th>
+                                <th>Grade Jabatan</th>
                                 <th width="10%">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($rsData AS $rs=>$r)
+                            <?php
+                            $grade = $arrGrade[$r->id_grade_khusus];
+                            if($grade==null){
+                                $grade = $r->nm_jab_fung->ms_grade->grade;
+                                if($grade==null){
+                                    $grade = $r->nm_jab_struk->ms_grade->grade;
+                                }
+                            }
+                            ?>
                             <tr>
                                 <td>
                                     <b>{{$r->nm_sdm}}</b><br/>
@@ -116,8 +128,19 @@
                                 <td>{{$r->nm_satker->nm_lemb}}</td>
                                 <td align="center">{{$r->nm_golongan->kode_golongan}}</td>
                                 <td align="center">{{$r->stat_kepegawaian->namastatuspegawai}}</td>
-                                <td>{{$r->nm_jab_fung->namajabatan}}</td>
-                                <td>{{$r->nm_jab_struk->namajabatan}}</td>
+                                <td>
+                                    @if($r->id_jabatan_fungsional_now)
+                                    {{$r->nm_jab_fung->namajabatan}}
+                                    @endif
+                                </td>
+                                <td>
+                                    @if($r->id_jabatan_struktural_now)
+                                    {{$r->nm_jab_struk->namajabatan}}
+                                    @endif
+                                </td>
+                                <td>
+                                    {{$grade}}
+                                </td>
                                 <th>
                                     <a href="{{URL::to('/data-pegawai/master-pegawai/detil-data')}}/{{Crypt::encrypt($r->id_sdm)}}" class="btn btn-primary btn-xs" style="margin-bottom: 70px;"><i class="fas fa-eye"></i> Lihat</a>
                                 </th>
@@ -128,7 +151,7 @@
                 </div><br/>
                 <div class="row">
                     <div class="col-md-4">
-                        <span><b>Total Data : {!!$totalRecord!!}</b></span>    
+                        <span><b>Total Data : {!!$totalRecord!!}</b></span>
                     </div>
                     <div class="col-md-8">
                         {!!$paging!!}

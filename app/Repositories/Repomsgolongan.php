@@ -15,7 +15,7 @@ class Repomsgolongan extends Repository
 
     public function get($with = null)
     {
-        return $this->model->orderBy('nama_golongan','desc')
+        return $this->model->orderBy('kode_golongan','desc')
             ->get();
     }
 }
