@@ -297,7 +297,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                               }
 
                         }
-                        if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                        if($info_pegawai->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                             $jamkerja = $presensi['msjadwalshift'];
                         }
                         $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
@@ -438,7 +438,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                            <td>{{$durasikerja}}</td>
                            <td>{{$durasikerjamenit}}</td>
                            <td>
-                            {{$terlambat}}
+                            {{$hitungdurasi_terlambat}}
                             @if($ketajuan['status']==1)
                                 @if($ketajuan['kategori_justifikasi']=="2")
                                     <li style="font-size:10px;color:green">Durasi Terlambat : {{$hitungdurasi_terlambat}}</li>

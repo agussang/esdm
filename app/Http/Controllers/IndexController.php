@@ -54,7 +54,6 @@ class IndexController extends Controller
             }else{
                 $data['getRekapDataAbsen'] = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,1);
             }
-
             $data['data_bulan'] = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_akhir,1);
             $data['jamkerjashift'] = Fungsi::jamkerjashift();
             $data['getDataAbsen'] = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);

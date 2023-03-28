@@ -350,6 +350,7 @@ class DataAbsenController extends Controller
         $req = $request->except('_token');
         $id_absen = $req['id_absen'];
         $file = $request->file('file_surat');
+
         if($file){
             $tipe = $file->getClientOriginalExtension();
             $size = $file->getSize();
@@ -386,6 +387,7 @@ class DataAbsenController extends Controller
         $tgl_akhir   =new DateTime($req['tgl_akhir']);
         $jumlahabsen =$tgl_akhir->diff($tgl_awal);
         $req['lama_hari'] = $jumlahabsen->d;
+
         $this->repotrabsenkehadiran->update($where,$req);
         $notification = [
             'message' => 'Berhasil, Data absen pegawai berhasil diupdate.',
