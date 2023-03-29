@@ -799,7 +799,8 @@ class Fungsi
             }
             $rsDataAbsenKehadiran = DB::table('tr_absen_kehadiran')
                 ->whereIn("id_sdm",$arrIdSdm)
-                ->whereRaw(" tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir'")
+                ->where('is_valid','1')
+                ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) and deleted_at is null")
                 ->get();
             foreach($rsDataAbsenKehadiran as $sen=>$senx){
                 $jm_absen = Fungsi::jumlah_absen($senx->tgl_awal,$senx->tgl_akhir,1);
@@ -960,6 +961,7 @@ class Fungsi
                     ->whereIn("id_sdm",$arrIdSdm)
                     //->where('id_absen','ffcfe614-a036-41eb-9a42-727f2d5841be')
                     ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) and deleted_at is null ")
+                    ->where('is_valid','1')
                     ->get();
         foreach($rsDataAbsenKehadiran as $rs=>$r){
             $tgl_awal = explode('-',$r->tgl_awal);
@@ -1137,7 +1139,8 @@ class Fungsi
             }
             $rsDataAbsenKehadiran = DB::table('tr_absen_kehadiran')
                 ->whereIn("id_sdm",$arrIdSdm)
-                ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) ")
+                ->where('is_valid','1')
+                ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' and deleted_at is null) ")
                 ->get();
             $arrAbsenTanggal= array();$jmalasanabsen = array();$jmalasanabsenfirst = array();$arrtglabsen = array();
             foreach($rsDataAbsenKehadiran as $sen=>$senx){

@@ -110,7 +110,7 @@ class DataAbsenController extends Controller
             }
         }
         unset($req['file_surat']);
-        $name = md5($req['id_sdm']);
+        $name = md5($req['id_sdm']).$req['id_alasan'].date('YmdHis');
         $req['file_bukti'] = $name.".pdf";
         $destinationPath = 'assets/file_bukti_absen/';
         $file->move($destinationPath, $req['file_bukti']);
@@ -377,7 +377,7 @@ class DataAbsenController extends Controller
                 }
             }
             unset($req['file_surat']);
-            $name = md5($req['id_sdm']);
+            $name = md5($req['id_sdm']).$req['id_alasan'].date('YmdHis');
             $req['file_bukti'] = $name.".pdf";
             $destinationPath = 'assets/file_bukti_absen/';
             $file->move($destinationPath, $req['file_bukti']);
