@@ -165,7 +165,7 @@ $disabled = "";
                                             if($r->is_valid!=1){
                                                 $bisa = 0;
                                             }
-                                            if(Session::get('level')=="A"){
+                                            if(Session::get('level')=="A" || Session::get('level')=="SA"){
                                                 $bisa = 1;
                                             }
                                             ?>

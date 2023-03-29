@@ -383,11 +383,8 @@ class DataAbsenController extends Controller
             $file->move($destinationPath, $req['file_bukti']);
         }
         $where['id_absen'] = $id_absen;
-        $tgl_awal    =new DateTime($req['tgl_awal']);
-        $tgl_akhir   =new DateTime($req['tgl_akhir']);
-        $jumlahabsen =$tgl_akhir->diff($tgl_awal);
-        $req['lama_hari'] = $jumlahabsen->d;
-
+        $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+        $req['lama_hari'] = $jmlhabsen['jmabsen'];
         $this->repotrabsenkehadiran->update($where,$req);
         $notification = [
             'message' => 'Berhasil, Data absen pegawai berhasil diupdate.',
