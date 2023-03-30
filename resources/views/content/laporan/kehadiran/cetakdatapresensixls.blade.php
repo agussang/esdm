@@ -175,7 +175,7 @@
                     }else{
                         $durasijustifikasi = "";
                     }
-                    $terlambat_durasi = $hitungdurasi_terlambat-$durasi_justifikasi;
+                    $terlambat_durasi = abs($hitungdurasi_terlambat-$durasi_justifikasi);
                     if($terlambat_durasi == 0){
                         //$ket = "";
                     }

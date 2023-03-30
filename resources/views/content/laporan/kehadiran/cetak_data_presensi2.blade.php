@@ -184,6 +184,7 @@
                         $ketajuan = $getajuan_justifikasi[$id_sdm][$tgl];
                         $durasi_justifikasi = 0;
                         $kategori = "";
+                        $durasijustifikasi = 0;
                         if($ketajuan){
                             $kategori = $arrkategorijustifikasi[$ketajuan['kategori_justifikasi']];
                             if($ketajuan['kategori_justifikasi']!="4" && $ketajuan['status']=="1"){
@@ -193,7 +194,7 @@
                         }else{
                             $durasijustifikasi = "";
                         }
-                        $terlambat_durasi = $hitungdurasi_terlambat-$durasi_justifikasi;
+                        $terlambat_durasi = abs($hitungdurasi_terlambat-$durasi_justifikasi);
                         if($terlambat_durasi == 0){
                             //$ket = "";
                         }

@@ -1396,7 +1396,8 @@ class Fungsi
         $arrtglramadhan = tgl_ramadhan($tahunpencarian);
         // ambil waktu ramadhan
         $wakturamadhan = jam_kerja_cek('347b23a9-8919-43ec-9b2d-a0c4b810b61d');
-
+        // ambil list hari libur
+        $list_hari_libur = list_hari_libur($tgl_awal,$tgl_akhir);
         $arrKategoriJustifikasi = array("0"=>"Tidak mengganggu layanan",'1'=>"Mengganggu Layanan");
         $rsDataAbsen = RiwayatPresensi::whereIn("id_sdm",$arrIdSdm)
                         ->whereRaw(" tanggal_absen >= '$tgl_awal' and tanggal_absen <= '$tgl_akhir'")
@@ -1451,12 +1452,20 @@ class Fungsi
                     $gbng = $thn."-".sprintf("%02d", $x)."-".sprintf("%02d", $i);
                     $tglx = Fungsi::formatDate($gbng);
                     $hari = explode(',',$tglx);
-                    if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
+                    $tglprei = $list_hari_libur[date('Y-m',strtotime($gbng))];
+                    $lewati = 1;
+                    if($tglprei != null){
+                        if($tglprei[$gbng]!=null){
+                            $lewati = 0;
+                        }
+                    }
+                    if($hari[0]!='Sabtu' && $hari[0]!='Minggu' && $lewati==1){
                         $data_bulan[sprintf("%02d", $x)]['nm_bulan'] = bulan($x);
                         $data_bulan[sprintf("%02d", $x)]['tgl_bulan'][sprintf("%02d", $i)] = sprintf("%02d", $i);
                     }
                 }
             }
+            //return $data_bulan;
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
             $rsAlasan = DB::table('ms_alasan_absen')->get();
             foreach($rsAlasan as $rsa=>$ralasan){
