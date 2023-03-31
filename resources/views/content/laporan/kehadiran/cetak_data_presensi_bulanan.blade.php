@@ -100,11 +100,9 @@
                 $dt_presensi = $dt_sdm['data_presensi'][$kode];
                 $jmh_hari_kerja = count($dt_bln['list_tgl']) - count($dt_hari_libur[$dt_bln['tahun']."-".$id_bulan]);
                 $total_tidak_masuk = $dt_presensi['tidakmasuk']['total'];
-                ?>
-                @if(count($dt_presensi)>0)
-                <?php
                 $terlambuat = abs($dt_presensi['telat']['total'] - $arrjumlahjustifikasi[$id_sdm]['jumlah_justifikasi']);
                 ?>
+                @if(count($dt_presensi)>0)
                 <tr>
                     <td>{{$no++}}</td>
                     <td>{{$dt_sdm['nip']}}</td>

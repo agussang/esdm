@@ -81,7 +81,7 @@ class LaporanPresensiController extends Controller
                 ];
                 return redirect()->route('laporan.presensi-kehadiran.index')->with($notification);
             }else{
-                $rsData = $this->repomspegawai->get("","",$req['satuan_kerja'],$req['id_sdm']);
+                $rsData = $this->repomspegawai->get("","1",$req['satuan_kerja'],$req['id_sdm']);
                 $arrIdSdm = array();
                 foreach($rsData as $rs=>$r){
                     $arrIdSdm[$r->id_sdm] = $r->id_sdm;
@@ -183,7 +183,7 @@ class LaporanPresensiController extends Controller
                 }
             }
         }else{
-            $rsData = $this->repomspegawai->get("","",$req['satuan_kerja'],$req['id_sdm']);
+            $rsData = $this->repomspegawai->get("","1",$req['satuan_kerja'],$req['id_sdm']);
             $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
             $arrIdSdm = array();
             foreach($rsData as $rs=>$r){

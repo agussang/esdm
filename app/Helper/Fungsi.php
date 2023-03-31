@@ -286,6 +286,10 @@ function jam_kerjaunit($id_satker){
 
 class Fungsi
 {
+    public static function wakturamadhan_karem(){
+        $rsData = jam_kerja_cek('347b23a9-8919-43ec-9b2d-a0c4b810b61d');
+        return $rsData;
+    }
     public static function get_client_ip() {
         $ipaddress = '';
         if (getenv('HTTP_CLIENT_IP'))
@@ -1389,7 +1393,18 @@ class Fungsi
 
     }
 
-
+    public static function status_persetujuan($id_status){
+        $arr = array('1'=>" Disetujui","2"=>'Tidak Disetujui',"5"=>"Belum disetujui");
+        $d = '<option value="">Pilih Status</option>';
+        foreach ($arr as $rs => $r) {
+            $sl = '';
+            if ($rs == $id_status) {
+                $sl = 'selected';
+            }
+            $d .= "<option value=\"$rs\" $sl>$r</option>";
+        }
+        return $d;
+    }
     public static function get_rekap_data_kehadiran($arrIdWaktuAbsen,$tgl_awal,$tgl_akhir,$arrIdSdm,$tipe){
         // cek ramadhan
         $tahunpencarian = date('Y',strtotime($tgl_awal));
@@ -1508,7 +1523,9 @@ class Fungsi
                 foreach($absen as $tgl_presensi=>$dt_absen){
                     $hariabsen = explode(',',$dt_absen['ket_tgl']);
                     if($arrtglramadhan[$tgl_presensi]){
-                        $arrIdWaktuAbsen = $wakturamadhan;
+                        $idwaktuabsen = $wakturamadhan;
+                    }else{
+                        $idwaktuabsen = $arrIdWaktuAbsen;
                     }
                     $tglpresensi = date('Y-m-d',strtotime($tgl_presensi));
                     $explode = explode('-',$tglpresensi);
@@ -1518,9 +1535,9 @@ class Fungsi
                     // cek apa ada absen jika ada abaikan semua keterangan presensi
                     if($arrAbsenTanggal[$id_sdm][$bln_presensi][$tglpresensikehadiran]==null){
                         if($hariabsen[0]=="Jumat"){
-                            $jam_kerja = $arrIdWaktuAbsen[2];
+                            $jam_kerja = $idwaktuabsen[2];
                         }else{
-                            $jam_kerja = $arrIdWaktuAbsen[1];
+                            $jam_kerja = $idwaktuabsen[1];
                         }
                         $jam_pulang = end($dt_absen['jam_absen']);
                         $jam_masuk = array_shift($dt_absen['jam_absen']);
@@ -1554,10 +1571,10 @@ class Fungsi
                                 $gabung = $depan.":".$hasilx[1];
                                 $menit = ($gabung*60)+$hasilx[1];
                                 $menit = $menit/60;
-                                $durasi_terlambat = $menit;
                                 if($jam_masuk==$jam_pulang){
                                     $menit = 0;
                                 }
+                                $durasi_terlambat = $menit;
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tgl'][$tglpresensikehadiran] = $durasi_terlambat;
                                 if($justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran]){
                                     $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['justifikasi'] = $justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran];

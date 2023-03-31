@@ -269,6 +269,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                         $jam_masuk = array_shift($presensi['jam_absen']);
                         $jam_keluar = end($presensi['jam_absen']);
                         $ketajuanall = $getajuan_justifikasiall[$id_sdm][$tgl];
+                        $prei = $dt_hari_libur[date('Y')."-".date('m')];
                         if($ketajuanall){
                             if($ketajuanall['kategori_justifikasi']=="4" && $ketajuanall['status']=="1"){
                                 $jam_masuk = $ketajuanall['jam_masuk'];
@@ -280,26 +281,32 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                         if($jam_keluar==null){
                               $jam_keluar = $jam_masuk;
                         }
+
                         if($hariabsen[0]=="Jumat"){
-                              $jamkerja = $jam_kerja[2];
-                              $lama_kerja = $durasibekerja[2]['lama_kerja'];
                               if($ramadhan[$tgl]){
                                 $jamkerja = $jam_kerja_ramadhan[2];
                                 $lama_kerja = $durasibekerja_ramadhan[2]['lama_kerja'];
+                              }else{
+                                $jamkerja = $jam_kerja[2];
+                                $lama_kerja = $durasibekerja[2]['lama_kerja'];
                               }
 
                         }else{
-                              $jamkerja = $jam_kerja[1];
-                              $lama_kerja = $durasibekerja[1]['lama_kerja'];
+
                               if($ramadhan[$tgl]){
                                 $jamkerja = $jam_kerja_ramadhan[1];
                                 $lama_kerja = $durasibekerja_ramadhan[1]['lama_kerja'];
+                              }else{
+                                $jamkerja = $jam_kerja[1];
+                                $lama_kerja = $durasibekerja[1]['lama_kerja'];
                               }
 
                         }
                         if($info_pegawai->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                             $jamkerja = $presensi['msjadwalshift'];
                         }
+
+
                         $durasi = Fungsi::hitungdurasi($jamkerja['jam_masuk'],$jamkerja['jam_pulang']);
                         $jam_masukex = explode(':',$jam_masuk);
                         $jam_keluarex = explode(':',$jam_keluar);
@@ -312,8 +319,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                         $gabung = 0;$menit = 0;$hitungdurasi_terlambat = 0;
                         $warna = "";
                         $hitungdurasi_pulang_cepat = 0;
-                        if($jam_masuk!=null){
-
+                        if($jam_masuk!=null && $prei[$tgl]==null){
                               if(str_replace(':','',$jam_keluar) < str_replace(':','',$jamkerja['jam_pulang'])){
                                     if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $jam_masuk != "--:--" && $jam_keluar != "--:--"){
                                        if($jam_masuk!=$jam_keluar){
@@ -330,7 +336,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                  $finger_sekali++;
                               }
 
-                              if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                              if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                                     $hadir++;
                                     if($ket!="Absen 1x"){
                                        $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
@@ -339,6 +345,16 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                           $kode_justifikasi = 2;
                                        }
                                     }
+                              }
+                              if($info_pegawai->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0" && $jamkerja['kode_jadwal']!="5"){
+                                $hadir++;
+                                if($ket!="Absen 1x"){
+                                    $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                    if($hitungdurasi_terlambat>0){
+                                        $ket = "Terlambat Datang";
+                                        $kode_justifikasi = 2;
+                                    }
+                                }
                               }
                               $kategori = "";
                               $durasijustifikasi = "";
@@ -349,7 +365,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                             //      $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
                             //   }
                         }
-                        if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                        $absenkehadiran = $getDataAbsen[$id_sdm][$tgl]['alasan_absen'];
+                        if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $absenkehadiran==null && $prei[$tgl]==null){
                               if($ket == null && $jam_masuk==null && $jam_keluar==null){
                                  $ket = "Tidak Hadir";
                                  $kode_justifikasi = 3;
@@ -358,8 +375,12 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                               }
                         }
                         if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu" || $dtgl['ket_nasional'] != null){
-                              $warna = "background-color: #f9cacb;";
-                              $ket = "";
+                            if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                               $warna = "background-color: #f9cacb;";
+                               $ket = "";
+                            }else{
+                                $warna = "background-color: #f9cacb;";
+                            }
                         }
                         if($jam_masuk == null){
                               $jam_masuk = "--:--";
@@ -368,7 +389,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                               $jam_keluar = "--:--";
                         }
 
-                        $absenkehadiran = $getDataAbsen[$id_sdm][$tgl]['alasan_absen'];
+
                         if($absenkehadiran!=null){
                               $absen_kehadiran++;
                               $ket = $absenkehadiran['kode_alasan'];
@@ -406,10 +427,10 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                         if($ket=="Terlambat Datang"){
                             $jterlambat++;
                         }
-                        $terlambat = $hitungdurasi_terlambat-$menitjustifikasi;
+                        $terlambat = abs($hitungdurasi_terlambat-$menitjustifikasi);
                         $gabung_lembur = 0;
                         $masterdurasikerja = Fungsi::konversiwaktu($durasi);
-                        if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
+                        if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu" && $prei[$tgl]==null){
                             if($durasikerja>$durasi){
                                 // dikurangi
                                 $durasikurangidurasikerja= abs($durasikerjamenit-$masterdurasikerja);
@@ -438,7 +459,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                            <td>{{$durasikerja}}</td>
                            <td>{{$durasikerjamenit}}</td>
                            <td>
-                            {{$hitungdurasi_terlambat}}
+                            {{$terlambat}}
                             @if($ketajuan['status']==1)
                                 @if($ketajuan['kategori_justifikasi']=="2")
                                     <li style="font-size:10px;color:green">Durasi Terlambat : {{$hitungdurasi_terlambat}}</li>

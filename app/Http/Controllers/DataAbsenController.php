@@ -35,6 +35,8 @@ class DataAbsenController extends Controller
         $id_sdm_atasan = Session::get('id_sdm_atasan');
         $data['pilihan_sdm'] = Fungsi::pilihan_sdm($id_sdm,"","",$id_sdm_atasan);
         $data['pilihan_alasan_absen'] = Fungsi::pilihan_alasan_absen($id_alasan);
+        $id_status = Session::get('id_status');
+        $data['status_persetujuan'] = Fungsi::status_persetujuan($id_status);
         $arrIdSdm = array();
         if($id_sdm_atasan){
             $rsPegawai = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','nm_jab_struk','nm_jab_fung']," id_stat_aktif = '1' and (id_sdm_atasan = '$id_sdm_atasan' or id_sdm_pendamping = '$id_sdm_atasan') ","nm_sdm");
@@ -42,7 +44,7 @@ class DataAbsenController extends Controller
                 $arrIdSdm[$r->id_sdm] = $r->id_sdm;
             }
         }
-        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','r_alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan,$arrIdSdm);
+        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','r_alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan,$arrIdSdm,$id_status);
         $paging = $rsData->links();
         $totalRecord = $rsData->total();
         $data['rsData'] = $rsData;
@@ -61,6 +63,7 @@ class DataAbsenController extends Controller
 
     public function cari(Request $request){
         $req = $request->except('_token');
+
         if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
             $req['id_sdm'] = Session::get('id_sdm');
         }

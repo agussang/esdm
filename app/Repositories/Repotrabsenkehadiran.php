@@ -13,7 +13,7 @@ class Repotrabsenkehadiran extends Repository
         $this->model = $model;
     }
 
-    public function paginate($with = null,$id_sdm = null,$tgl_awal = null,$tgl_akhir = null,$id_alasan = null,$arrIdSdm = null)
+    public function paginate($with = null,$id_sdm = null,$tgl_awal = null,$tgl_akhir = null,$id_alasan = null,$arrIdSdm = null,$id_status = null)
     {
         return $this->model
             ->when($with, function ($query) use ($with) {
@@ -26,7 +26,15 @@ class Repotrabsenkehadiran extends Repository
                 return $query->where('id_alasan',$id_alasan);
             })->when($arrIdSdm, function ($query) use ($arrIdSdm) {
                 return $query->whereIn('id_sdm',$arrIdSdm);
-            })->orderBy('created_at','asc')->paginate(25);
+            })
+            ->when($id_status, function ($query) use ($id_status) {
+                if($id_status!=5){
+                    return $query->where('is_valid',$id_status);
+                }else{
+                    return $query->where('is_valid',null);
+                }
+            })
+            ->orderBy('created_at','asc')->paginate(25);
     }
 
     public function getpertahun($with = null, $tahun = null, $id_sdm = null){
