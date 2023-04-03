@@ -258,12 +258,18 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                             </thead>
                                             <tbody>
                                                <?php
+                                               $arrDatacek = array();
                                                $bulanx = $bulan;
-                                                $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
+                                               $tidak_hadir = 0;
+                                               if(count($getDataAbsen[$rsData->id_sdm])>0){
+                                                    $tidak_hadir = count($getDataAbsen[$rsData->id_sdm]);
+                                                }
+                                                $no=1;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
                                                 @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                                                 <?php
+
                                                 $kode_justifikasi = 0;
-                                                $prei = $dt_hari_libur[date('Y')."-".date('m')];
+                                                $prei = $dt_hari_libur[date('Y-m',strtotime($tgl))];
                                                 $presensi = $arrData[$tgl];
                                                 $hariabsen = explode(',',$dtgl['tgl']);
                                                 $jam_masuk = array_shift($presensi['jam_absen']);
@@ -306,7 +312,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                 $gabung = 0;$menit = 0;$hitungdurasi_terlambat = 0;
                                                 $warna = "";$kode_justifikasi = 0;
                                                 $hitungdurasi_pulang_cepat = 0;
-                                                if($jam_masuk!=null && $prei[$tgl]==null){
+                                                $absenkehadiran = $getDataAbsen[$rsData->id_sdm][$tgl]['alasan_absen'];
+                                                if($jam_masuk!=null && $prei[$tgl]==null && $absenkehadiran == null){
 
                                                         if(str_replace(':','',$jam_keluar) < str_replace(':','',$jamkerja['jam_pulang'])){
                                                             if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $jam_masuk != "--:--" && $jam_keluar != "--:--"){
@@ -364,12 +371,13 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                             $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
                                                         }
                                                 }
-                                                $absenkehadiran = $getDataAbsen[$rsData->id_sdm][$tgl]['alasan_absen'];
-                                                if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $absenkehadiran == null && $prei[$tgl]==null){
+
+                                                if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $prei[$tgl]==null && $absenkehadiran == null){
                                                         if($ket == null && $jam_masuk==null && $jam_keluar==null){
                                                             $ket = "Tidak Hadir";
                                                             $tidak_hadir++;
                                                             $warna = "background-color: #F1E780;";
+
                                                         }
                                                 }
                                                 if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu" || $dtgl['ket_nasional'] != null){
@@ -385,11 +393,11 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
 
 
                                                 if($absenkehadiran!=null){
-                                                        $absen_kehadiran++;
-                                                        $ket = $absenkehadiran['kode_alasan'];
-                                                        $warna = "background-color: #F1E780;";
-                                                        $hitungdurasi_terlambat = "0";
-                                                        $hitungdurasi_pulang_cepat = 0;
+                                                    $absen_kehadiran++;
+                                                    $ket = $absenkehadiran['kode_alasan'];
+                                                    $warna = "background-color: #F1E780;";
+                                                    $hitungdurasi_terlambat = "0";
+                                                    $hitungdurasi_pulang_cepat = 0;
                                                 }
 
                                                 $durasikerja = "00:00:00";$durasikerjamenit = "0";
@@ -476,6 +484,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                 </div>
                             </div>
                         </div>
+
                         {{-- <div class="tab-pane fade" id="profile-two" role="tabpanel" aria-labelledby="profile-tab-two">
                             <div class="table-responsive">
                                 <table class="table table-bordered">

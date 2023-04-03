@@ -167,6 +167,17 @@
                                     }
                                 }
                             }
+                            if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                                if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu"){
+                                    if($ket!="Absen 1x"){
+                                        $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                        if($hitungdurasi_terlambat>0){
+                                            $ket = " Terlambat Datang";
+                                            $terlambat++;
+                                        }
+                                    }
+                                }
+                            }
 
 
                             $kategori = "";
@@ -188,6 +199,14 @@
                     if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu" || $dtgl['ket_nasional'] != null){
                             $warna = "background-color: #f9cacb;";
                             $ket = "";
+                            if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                                $warna = "";
+                                if($ket == null && $jam_masuk==null && $jam_keluar==null){
+                                    $ket = "Tidak Hadir";
+                                    $tidak_hadir++;
+                                    $warna = "background-color: #F1E780;";
+                                }
+                            }
                     }
                     if($jam_masuk == null){
                             $jam_masuk = "--:--";
