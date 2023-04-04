@@ -103,8 +103,10 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <?php $no=1;?>
+                    <?php $no=1;
+                    ?>
                     @foreach($dtbulan['list_tgl'] as $tgl=>$dtgl)
+                    @if($tgl<=$tgl_akhir)
                     <?php
 
                     $presensi = $dt_sdm['data_presensi'][$tgl];
@@ -189,6 +191,7 @@
                                 $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
                             }
                     }
+                    $absenkehadiran = $dt_sdm['dt_absen'][$tgl]['alasan_absen'];
                     if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
                             if($ket == null && $jam_masuk==null && $jam_keluar==null){
                                 $ket = "Tidak Hadir";
@@ -201,12 +204,23 @@
                             $ket = "";
                             if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                                 $warna = "";
-                                if($ket == null && $jam_masuk==null && $jam_keluar==null){
+                                if($ket == null && $jam_masuk==null && $jam_keluar==null && $absenkehadiran==null){
                                     $ket = "Tidak Hadir";
                                     $tidak_hadir++;
                                     $warna = "background-color: #F1E780;";
                                 }
                             }
+                    }else if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu"){
+                        $warna = "background-color: #f9cacb;";
+                        $ket = "";
+                        if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                            $warna = "";
+                            if($ket == null && $jam_masuk==null && $jam_keluar==null && $absenkehadiran==null){
+                                $ket = "Tidak Hadir";
+                                $tidak_hadir++;
+                                $warna = "background-color: #F1E780;";
+                            }
+                        }
                     }
                     if($jam_masuk == null){
                             $jam_masuk = "--:--";
@@ -215,7 +229,7 @@
                             $jam_keluar = "--:--";
                     }
 
-                    $absenkehadiran = $dt_sdm['dt_absen'][$tgl]['alasan_absen'];
+
                         if($absenkehadiran!=null){
                             $ket = $absenkehadiran['kode_alasan'];
                             $warna = "background-color: #F1E780;";
@@ -249,6 +263,7 @@
                     if($jamkerja['nm_shift']=="Libur"){
                         $ket = "";
                         $warna = "background-color: #F98686;";
+                        $terlambat_durasi = 0;
                     }
                     ?>
                     <tr style="{{$warna}}">
@@ -274,6 +289,7 @@
                         </td>
                         @endif
                     </tr>
+                    @endif
                     @endforeach
                 </tbody>
             </table>

@@ -141,6 +141,33 @@ function harikerja($tgl_awal,$tgl_akhir){
     return $data_bulan;
 }
 
+function harikerjapoli($tgl_awal,$tgl_akhir){
+    $list_hari_libur = list_hari_libur($tgl_awal,$tgl_akhir);
+    $bulan_awal = date('m',strtotime($tgl_awal));
+    $bulan_akhir = date('m',strtotime($tgl_akhir));
+    $bulan_awal = sprintf("%0d", $bulan_awal);
+    $thn = date('Y',strtotime($tgl_awal));
+    $data_bulan = array();
+    $bts_tgl_awal = date('d',strtotime($tgl_awal));
+    $bts_tgl_akhir = date('d',strtotime($tgl_akhir));
+    $arrAwal[$bulan_awal] = sprintf("%0d",$bts_tgl_awal);
+    $arrAkhir[$bulan_akhir] = sprintf("%0d",$bts_tgl_akhir);
+    $seee = array();
+    for($x=$bulan_awal;$x<=$bulan_akhir;$x++){
+        $tanggal = cal_days_in_month(CAL_GREGORIAN, $x, $thn);
+        for ($i=1; $i < $tanggal+1; $i++) {
+                $gbng = $thn."-".sprintf("%02d", $x)."-".sprintf("%02d", $i);
+                $tgl = Fungsi::formatDate($gbng);
+                $hari = explode(',',$tgl);
+                if($list_hari_libur[$thn."-".sprintf("%02d", $bulan_awal)][$gbng] == null){
+                    $buwulan = $x;
+                    $data_bulan[$buwulan][$i] = $i;
+                }
+        }
+    }
+    return $data_bulan;
+}
+
 
 
 function daterange($tgl_awal,$tgl_akhir){
@@ -236,6 +263,38 @@ function harikerjareal($tgl_awal,$tgl_akhir){
 
 function jm_absensi($tgl_awal,$tgl_akhir){
     $rsData = harikerja($tgl_awal,$tgl_akhir);
+    $pecah1 = explode("-", $tgl_awal);
+    $date1 = sprintf("%0d",$pecah1[2]);
+    $month1 = sprintf("%0d",$pecah1[1]);
+
+    $pecah2 = explode("-", $tgl_akhir);
+    $date2 = sprintf("%0d",$pecah2[2]);
+    $month2 = sprintf("%0d",$pecah2[1]);
+    foreach($rsData[$month1] as $tgl=>$g){
+        if($tgl<$date1){
+            unset($rsData[$month1][$tgl]);
+        }
+    }
+    foreach($rsData[$month2] as $tgl2=>$g2){
+        if($tgl2>$date2){
+            unset($rsData[$month2][$tgl2]);
+        }
+    }
+    $arrJbul = array();
+    foreach($rsData as $bul=>$jtgl){
+        foreach($jtgl as $tg=>$lx){
+            if($laporan==1){
+                $arrJbul[$bul]['jmabsen']+=1;
+            }else{
+                $arrJbul['jmabsen']+=1;
+            }
+        }
+    }
+    return $arrJbul;
+}
+
+function jm_absensi_poli($tgl_awal,$tgl_akhir){
+    $rsData = harikerjapoli($tgl_awal,$tgl_akhir);
     $pecah1 = explode("-", $tgl_awal);
     $date1 = sprintf("%0d",$pecah1[2]);
     $month1 = sprintf("%0d",$pecah1[1]);
@@ -478,6 +537,12 @@ class Fungsi
         $jm_absensi = jm_absensi($tgl_awal,$tgl_akhir);
         return $jm_absensi;
     }
+
+    public static function hitung_absen_poli($tgl_awal,$tgl_akhir){
+        $jm_absensi = jm_absensi_poli($tgl_awal,$tgl_akhir);
+        return $jm_absensi;
+    }
+
     public static function rekap_presensi_pegawai($bulan,$tahun){
         $tgl_terakhir = cal_days_in_month(CAL_GREGORIAN, $bulan, $tahun);
         $tgl_awal = $tahun."-".$bulan."-01";
@@ -962,9 +1027,10 @@ class Fungsi
             $arrAlasan[$ralasan->id_alasan]['kode_alasan'] = $ralasan->kode_lokal;
         }
         $rsDataAbsenKehadiran = DB::table('tr_absen_kehadiran')
-                    ->whereIn("id_sdm",$arrIdSdm)
+                    ->join('ms_pegawai as b','tr_absen_kehadiran.id_sdm','=','b.id_sdm')
+                    ->whereIn("b.id_sdm",$arrIdSdm)
                     //->where('id_absen','ffcfe614-a036-41eb-9a42-727f2d5841be')
-                    ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) and deleted_at is null ")
+                    ->whereRaw(" ( tgl_awal BETWEEN '$tgl_awal' AND '$tgl_akhir' OR tgl_akhir BETWEEN '$tgl_akhir' AND '$tgl_akhir' ) and tr_absen_kehadiran.deleted_at is null ")
                     ->where('is_valid','1')
                     ->get();
         foreach($rsDataAbsenKehadiran as $rs=>$r){
@@ -974,8 +1040,12 @@ class Fungsi
             foreach($tanggal_absen as $tgl){
                 $tglx = Fungsi::formatDate($tgl);
                 $hari = explode(',',$tglx);
-                if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
+                if($r->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                     $arrData[$r->id_sdm][$tgl]['alasan_absen'] = $arrAlasan[$r->id_alasan];
+                }else{
+                    if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
+                        $arrData[$r->id_sdm][$tgl]['alasan_absen'] = $arrAlasan[$r->id_alasan];
+                    }
                 }
             }
 
@@ -1200,12 +1270,12 @@ class Fungsi
                         if($jam_pulang==null){
                             $jam_pulang = $jam_masuk;
                         }
-                        if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu" && $jam_masuk == $jam_pulang){
+                        //if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu" && $jam_masuk == $jam_pulang){
                             $arrDataRekap[$id_sdm][$thn.$bln_presensi]['absensekali']['list_tgl'][$tglpresensikehadiran]=1;
-                        }
+                        //}
 
                         if($jam_masuk >= $jam_kerja['jam_masuk'] && $jam_masuk!=$jam_pulang){
-                            if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
+                            //if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
                                 $jam_masukex = explode(':',$jam_masuk);
                                 $jam_telatex = explode(':',$jam_kerja['jam_masuk']);
 
@@ -1235,10 +1305,10 @@ class Fungsi
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['masuk'] = $jam_masuk;
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['pulang'] = $jam_pulang;
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['menit'] = $durasi_terlambat;
-                            }
+                            //}
                         }
                         if($jam_pulang <= $jam_kerja['jam_pulang'] && $jam_masuk!=$jam_pulang){
-                            if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
+                            //if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
                                 $jam_pulangex = explode(':',$jam_pulang);
                                 $jam_ker_pulangex = explode(':',$jam_kerja['jam_pulang']);
 
@@ -1267,7 +1337,7 @@ class Fungsi
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['masuk'] = $jam_masuk;
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['pulang'] = $jam_pulang;
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tglwaktuabsen'][$tglpresensikehadiran]['menit'] = $menitcpt;
-                            }
+                           // }
                         }
                     }
                 }

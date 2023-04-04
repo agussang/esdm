@@ -193,6 +193,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                              </div>
                                              <div class="text-right">
                                                 <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="terlambat"></div></span></h2>
+                                                <font style="font-size:14px;"><div id="terlambatmenit"></div></font>
                                                 <h5 class="">Terlambat</h5>
                                              </div>
                                           </div>
@@ -223,6 +224,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                              </div>
                                              <div class="text-right">
                                                 <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="pulang_cepat"></div></span></h2>
+                                                <font style="font-size:14px;"><div id="pulangepatmenit"></div></font>
                                                 <h5 class="">Pulang Cepat</h5>
                                              </div>
                                           </div>
@@ -264,7 +266,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                if(count($getDataAbsen[$rsData->id_sdm])>0){
                                                     $tidak_hadir = count($getDataAbsen[$rsData->id_sdm]);
                                                 }
-                                                $no=1;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
+                                                $no=1;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;
+                                                $terlambuatmenit = 0;$pulang_cepatmenit = 0;
+                                                ?>
                                                 @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                                                 <?php
 
@@ -384,6 +388,21 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         $warna = "background-color: #f9cacb;";
                                                         $ket = "";
                                                 }
+                                                if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                                                    if($hariabsen[0]=="Minggu" || $hariabsen[0]=="Sabtu" || $dtgl['ket_nasional'] != null){
+                                                        if($jamkerja['nm_shift']!="Libur"){
+                                                            $warna = "";
+                                                            $ket = "";
+                                                        }
+                                                    }
+
+                                                    if($hariabsen[0]!="Sabtu" || $hariabsen[0]!="Minggu"){
+                                                        if($jamkerja['nm_shift']=="Libur" && $jam_masuk==null && $jam_keluar==null ){
+                                                            $warna = "background-color: #f9cacb;";
+                                                            $ket = "";
+                                                        }
+                                                    }
+                                                }
                                                 if($jam_masuk == null){
                                                         $jam_masuk = "--:--";
                                                 }
@@ -432,6 +451,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     $jterlambat++;
                                                 }
                                                 $terlambat = abs($hitungdurasi_terlambat-$menitjustifikasi);
+                                                $terlambuatmenit+=$terlambat;
+                                                $pulang_cepatmenit+=$hitungdurasi_pulang_cepat;
+
                                                 ?>
                                                 <tr style="{{$warna}}">
                                                     <td>{{$no++}}</td>
@@ -614,6 +636,10 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
         </div>
     </div>
 </div>
+<?php
+$textterlambat = $terlambuatmenit." ( Menit )";
+$textpulangcepat = $pulang_cepatmenit." ( Menit ) ";
+?>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <meta name="csrf_token" content="{{ csrf_token() }}" />
 <script type="text/javascript">
@@ -622,6 +648,8 @@ document.getElementById("hadir").innerHTML = "{{$hadir}}";
 document.getElementById("finger_sekali").innerHTML = "{{$finger_sekali}}";
 document.getElementById("terlambat").innerHTML = "{{$jterlambat}}";
 document.getElementById("pulang_cepat").innerHTML = "{{$pulang_cepat}}";
+document.getElementById("terlambatmenit").innerHTML = "{{$textterlambat}}";
+document.getElementById("pulangepatmenit").innerHTML = "{{$textpulangcepat}}";
 document.getElementById("absen_kehadiran").innerHTML = "{{$absen_kehadiran}}";
 </script>
 @stop

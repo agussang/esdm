@@ -21,6 +21,7 @@ class Repotrjustifikasi extends Repository
             })->when($tahunbulan, function ($query) use ($tahunbulan) {
                 return $query->whereRaw(" SUBSTRING(CAST(tanggal_absen AS VARCHAR(19)), 0, 8) = '$tahunbulan' ");
             })
+            ->orderBy('tanggal_absen','asc')
             ->get();
     }
 }

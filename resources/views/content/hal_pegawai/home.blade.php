@@ -71,7 +71,11 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                            <div class="rounded iq-card-icon bg-info"><i class="ri-hospital-line"></i>
                            </div>
                            <div class="text-right">
-                              <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="terlambat"></div></span></h2>
+                              <h2 class="mb-0"><span class="counter" style="visibility: visible;">
+                                <div id="terlambat"></div>
+
+                                </span></h2>
+                                <font style="font-size:14px;"><div id="terlambatmenit"></div></font>
                               <h5 class="">Terlambat</h5>
                            </div>
                         </div>
@@ -100,6 +104,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                              </div>
                              <div class="text-right">
                                 <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="pulang_cepat"></div></span></h2>
+                                <font style="font-size:14px;"><div id="pulangepatmenit"></div></font>
                                 <h5 class="">Pulang Cepat</h5>
                              </div>
                           </div>
@@ -260,7 +265,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                      <tbody>
                         <?php
                         $bulanx = sprintf("%0d", date('m'));
-                        $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;?>
+                        $no=1;$tidak_hadir = 0;$hadir = 0;$finger_sekali = 0;$jterlambat=0;$pulang_cepat=0;$absen_kehadiran=0;
+                        $terlambuatmenit = 0;$pulang_cepatmenit = 0;
+                        ?>
                         @foreach($data_bulan[$bulanx]['list_tgl'] as $tgl=>$dtgl)
                         <?php
                         $kode_justifikasi = 0;
@@ -446,6 +453,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                         }
                         $gabung_lembur = floor($durasikurangidurasikerja / 60).':'.($durasikurangidurasikerja -   floor($durasikurangidurasikerja / 60) * 60);
                         $gabung_lembur = explode(":",$gabung_lembur);
+                        $terlambuatmenit+=$terlambat;
+                        $pulang_cepatmenit+=$hitungdurasi_pulang_cepat;
                         ?>
                         <tr style="{{$warna}}">
                            <td>{{$no++}}</td>
@@ -500,6 +509,10 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
         </div>
     </div>
 </div>
+<?php
+$textterlambat = $terlambuatmenit." ( Menit )";
+$textpulangcepat = $pulang_cepatmenit." ( Menit ) ";
+?>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <meta name="csrf_token" content="{{ csrf_token() }}" />
 <script type="text/javascript">
@@ -507,7 +520,10 @@ document.getElementById("tidak_masuk").innerHTML = "{{$tidak_hadir}}";
 document.getElementById("hadir").innerHTML = "{{$hadir}}";
 document.getElementById("finger_sekali").innerHTML = "{{$finger_sekali}}";
 document.getElementById("terlambat").innerHTML = "{{$jterlambat}}";
+
 document.getElementById("pulang_cepat").innerHTML = "{{$pulang_cepat}}";
+document.getElementById("terlambatmenit").innerHTML = "{{$textterlambat}}";
+document.getElementById("pulangepatmenit").innerHTML = "{{$textpulangcepat}}";
 document.getElementById("absen_kehadiran").innerHTML = "{{$absen_kehadiran}}";
 </script>
 @stop

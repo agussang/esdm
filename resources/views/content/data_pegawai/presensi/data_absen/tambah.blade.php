@@ -74,6 +74,16 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">No Sk</span>
+                                </div>
+                                <input type="text" class="form-control" id="no_sk" name="no_sk">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
                             <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Simpan</button>
                         </div>
                     </div>

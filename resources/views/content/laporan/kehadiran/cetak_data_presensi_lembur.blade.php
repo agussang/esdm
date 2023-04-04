@@ -70,6 +70,7 @@
                 <?php $no=1;?>
                 @foreach($arrData as $id_sdm=>$dt_sdm)
                     @foreach($dt_sdm['data_presensi'] as $tanggal=>$presensi)
+                    @if($tanggal<=$tgl_akhir)
                     <?php
                     $hariabsen = explode(',',$presensi['ket_tgl']);
                     $jam_masuk = array_shift($presensi['jam_absen']);
@@ -175,6 +176,7 @@
                             </td>
                         @endif
                     </tr>
+                    @endif
                     @endforeach
                 @endforeach
             </tbody>

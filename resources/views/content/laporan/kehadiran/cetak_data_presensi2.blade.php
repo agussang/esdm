@@ -79,6 +79,7 @@
                     @foreach($data_bulan as $id_bulan=>$dtbulan)
                         <?php $no=1;?>
                         @foreach($dtbulan['list_tgl'] as $tgl=>$dtgl)
+                        @if($tgl<=$tgl_akhir)
                         <?php
                         $presensi = $dt_sdm['data_presensi'][$tgl];
                         $hariabsen = explode(',',$dtgl['tgl']);
@@ -201,6 +202,7 @@
                         if($jamkerja['nm_shift']=="Libur"){
                             $ket = "";
                             $warna = "background-color: #F98686;";
+                            $terlambat_durasi = 0;
                         }
                         ?>
                         <tr style="{{$warna}}">
@@ -228,6 +230,7 @@
                             </td>
                             @endif
                         </tr>
+                        @endif
                         @endforeach
                     @endforeach
                 @endforeach

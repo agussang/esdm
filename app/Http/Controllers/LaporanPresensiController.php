@@ -58,6 +58,8 @@ class LaporanPresensiController extends Controller
         $rsDataKetApp = $this->reposettingapp->findId("","cb6020d6-e8a7-4240-ab2c-dffd30d31892","id_setting");
         $tgl_awal = $req['tgl_awal'];
         $tgl_akhir = $req['tgl_akhir'];
+        $data['tgl_awal'] = $tgl_awal;
+        $data['tgl_akhir'] = $tgl_akhir;
         $data['rsDataKetApp'] = $rsDataKetApp;
         $data['tipe'] = $req['tipe'];
         $data_bulan = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_akhir,1);
@@ -207,6 +209,7 @@ class LaporanPresensiController extends Controller
                     $arrData[$rx->id_sdm]['dt_absen'] = $getDataAbsen[$rx->id_sdm];
                     $arrData[$rx->id_sdm]['data_presensi'] = $getRekapDataAbsen[$rx->id_sdm];
                 }
+
                 $dt_hari_libur = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_akhir);
                 $data['dt_hari_libur'] = $dt_hari_libur;
                 $data['arrData'] = $arrData;

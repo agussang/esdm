@@ -129,7 +129,13 @@ class DataAbsenController extends Controller
                 return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
             }
         }else{
-            $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+            // cek unit kerjanya
+            $cek = $this->repomspegawai->findWhereRaw("","id_sdm = '$req[id_sdm]'");
+            if($cek->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                $jmlhabsen = Fungsi::hitung_absen_poli($req['tgl_awal'],$req['tgl_akhir']);
+            }else{
+                $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+            }
             $req['lama_hari'] = $jmlhabsen['jmabsen'];
 
             $this->repotrabsenkehadiran->store($req);
@@ -174,6 +180,14 @@ class DataAbsenController extends Controller
                     $tgl_awalx = date('Y-m-d',strtotime($r[2]));
                     $tgl_akhirx = date('Y-m-d',strtotime($r[3]));
                     $jmlhabsen = Fungsi::hitung_absen($tgl_awalx,$tgl_akhirx);
+                    // cek unit kerjanya
+                    $nipx = trim($r[0]);
+                    $cek = $this->repomspegawai->findWhereRaw("","nip = '$nipx'");
+                    if($cek->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                        $jmlhabsen = Fungsi::hitung_absen_poli($tgl_awalx,$tgl_akhirx);
+                    }else{
+                        $jmlhabsen = Fungsi::hitung_absen($tgl_awalx,$tgl_akhirx);
+                    }
                     $data['lama_hari'] = $jmlhabsen['jmabsen'];
                     $data['nip'] = trim($r[0]);
                     $data['nama'] = $r[1];
@@ -386,7 +400,13 @@ class DataAbsenController extends Controller
             $file->move($destinationPath, $req['file_bukti']);
         }
         $where['id_absen'] = $id_absen;
-        $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+        // cek unit kerjanya
+        $cekunit = $this->repotrabsenkehadiran->findId(['dt_pegawai'],$id_absen,"id_absen");
+        if($cekunit->dt_pegawai->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+            $jmlhabsen = Fungsi::hitung_absen_poli($req['tgl_awal'],$req['tgl_akhir']);
+        }else{
+            $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+        }
         $req['lama_hari'] = $jmlhabsen['jmabsen'];
         $this->repotrabsenkehadiran->update($where,$req);
         $notification = [
