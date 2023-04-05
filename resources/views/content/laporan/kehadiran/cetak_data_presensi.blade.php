@@ -230,12 +230,12 @@
                     }
 
 
-                        if($absenkehadiran!=null){
-                            $ket = $absenkehadiran['kode_alasan'];
-                            $warna = "background-color: #F1E780;";
-                            $hitungdurasi_terlambat = "0";
-                            $hitungdurasi_pulang_cepat = 0;
-                        }
+                    if($absenkehadiran!=null){
+                        $ket = $absenkehadiran['kode_alasan'];
+                        $warna = "background-color: #F1E780;";
+                        $hitungdurasi_terlambat = "0";
+                        $hitungdurasi_pulang_cepat = 0;
+                    }
                     $durasikerja = "00:00:00";$durasikerjamenit = "0";
                     if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
                         $jamawal = $tgl." ".$jam_masuk;
@@ -263,6 +263,12 @@
                     if($jamkerja['nm_shift']=="Libur"){
                         $ket = "";
                         $warna = "background-color: #F98686;";
+                        $terlambat_durasi = 0;
+                    }
+                    if($absenkehadiran!=null){
+                        $ket = $absenkehadiran['kode_alasan'];
+                        $warna = "background-color: #F1E780;";
+
                         $terlambat_durasi = 0;
                     }
                     ?>
