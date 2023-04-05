@@ -484,6 +484,45 @@ class Fungsi
         $rsData = harikerjareal($tgl_awal,$tgl_akhir);
         return $rsData;
     }
+
+    public static function jumlah_absen_poli($tgl_awal,$tgl_akhir,$laporan=0){
+        $rsData = harikerjapoli($tgl_awal,$tgl_akhir);
+        $pecah1 = explode("-", $tgl_awal);
+        $date1 = sprintf("%0d",$pecah1[2]);
+        $month1 = sprintf("%0d",$pecah1[1]);
+
+        $pecah2 = explode("-", $tgl_akhir);
+        $date2 = sprintf("%0d",$pecah2[2]);
+        $month2 = sprintf("%0d",$pecah2[1]);
+        foreach($rsData[$month1] as $tgl=>$g){
+            if($tgl<$date1){
+                unset($rsData[$month1][$tgl]);
+            }
+        }
+        foreach($rsData[$month2] as $tgl2=>$g2){
+            if($tgl2>$date2){
+                unset($rsData[$month2][$tgl2]);
+            }
+        }
+        $arrJbul = array();
+        $arrNmBulan = nm_bulan();
+        foreach($rsData as $bul=>$jtgl){
+            foreach($jtgl as $tg=>$lx){
+                $arrJbul[sprintf("%02d",$bul)]['nm_bulan'] = $arrNmBulan[sprintf("%02d",$bul)];
+                if($laporan==1){
+                    $arrJbul[sprintf("%02d",$bul)]['list_tgl'][sprintf("%02d",$tg)] = sprintf("%02d",$tg);
+                    $arrJbul[sprintf("%02d",$bul)]['total']+=1;
+                }else{
+                    $arrJbul[sprintf("%02d",$bul)]['list_tgl'][$tg] = $tg;
+                    $arrJbul['total']+=1;
+                }
+                $arrJbul[sprintf("%02d",$bul)]['tahun'] = $pecah1[0];
+            }
+        }
+
+        return $arrJbul;
+    }
+
     public static function jumlah_absen($tgl_awal,$tgl_akhir,$laporan=0){
         $rsData = harikerja($tgl_awal,$tgl_akhir);
         $pecah1 = explode("-", $tgl_awal);
@@ -1200,10 +1239,10 @@ class Fungsi
                     $gbng = $thn."-".sprintf("%02d", $x)."-".sprintf("%02d", $i);
                     $tglx = Fungsi::formatDate($gbng);
                     $hari = explode(',',$tglx);
-                    if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
+                    //if($hari[0]!='Sabtu' && $hari[0]!='Minggu'){
                         $data_bulan[sprintf("%02d", $x)]['nm_bulan'] = bulan($x);
                         $data_bulan[sprintf("%02d", $x)]['tgl_bulan'][sprintf("%02d", $i)] = sprintf("%02d", $i);
-                    }
+                    //}
                 }
             }
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
@@ -1218,7 +1257,7 @@ class Fungsi
                 ->get();
             $arrAbsenTanggal= array();$jmalasanabsen = array();$jmalasanabsenfirst = array();$arrtglabsen = array();
             foreach($rsDataAbsenKehadiran as $sen=>$senx){
-                $jm_absen = Fungsi::jumlah_absen($senx->tgl_awal,$senx->tgl_akhir,1);
+                $jm_absen = Fungsi::jumlah_absen_poli($senx->tgl_awal,$senx->tgl_akhir,1);
                 $jmalasanabsenfirst[$senx->id_sdm][$senx->id_alasan][$senx->id_absen] = $jm_absen;
                 $tanggal_absen = daterange($senx->tgl_awal,$senx->tgl_akhir);
                 foreach($tanggal_absen as $tgl){
@@ -1229,16 +1268,19 @@ class Fungsi
                 }
 
             }
+            //return ($arrAbsenTanggal);
             foreach($jmalasanabsenfirst as $idsdmpegawai=>$dtsdmpegawai){
                 foreach($dtsdmpegawai as $idalasanabsen=>$dtalasanabsen){
                     foreach($dtalasanabsen as $keyidabsen=>$dtkeyabsen){
                         foreach($dtkeyabsen as $idbulanabsen=>$dtidbulanabsen){
+
                             foreach($dtidbulanabsen['list_tgl'] as $dtlist_tgl=>$lst_tgl){
                                 $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['nm_bulan'] = $dtidbulanabsen['nm_bulan'];
                                 $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['list_tgl'][$dtlist_tgl] = $dtlist_tgl;
-                                $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['total']+=1;
+
                                 $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['tahun'] = $dtidbulanabsen['tahun'];
                             }
+                            $jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['total']=count($jmalasanabsen[$idsdmpegawai][$idalasanabsen][$idbulanabsen]['list_tgl']);
                         }
                     }
                 }
