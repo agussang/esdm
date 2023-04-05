@@ -52,7 +52,7 @@ if($kode==4){
                 </div>
             </div>
             <div class="card-body">
-                <form class="form" action="{{route('justifikasi.simpan-pengajuan-justifikasi')}}" method="post">
+                <form class="form" action="{{route('justifikasi.simpan-pengajuan-justifikasi-pegawai')}}" method="post">
                 {!! csrf_field() !!}
                 <input type="hidden" name="ket_justifikasi" id="ket_justifikasi" value="{{$ket_justifikasi}}">
                 <div class="row">

@@ -439,7 +439,9 @@ class MsPegawaiController extends Controller
         if($cekdulu==null){
             unset($req['nm_sdm']);
             unset($req['nip']);
-            $req['justifikasi_atasan'] = 1;
+            if(Session::get('level')=="A"){
+                $req['justifikasi_atasan'] = 1;
+            }
             $req['durasi_justifikasi'] = $req['ajuan_durasi_justifikasi'];
             $req['tgl_justifikasi'] = date('Y-m-d H:i:s');
             $this->repotrjustifikasi->store($req);
@@ -448,7 +450,9 @@ class MsPegawaiController extends Controller
             unset($req['id_sdm']);
             unset($req['nm_sdm']);
             unset($req['nip']);
-            $req['justifikasi_atasan'] = 1;
+            if(Session::get('level')=="A"){
+                $req['justifikasi_atasan'] = 1;
+            }
             $req['durasi_justifikasi'] = $req['ajuan_durasi_justifikasi'];
             $req['tgl_justifikasi'] = date('Y-m-d H:i:s');
             $this->repotrjustifikasi->update($where,$req);

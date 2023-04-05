@@ -106,7 +106,7 @@
                     <?php $no=1;
                     ?>
                     @foreach($dtbulan['list_tgl'] as $tgl=>$dtgl)
-                    @if($tgl<=$tgl_akhir)
+                    @if($tgl>=$tgl_awal && $tgl<=$tgl_akhir)
                     <?php
 
                     $presensi = $dt_sdm['data_presensi'][$tgl];

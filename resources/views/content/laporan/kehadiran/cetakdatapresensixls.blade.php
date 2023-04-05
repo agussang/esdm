@@ -60,7 +60,7 @@
                 <tbody>
                     <?php $no=1;?>
                     @foreach($dtbulan['list_tgl'] as $tgl=>$dtgl)
-                    @if($tgl<=$data['tgl_akhir'])
+                    @if($tgl>=$data['tgl_awal'] && $tgl<=$data['tgl_akhir'])
                     <?php
                     $presensi = $dt_sdm['data_presensi'][$tgl];
                     $hariabsen = explode(',',$dtgl['tgl']);

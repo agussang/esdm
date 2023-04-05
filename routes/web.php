@@ -424,7 +424,7 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
     Route::get('beranda',[IndexController::class,'index'])->name('beranda');
     Route::group(['prefix' => 'justifikasi'], function () {
         Route::get('/pengajuan/{id_sdm?}/{tanggal?}/{kode?}',[MsPegawaiController::class,'pengajuan_justifikasi'])->name('justifikasi.pengajuan');
-        Route::post('simpan-pengajuan',[MsPegawaiController::class,'simpan_pengajuan'])->name('justifikasi.simpan-pengajuan-justifikasi');
+        Route::post('simpan-pengajuan-justifikasi-pegawai',[MsPegawaiController::class,'simpan_pengajuan'])->name('justifikasi.simpan-pengajuan-justifikasi-pegawai');
     });
     Route::group(['prefix' => 'pegawai'], function () {
         Route::get('/riwayat-apel/{id?}',[MsPegawaiController::class,'riwayat_apel'])->name('pegawai.riwayat-apel');
