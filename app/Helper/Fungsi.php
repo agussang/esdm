@@ -379,6 +379,19 @@ class Fungsi
         }
         return $d;
     }
+
+    public static function status_val_skp($id_stat){
+        $arr = array('0'=>"Proses Verifikasi",'1'=>"Disetujui",'2'=>"Tidak disetujui");
+        $d = '<option value=""></option>';
+        foreach ($arr as $rs => $r) {
+            $sl = '';
+            if ($rs == $id_stat) {
+                $sl = 'selected';
+            }
+            $d .= "<option value=\"$rs\" $sl>$r</option>";
+        }
+        return $d;
+    }
     public static function get_client_browser() {
         $browser = '';
         if(strpos($_SERVER['HTTP_USER_AGENT'], 'Netscape'))

@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use App\Repositories\Repotrrekapskp;
 use App\Repositories\Repomspegawai;
 use App\Repositories\Repomsperiodeskp;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Exports\SkpExport;
 use Session;
 use Crypt;
 use Fungsi;
+use Exception;
 
 class DataSkpController extends Controller
 {
@@ -54,6 +57,121 @@ class DataSkpController extends Controller
         $data['pilihan_tahun_skp'] = Fungsi::pilihan_tahun_skp($tahun);
         $data['pilihan_bulan_skp'] = Fungsi::pilihan_bulan_skp($bulan);
         $text_cari = Session::get('text_cari');
+        if(Session::get('level')=="B"){
+            $data['rsData'] = $this->repomspegawai->getskp(['nm_atasan','nm_atasan_pendamping','nm_satker'],1,$text_cari,$id_sdm_atasan,"60943815-0ef4-403e-98d8-7a96ecdc6d5f");
+        }else{
+            $data['rsData'] = $this->repomspegawai->getskp(['nm_atasan','nm_atasan_pendamping','nm_satker'],1,$text_cari,$id_sdm_atasan);
+        }
+
+        $arrIdSdm = array();
+        foreach($data['rsData'] as $rsp=>$rp){
+            $arrIdSdm[$rp->id_sdm] = $rp->id_sdm;
+        }
+        $rekap_skp = $this->repotrrekapskp->get(['dt_periode'],"", $tahun, $bulan,$arrIdSdm);
+        $arrrekapnilai = array(); $arrRekapskp = array();
+        foreach($rekap_skp as $rs=>$r){
+            $arrrekapnilai[$r->id_sdm]['idperiode'] = $r->idperiode;
+            $arrrekapnilai[$r->id_sdm]['val_baak'] = $r->val_baak;
+            $arrrekapnilai[$r->id_sdm]['nilai_skp'] = $r->nilai_skp;
+            $arrrekapnilai[$r->id_sdm]['nilai_perilaku'] = $r->nilai_perilaku;
+            $arrrekapnilai[$r->id_sdm]['validasi'] = $r->validasi;
+            $arrrekapnilai[$r->id_sdm]['file_skp'] = $r->file_skp;
+            $arrrekapnilai[$r->id_sdm]['ket_justifikasi'] = $r->ket_justifikasi;
+            $arrrekapnilai[$r->id_sdm]['validated_at'] = date('d-m-Y H:i:s',strtotime($r->validated_at));
+            $arrrekapnilai[$r->id_sdm]['created_at'] = date('d-m-Y H:i:s',strtotime($r->created_at));
+            $arrrekapnilai[$r->id_sdm]['point_disiplin'] = 0;
+            $arrrekapnilai[$r->id_sdm]['ket_disiplin'] = "";
+            if(date('Ymd',strtotime($r->created_at)) > date('Ymd',strtotime($data['periode_skp']->tgl_batas_skp))){
+                if(date('Ymd',strtotime($r->created_at)) > date('Ymd',strtotime($data['periode_skp']->tgl_batas_skp))){
+                    $arrrekapnilai[$r->id_sdm]['point_disiplin'] = 3;
+                    $keterlambatan = Fungsi::hitung_absen($data['periode_skp']->tgl_batas_skp,date('Y-m-d',strtotime($r->created_at)),"");
+                    $keter = $keterlambatan['jmabsen']-1;
+                    $arrrekapnilai[$r->id_sdm]['ket_disiplin'] = "Terlambat ".$keter." hari";
+                }
+                if(date('Ymd',strtotime($r->created_at)) > date('Ymd',strtotime($data['periode_skp']->tgl_potongan3persen))){
+                    $arrrekapnilai[$r->id_sdm]['point_disiplin'] = 100;
+                    $keterlambatan = Fungsi::hitung_absen($data['periode_skp']->tgl_potongan3persen,date('Y-m-d',strtotime($r->created_at)),"");
+                    $keter = $keterlambatan['jmabsen']-1;
+                    $arrrekapnilai[$r->id_sdm]['ket_disiplin'] = "Terlambat ".$keter." hari";
+                }
+            }
+            if($r->point_justifikasi!=null){
+                $arrrekapnilai[$r->id_sdm]['point_disiplin'] = $r->point_justifikasi;
+            }
+
+        }
+        $data['tahun'] = $tahun;
+        $data['bulan'] = $bulan;
+        $data['arrrekapnilai'] = $arrrekapnilai;
+        return view('content.skp.data_skp.index',$data);
+    }
+
+    public function validasi_skp(Request $request){
+        $req = $request->except('_token');
+        $statment = $req['statment'];
+            unset($req['statment']);
+            if($statment==1){
+                if($req['val_baak']=="true"){
+                    $req['val_baak'] = 1;
+                }else{
+                    $req['val_baak'] = 0;
+                }
+            }
+            $kode_skp = $req['kode_skp'];
+            $explode = explode("_",$kode_skp);
+            $id_sdm = $explode[0];
+            $id_periode = $explode[1];
+            $where['id_sdm'] = $id_sdm;
+            $where['idperiode'] = $id_periode;
+
+            unset($req['kode_skp']);
+            $this->repotrrekapskp->update($where,$req);
+            if($req['val_baak']==1){
+                echo '<script type="text/javascript">toastr.success("SKP berhasil disetujui.")</script>';
+            }else{
+                echo '<script type="text/javascript">toastr.warning("SKP berhasil tidak disetujui.")</script>';
+            }
+            echo "<script>
+            setTimeout(function () {
+            location.reload();
+            }, 2000);
+            </script>";
+    }
+
+    public function reset_skp($id,$id_sdm){
+        try{
+            $where['idperiode'] = Crypt::decrypt($id);
+            $where['id_sdm'] = Crypt::decrypt($id_sdm);
+            $req['nilai_skp'] = null;
+            $req['validasi'] = null;
+            $req['validated_at'] = null;
+            $req['userid_validated'] = null;
+            $req['justifikasi'] = null;
+            $req['tgl_justifikasi'] = null;
+            $req['ket_justifikasi'] = null;
+            $this->repotrrekapskp->update($where,$req);
+            $notification = [
+                'message' => 'Berhasil, Penilaian prilaku pegawai berhasil di reset.',
+                'alert-type' => 'success',
+            ];
+            return redirect()->route('skp.data-skp.index')->with($notification);
+        }catch (Exception $e) {
+            $notification = [
+                'message' => 'Error',
+                'alert-type' => 'error',
+            ];
+            return redirect()->route('skp.data-skp.index')->with($notification);
+        }
+    }
+
+    public function download($tahun,$bulan){
+        $id_sdm_atasan = "";
+        if(Session::get('atasan_penilai')==1){
+            $id_sdm_atasan = Session::get('id_sdm');
+        }
+        $tahun = Crypt::decrypt($tahun);
+        $bulan = Crypt::decrypt($bulan);
+        $text_cari = Session::get('text_cari');
         $data['rsData'] = $this->repomspegawai->getskp(['nm_atasan','nm_atasan_pendamping','nm_satker'],1,$text_cari,$id_sdm_atasan);
         $arrIdSdm = array();
         foreach($data['rsData'] as $rsp=>$rp){
@@ -91,8 +209,10 @@ class DataSkpController extends Controller
             }
 
         }
+        $data['periode_skp'] = $this->repomsperiodeskp->findWhereRaw(""," bulan = '$bulan' and tahun='$tahun'");
         $data['arrrekapnilai'] = $arrrekapnilai;
-        return view('content.skp.data_skp.index',$data);
+        $judul = "Download_skp_".$bulan."_".$tahun;
+        return Excel::download(new SkpExport($data), $judul.'.xlsx');
     }
 
     public function simpan_penilaian_skp(Request $request){

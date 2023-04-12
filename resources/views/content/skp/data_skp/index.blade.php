@@ -47,7 +47,6 @@
                         <div class="col-md-3">
                             <button href="" class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
                         </div>
-
                     </div>
                 </form>
             </div>
@@ -109,7 +108,14 @@
                         </table>
                     </div>
                 </div>
-
+                @if(Session::get('level')!="B")
+                <div class="row">
+                    <div class="col-md-12">
+                        <a target="_blank" href="{{URL::to('skp/data-skp/download')}}/{{Crypt::encrypt($tahun)}}/{{Crypt::encrypt($bulan)}}" class="btn btn-primary pull-right"><i class="fas fa-file-excel"></i> Download SKP</a>
+                    </div>
+                </div>
+                @endif
+                <br/>
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <thead>
@@ -118,15 +124,20 @@
                                 <th rowspan="2">Nip / Nama</th>
                                 <th rowspan="2"><center>Atasan Langsung</center></th>
                                 <th colspan="6"><center>Realisasi SKP</center></th>
+                                @if(Session::get('level')!="B")
                                 <th rowspan="2">Aksi</th>
+                                @endif
                             </tr>
                             <tr>
                                 <th>Tanggal Unggah SKP</th>
                                 <th>Nilai Realisasi</th>
                                 <th>Disetujui</th>
+                                <th>Verifikasi BAAK</th>
                                 <th>File Skp</th>
+                                @if(Session::get('level')!="B")
                                 <th>Point Pengurang</th>
                                 <th>Justifikasi?</th>
+                                @endif
                             </tr>
                         </thead>
                         <tbody>
@@ -156,6 +167,7 @@
                             if($dtnilai_skp['nilai_skp']){
                                 $sudahdinilai++;
                             }
+                            $id_value = $r->id_sdm."_".$dtnilai_skp['idperiode'];
                             ?>
                             <tr>
                                 <td>{{$no++}}</td>
@@ -178,11 +190,25 @@
                                         @endif
                                     @endif
                                 </td>
+                                <td>
+                                    @if(Session::get('level')=="B" || Session::get('level')=="A" || Session::get('level')=="SA")
+                                        @if($r->id_jns_sdm=="60943815-0ef4-403e-98d8-7a96ecdc6d5f")
+                                        <div class="custom-control custom-switch custom-switch-text custom-control-inline">
+                                            <div class="custom-switch-inner">
+                                            <input onChange="validkan('{{$id_value}}',$(this))" type="checkbox" class="custom-control-input" id="{{$id_value}}" @if($dtnilai_skp['val_baak']==1) checked @endif>
+                                            <label class="custom-control-label" for="{{$id_value}}" data-on-label="Yes" data-off-label="No">
+                                            </label>
+                                            </div>
+                                        </div>
+                                        @endif
+                                    @endif
+                                </td>
                                 <td align="center">
                                     @if($dtnilai_skp['file_skp'])
                                         <a href="{{URL::to('assets/file_bukti_skp')}}/{{$dtnilai_skp['file_skp']}}" target="_blank"><i class="fas fa-file-pdf" style="font-size:50px;"></i></a>
                                     @endif
                                 </td>
+                                @if(Session::get('level')!="B")
                                 <td align="center">
                                     <span>
                                         {{$point}} %<br/>
@@ -204,7 +230,14 @@
                                     if(Session::get('atasan_penilai')==1){
                                         $text = "Nilai";
                                     }
+                                    $hidden = 0;
+                                    if($r->id_jns_sdm=="60943815-0ef4-403e-98d8-7a96ecdc6d5f"){
+                                        if($dtnilai_skp['val_baak']==0){
+                                            $hidden = 1;
+                                        }
+                                    }
                                     ?>
+                                    @if($hidden==0)
                                     <div class="btn-group" role="group">
                                         <button id="btnGroupDrop1" type="button" class="btn btn-danger dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             Aksi
@@ -212,15 +245,16 @@
                                         <div class="dropdown-menu" aria-labelledby="btnGroupDrop1" style="">
                                             <a class="dropdown-item" href="{{URL::to('skp/data-skp/penilaian-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" ><i class="fas fa-eye"></i> {{$text}}</a>
                                             @if($dtnilai_skp['nilai_skp'])
-                                                @if(Session::get('level')=='A')
-                                                <a class="dropdown-item" href="{{URL::to('skp-pegawai/skp/reset-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}" data-toggle="modal" data-target=".bd-example-modal-lg"><i class="fas fa-sync"></i> Reset Penilaian</a>
+                                                @if(Session::get('level')=='A' || Session::get('level')=='SA')
+                                                <a class="dropdown-item" href="{{URL::to('skp/data-skp/reset-skp')}}/{{Crypt::encrypt($dtnilai_skp['idperiode'])}}/{{Crypt::encrypt($r->id_sdm)}}"  onclick="return confirm('Apakah anda yakin ingin me-reset pengisian sekaligus penilaian dari SKP ini ? ');"><i class="fas fa-sync"></i> Reset Penilaian</a>
                                                 @endif
                                             @endif
                                         </div>
                                     </div>
-
+                                    @endif
                                     @endif
                                 </td>
+                                @endif
                             </tr>
                             @endforeach
                         </tbody>
@@ -258,6 +292,22 @@ document.getElementById("terisi").innerHTML = "{{$terisi}} Pegawai";
 document.getElementById("belumterisi").innerHTML = "{{$belumterisi}} Pegawai";
 document.getElementById("sudahdiisibelumdinilai").innerHTML = "{{$sudahdiisibelumdinilai}} Pegawai";
 document.getElementById("sudahdinilai").innerHTML = "{{$sudahdinilai}} Pegawai";
+</script>
+<script>
+function validkan(kode,value)
+{
+    var x=value.prop("checked");
+    var request = $.ajax ({
+           url : "{{route('skp.data-skp.validasi-skp-baak')}}",
+           data:"kode_skp="+kode+"&val_baak="+x+"&statment="+1,
+           type : "get",
+           dataType: "html"
+       });
+       $('#balik').html('Proses menampilkan data .... ');
+       request.done(function(output) {
+        $('#balik').html(output);
+       });
+}
 </script>
 <script>
 function edit(tgl,id_sdm,kode)

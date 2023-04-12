@@ -7,6 +7,8 @@ use App\Repositories\Repotrabsenkehadiran;
 use App\Repositories\Repomspegawai;
 use App\Models\MsAlasanAbsen;
 use App\Imports\Absenkehadiranimport;
+use App\Repositories\Repomsperiodeskp;
+use App\Repositories\Repotrjustifikasi;
 use Session;
 use Fungsi;
 use Crypt;
@@ -19,11 +21,15 @@ class DataAbsenController extends Controller
     public function __construct(
         Request $request,
         Repotrabsenkehadiran $repotrabsenkehadiran,
-        Repomspegawai $repomspegawai
+        Repomspegawai $repomspegawai,
+        Repomsperiodeskp $repomsperiodeskp,
+        Repotrjustifikasi $repotrjustifikasi
     ){
         $this->request = $request;
         $this->repotrabsenkehadiran = $repotrabsenkehadiran;
         $this->repomspegawai = $repomspegawai;
+        $this->repomsperiodeskp = $repomsperiodeskp;
+        $this->repotrjustifikasi = $repotrjustifikasi;
     }
 
     public function index()
@@ -81,6 +87,82 @@ class DataAbsenController extends Controller
         }
     }
 
+    public function ajuan_justifikasi_kehadiran(Request $request){
+        $data['arrStatusJustifikasi'] = array("0"=>"Belum Disetujui","1"=>"Disetujui","2"=>"Tidak Disetuji");
+        $rsData = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','nm_jab_struk','nm_jab_fung']," id_stat_aktif = '1'","nm_sdm");
+        $data['rsData'] = $rsData;
+        $arrIdSdm = array();
+        foreach($rsData as $rs=>$r){
+            $arrIdSdm[$r->id_sdm] = $r->id_sdm;
+        }
+        $bln = date('m');
+        if(Session::get('bln')!=null){
+            $bln = Session::get('bln');
+        }
+        $tahun = date('Y');
+        if(Session::get('tahun')!=null){
+            $tahun = Session::get('tahun');
+        }
+        $data['bulan'] = $bln;
+        $data['tahun'] = $tahun;
+        $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
+        $data['pilihan_bulan_presensi'] = Fungsi::pilihan_bulan_presensi($bln);
+
+        $tgl_terakhir = cal_days_in_month(CAL_GREGORIAN, $bln, $tahun);
+        $tgl_awal = $tahun."-".$bln."-"."01";
+        $tgl_akhir = $tahun."-".$bln."-".$tgl_terakhir;
+        $data['getajuan_justifikasi'] = Fungsi::getajuan_justifikasiarr($arrIdSdm,$tgl_awal,$tgl_akhir,1);
+        $arrRekap = array();
+        foreach($data['getajuan_justifikasi'] as $id_sdm=>$dtsdm){
+            foreach($dtsdm as $key=>$dtkey){
+                $arrRekap[$key]['jmlh']+=$dtkey['jmlh'];
+            }
+        }
+        $data['arrRekap'] = $arrRekap;
+        return view('content.data_pegawai.history_ajuan_justifikasi_kehadiran.index',$data);
+    }
+
+    public function cari_ajuan_justifikasi_kehadiran(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->route('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.index');
+    }
+
+    public function history_kehadiran($id_sdm,$bulan,$tahun){
+        $tahunbulan = $tahun."-".$bulan;
+        $data['rsData'] = $this->repotrjustifikasi->get("",Crypt::decrypt($id_sdm),$tahunbulan);
+        $data['dt_pegawai'] =  $this->repomspegawai->findId("",Crypt::decrypt($id_sdm),"id_sdm");
+        $data['arrnmbulan'] = Fungsi::nm_bulan();
+        $data['arrkategorijustifikasi'] = Fungsi::arrkategorijustifikasi();
+        $data['bulan'] = $bulan;
+        $data['tahun'] = $tahun;
+        //dd($data['dt_pegawai']);
+        return view('content.data_pegawai.history_ajuan_justifikasi_kehadiran.history',$data);
+    }
+
+    public function tolak_justifikasi($id_justifikasi){
+        $notification = [
+            'message' => 'Justifikasi Berhasil di tolak oleh admin.',
+            'alert-type' => 'success',
+        ];
+        $rsData = $this->repotrjustifikasi->findId("",Crypt::decrypt($id_justifikasi),"id_justifikasi");
+
+        $bulan = date('m',strtotime($rsData->tanggal_absen));
+        $tahun = date('Y',strtotime($rsData->tanggal_absen));
+        $tgl_batal = date('Y-m-d H:i:s');
+        $req['ket_pembatalan_admin'] = "Dibatalkan oleh admin ".$tgl_batal;
+        $req['justifikasi_atasan'] = "2";
+        $where['id_justifikasi'] = Crypt::decrypt($id_justifikasi);
+        $this->repotrjustifikasi->update($where,$req);
+
+        return redirect()->intended('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/history/'.Crypt::encrypt($rsData->id_sdm).'/'.$bulan.'/'.$tahun)->with($notification);
+    }
 
     public function store(Request $request)
     {
