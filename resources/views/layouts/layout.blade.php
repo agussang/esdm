@@ -145,7 +145,7 @@
                                         @include('menu.admin')
                                     @elseif(Session::get('level')=="P")
                                         @include('menu.pegawai')
-                                    @elseif(Session::get('level')=="B")
+                                    @elseif(Session::get('level')=="B" || Session::get('level')=="B")
                                         @include('menu.baak')
                                     @endif
                                 </ul>
