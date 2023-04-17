@@ -145,13 +145,8 @@
                                         @include('menu.admin')
                                     @elseif(Session::get('level')=="P")
                                         @include('menu.pegawai')
-<<<<<<< HEAD
-                                    @elseif(Session::get('level')=="P")
-                                    @include('menu.baak')
-=======
                                     @elseif(Session::get('level')=="B")
                                         @include('menu.baak')
->>>>>>> fda779570fc3adf20f1b79fea96adbc8111b05d1
                                     @endif
                                 </ul>
                             </nav>
