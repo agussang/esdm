@@ -58,6 +58,8 @@ class Repomspegawai extends Repository
                  return $query->where('id_sdm_atasan',$id_sdm_atasan);
             })->when($id_jns_pegawai, function ($query) use ($id_jns_pegawai) {
                 return $query->where('id_jns_sdm', $id_jns_pegawai);
+            })->when($text_cari, function ($query) use ($text_cari) {
+                return $query->whereRaw(" (nm_sdm like '%$text_cari%' or nip like '%$text_cari%' )");
             })->orderBy('nm_sdm','asc')->get();
     }
 

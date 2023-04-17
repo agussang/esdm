@@ -111,7 +111,7 @@
                 @if(Session::get('level')!="B")
                 <div class="row">
                     <div class="col-md-12">
-                        <a target="_blank" href="{{URL::to('skp/data-skp/download')}}/{{Crypt::encrypt($tahun)}}/{{Crypt::encrypt($bulan)}}" class="btn btn-primary pull-right"><i class="fas fa-file-excel"></i> Download SKP</a>
+                        <a href="{{URL::to('skp/data-skp/download')}}/{{Crypt::encrypt($tahun)}}/{{Crypt::encrypt($bulan)}}" class="btn btn-primary pull-right"><i class="fas fa-file-excel"></i> Download SKP</a>
                     </div>
                 </div>
                 @endif
