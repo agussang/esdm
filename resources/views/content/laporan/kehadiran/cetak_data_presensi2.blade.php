@@ -79,6 +79,7 @@
                     @foreach($data_bulan as $id_bulan=>$dtbulan)
                         <?php $no=1;?>
                         @foreach($dtbulan['list_tgl'] as $tgl=>$dtgl)
+                        @if($tgl>=$tgl_awal && $tgl<=$tgl_akhir)
                         <?php
                         $presensi = $dt_sdm['data_presensi'][$tgl];
                         $hariabsen = explode(',',$dtgl['tgl']);
@@ -184,6 +185,7 @@
                         $ketajuan = $getajuan_justifikasi[$id_sdm][$tgl];
                         $durasi_justifikasi = 0;
                         $kategori = "";
+                        $durasijustifikasi = 0;
                         if($ketajuan){
                             $kategori = $arrkategorijustifikasi[$ketajuan['kategori_justifikasi']];
                             if($ketajuan['kategori_justifikasi']!="4" && $ketajuan['status']=="1"){
@@ -193,13 +195,14 @@
                         }else{
                             $durasijustifikasi = "";
                         }
-                        $terlambat_durasi = $hitungdurasi_terlambat-$durasi_justifikasi;
+                        $terlambat_durasi = abs($hitungdurasi_terlambat-$durasi_justifikasi);
                         if($terlambat_durasi == 0){
                             //$ket = "";
                         }
                         if($jamkerja['nm_shift']=="Libur"){
                             $ket = "";
                             $warna = "background-color: #F98686;";
+                            $terlambat_durasi = 0;
                         }
                         ?>
                         <tr style="{{$warna}}">
@@ -227,6 +230,7 @@
                             </td>
                             @endif
                         </tr>
+                        @endif
                         @endforeach
                     @endforeach
                 @endforeach

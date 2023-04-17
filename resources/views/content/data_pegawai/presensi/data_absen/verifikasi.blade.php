@@ -84,8 +84,9 @@
                 <span><i class="fas fa-file-pdf text-dark"></i> File Bukti Absen Kehadiran</span>
                 <hr/>
                 <center>
-                    <object type="application/pdf" data="{{URL::to('assets/file_bukti_absen')}}/{{$rsData->file_bukti}}" src="" width="1400" height="800">
-                    </object>
+                    <iframe src="{{URL::to('assets/file_bukti_absen')}}/{{$rsData->file_bukti}}" width="1400" height="800">
+
+                    </iframe>
                 </center>
             </div>
         </div>

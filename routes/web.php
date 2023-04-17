@@ -393,6 +393,9 @@ Route::group(['middleware' => 'role:P_SA_A_PI_B'], function () {
             Route::get('penilaian-skp/{id_periode?}/{id_sdm?}',[SkpPrilakuPegawaiController::class,'penilaian'])->name('skp.data-skp.penilaian-skp');
             Route::post('/cari',[DataSkpController::class,'cari'])->name('skp.data-skp.cari');
             Route::post('/simpan-penilaian-skp',[SkpPrilakuPegawaiController::class,'simpan_penilaian_skp'])->name('skp.data-skp.simpan-penilaian-skp');
+            Route::get('/download/{tahun}/{bulan}',[DataSkpController::class,'download'])->name('skp.data-skp.download');
+            Route::get('/reset-skp/{id_periode}/{id_sdm}',[DataSkpController::class,'reset_skp'])->name('skp.data-skp.reset_skp');
+            Route::get('/validasi-skp-baak',[DataSkpController::class,'validasi_skp'])->name('skp.data-skp.validasi-skp-baak');
         });
     });
     Route::group(['prefix' => 'data-pegawai'], function () {
@@ -417,6 +420,12 @@ Route::group(['middleware' => 'role:P_SA_A_PI_B'], function () {
                 Route::post('/unggah-sk-cari',[DataAbsenController::class,'cari_sk'])->name('data-pegawai.data-presensi.data-absen.unggah-sk-cari');
                 Route::post('/unggah-file-sk-simpan',[DataAbsenController::class,'unggah_file_sk_simpan'])->name('data-pegawai.data-presensi.data-absen.unggah-file-sk-simpan');
             });
+            Route::group(['prefix' => 'pengajuan-justifikasi-kehadiran'], function () {
+                Route::get('/',[DataAbsenController::class,'ajuan_justifikasi_kehadiran'])->name('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.index');
+                Route::post('/cari',[DataAbsenController::class,'cari_ajuan_justifikasi_kehadiran'])->name('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.cari');
+                Route::get('/history/{id_sdm?}/{bulan?}/{tahun?}',[DataAbsenController::class,'history_kehadiran'])->name('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.history');
+                Route::get('/tolak/{id_justifikasi?}',[DataAbsenController::class,'tolak_justifikasi'])->name('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.tolak');
+            });
         });
     });
 });
@@ -424,7 +433,7 @@ Route::group(['middleware' => 'role:P_SA_A_PI'], function () {
     Route::get('beranda',[IndexController::class,'index'])->name('beranda');
     Route::group(['prefix' => 'justifikasi'], function () {
         Route::get('/pengajuan/{id_sdm?}/{tanggal?}/{kode?}',[MsPegawaiController::class,'pengajuan_justifikasi'])->name('justifikasi.pengajuan');
-        Route::post('simpan-pengajuan',[MsPegawaiController::class,'simpan_pengajuan'])->name('justifikasi.simpan-pengajuan-justifikasi');
+        Route::post('simpan-pengajuan-justifikasi-pegawai',[MsPegawaiController::class,'simpan_pengajuan'])->name('justifikasi.simpan-pengajuan-justifikasi-pegawai');
     });
     Route::group(['prefix' => 'pegawai'], function () {
         Route::get('/riwayat-apel/{id?}',[MsPegawaiController::class,'riwayat_apel'])->name('pegawai.riwayat-apel');

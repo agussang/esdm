@@ -59,7 +59,13 @@ class SettingTanggalRamadhanController extends Controller
     public function store(Request $request)
     {
         $req = $request->except('_token');
-        $cek = $this->reposettingramadhan->findId("",$req['idagama'],"idagama");
+        $date = str_replace(' ','',$req['daterange']);
+        $date = explode('-',$date);
+        $tgl1 = date('Y-m-d',strtotime($date[0]));
+        $tgl2 = date('Y-m-d',strtotime($date[1]));
+        $tahun = date('Y',strtotime($date[0]));
+
+        $cek = $this->reposettingramadhan->findWhereRaw("","tahun = '$tahun'","");
         if($cek){
             $notification = [
                 'message' => 'Gagal, Setting Tanggal Ramadhan sudah ada jika ada perubahan data silahkan melakukan editing data yang ada.',

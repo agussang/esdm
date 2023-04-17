@@ -145,6 +145,8 @@
                                         @include('menu.admin')
                                     @elseif(Session::get('level')=="P")
                                         @include('menu.pegawai')
+                                    @elseif(Session::get('level')=="P")
+                                    @include('menu.baak')
                                     @endif
                                 </ul>
                             </nav>

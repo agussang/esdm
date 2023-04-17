@@ -7,6 +7,8 @@ use App\Repositories\Repotrabsenkehadiran;
 use App\Repositories\Repomspegawai;
 use App\Models\MsAlasanAbsen;
 use App\Imports\Absenkehadiranimport;
+use App\Repositories\Repomsperiodeskp;
+use App\Repositories\Repotrjustifikasi;
 use Session;
 use Fungsi;
 use Crypt;
@@ -19,11 +21,15 @@ class DataAbsenController extends Controller
     public function __construct(
         Request $request,
         Repotrabsenkehadiran $repotrabsenkehadiran,
-        Repomspegawai $repomspegawai
+        Repomspegawai $repomspegawai,
+        Repomsperiodeskp $repomsperiodeskp,
+        Repotrjustifikasi $repotrjustifikasi
     ){
         $this->request = $request;
         $this->repotrabsenkehadiran = $repotrabsenkehadiran;
         $this->repomspegawai = $repomspegawai;
+        $this->repomsperiodeskp = $repomsperiodeskp;
+        $this->repotrjustifikasi = $repotrjustifikasi;
     }
 
     public function index()
@@ -35,6 +41,8 @@ class DataAbsenController extends Controller
         $id_sdm_atasan = Session::get('id_sdm_atasan');
         $data['pilihan_sdm'] = Fungsi::pilihan_sdm($id_sdm,"","",$id_sdm_atasan);
         $data['pilihan_alasan_absen'] = Fungsi::pilihan_alasan_absen($id_alasan);
+        $id_status = Session::get('id_status');
+        $data['status_persetujuan'] = Fungsi::status_persetujuan($id_status);
         $arrIdSdm = array();
         if($id_sdm_atasan){
             $rsPegawai = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','nm_jab_struk','nm_jab_fung']," id_stat_aktif = '1' and (id_sdm_atasan = '$id_sdm_atasan' or id_sdm_pendamping = '$id_sdm_atasan') ","nm_sdm");
@@ -42,7 +50,7 @@ class DataAbsenController extends Controller
                 $arrIdSdm[$r->id_sdm] = $r->id_sdm;
             }
         }
-        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','r_alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan,$arrIdSdm);
+        $rsData = $this->repotrabsenkehadiran->paginate(['dt_pegawai','r_alasan'],$id_sdm,$tgl_awal,$tgl_akhir,$id_alasan,$arrIdSdm,$id_status);
         $paging = $rsData->links();
         $totalRecord = $rsData->total();
         $data['rsData'] = $rsData;
@@ -61,6 +69,7 @@ class DataAbsenController extends Controller
 
     public function cari(Request $request){
         $req = $request->except('_token');
+
         if(Session::get('level')=="P" && Session::get('id_sdm_atasan')!=Session::get('id_sdm')){
             $req['id_sdm'] = Session::get('id_sdm');
         }
@@ -78,6 +87,82 @@ class DataAbsenController extends Controller
         }
     }
 
+    public function ajuan_justifikasi_kehadiran(Request $request){
+        $data['arrStatusJustifikasi'] = array("0"=>"Belum Disetujui","1"=>"Disetujui","2"=>"Tidak Disetuji");
+        $rsData = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','nm_jab_struk','nm_jab_fung']," id_stat_aktif = '1'","nm_sdm");
+        $data['rsData'] = $rsData;
+        $arrIdSdm = array();
+        foreach($rsData as $rs=>$r){
+            $arrIdSdm[$r->id_sdm] = $r->id_sdm;
+        }
+        $bln = date('m');
+        if(Session::get('bln')!=null){
+            $bln = Session::get('bln');
+        }
+        $tahun = date('Y');
+        if(Session::get('tahun')!=null){
+            $tahun = Session::get('tahun');
+        }
+        $data['bulan'] = $bln;
+        $data['tahun'] = $tahun;
+        $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
+        $data['pilihan_bulan_presensi'] = Fungsi::pilihan_bulan_presensi($bln);
+
+        $tgl_terakhir = cal_days_in_month(CAL_GREGORIAN, $bln, $tahun);
+        $tgl_awal = $tahun."-".$bln."-"."01";
+        $tgl_akhir = $tahun."-".$bln."-".$tgl_terakhir;
+        $data['getajuan_justifikasi'] = Fungsi::getajuan_justifikasiarr($arrIdSdm,$tgl_awal,$tgl_akhir,1);
+        $arrRekap = array();
+        foreach($data['getajuan_justifikasi'] as $id_sdm=>$dtsdm){
+            foreach($dtsdm as $key=>$dtkey){
+                $arrRekap[$key]['jmlh']+=$dtkey['jmlh'];
+            }
+        }
+        $data['arrRekap'] = $arrRekap;
+        return view('content.data_pegawai.history_ajuan_justifikasi_kehadiran.index',$data);
+    }
+
+    public function cari_ajuan_justifikasi_kehadiran(Request $request){
+        $req = $request->except('_token');
+        foreach ($req as $k => $v) {
+            if ($v != null) {
+                Session::put($k, $v);
+            } else {
+                Session::forget($k);
+            }
+        }
+        return redirect()->route('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.index');
+    }
+
+    public function history_kehadiran($id_sdm,$bulan,$tahun){
+        $tahunbulan = $tahun."-".$bulan;
+        $data['rsData'] = $this->repotrjustifikasi->get("",Crypt::decrypt($id_sdm),$tahunbulan);
+        $data['dt_pegawai'] =  $this->repomspegawai->findId("",Crypt::decrypt($id_sdm),"id_sdm");
+        $data['arrnmbulan'] = Fungsi::nm_bulan();
+        $data['arrkategorijustifikasi'] = Fungsi::arrkategorijustifikasi();
+        $data['bulan'] = $bulan;
+        $data['tahun'] = $tahun;
+        //dd($data['dt_pegawai']);
+        return view('content.data_pegawai.history_ajuan_justifikasi_kehadiran.history',$data);
+    }
+
+    public function tolak_justifikasi($id_justifikasi){
+        $notification = [
+            'message' => 'Justifikasi Berhasil di tolak oleh admin.',
+            'alert-type' => 'success',
+        ];
+        $rsData = $this->repotrjustifikasi->findId("",Crypt::decrypt($id_justifikasi),"id_justifikasi");
+
+        $bulan = date('m',strtotime($rsData->tanggal_absen));
+        $tahun = date('Y',strtotime($rsData->tanggal_absen));
+        $tgl_batal = date('Y-m-d H:i:s');
+        $req['ket_pembatalan_admin'] = "Dibatalkan oleh admin ".$tgl_batal;
+        $req['justifikasi_atasan'] = "2";
+        $where['id_justifikasi'] = Crypt::decrypt($id_justifikasi);
+        $this->repotrjustifikasi->update($where,$req);
+
+        return redirect()->intended('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/history/'.Crypt::encrypt($rsData->id_sdm).'/'.$bulan.'/'.$tahun)->with($notification);
+    }
 
     public function store(Request $request)
     {
@@ -110,7 +195,7 @@ class DataAbsenController extends Controller
             }
         }
         unset($req['file_surat']);
-        $name = md5($req['id_sdm']);
+        $name = md5($req['id_sdm']).$req['id_alasan'].date('YmdHis');
         $req['file_bukti'] = $name.".pdf";
         $destinationPath = 'assets/file_bukti_absen/';
         $file->move($destinationPath, $req['file_bukti']);
@@ -126,7 +211,13 @@ class DataAbsenController extends Controller
                 return redirect()->route('data-pegawai.data-presensi.data-absen.index')->with($notification);
             }
         }else{
-            $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+            // cek unit kerjanya
+            $cek = $this->repomspegawai->findWhereRaw("","id_sdm = '$req[id_sdm]'");
+            if($cek->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                $jmlhabsen = Fungsi::hitung_absen_poli($req['tgl_awal'],$req['tgl_akhir']);
+            }else{
+                $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+            }
             $req['lama_hari'] = $jmlhabsen['jmabsen'];
 
             $this->repotrabsenkehadiran->store($req);
@@ -171,6 +262,14 @@ class DataAbsenController extends Controller
                     $tgl_awalx = date('Y-m-d',strtotime($r[2]));
                     $tgl_akhirx = date('Y-m-d',strtotime($r[3]));
                     $jmlhabsen = Fungsi::hitung_absen($tgl_awalx,$tgl_akhirx);
+                    // cek unit kerjanya
+                    $nipx = trim($r[0]);
+                    $cek = $this->repomspegawai->findWhereRaw("","nip = '$nipx'");
+                    if($cek->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                        $jmlhabsen = Fungsi::hitung_absen_poli($tgl_awalx,$tgl_akhirx);
+                    }else{
+                        $jmlhabsen = Fungsi::hitung_absen($tgl_awalx,$tgl_akhirx);
+                    }
                     $data['lama_hari'] = $jmlhabsen['jmabsen'];
                     $data['nip'] = trim($r[0]);
                     $data['nama'] = $r[1];
@@ -350,6 +449,7 @@ class DataAbsenController extends Controller
         $req = $request->except('_token');
         $id_absen = $req['id_absen'];
         $file = $request->file('file_surat');
+
         if($file){
             $tipe = $file->getClientOriginalExtension();
             $size = $file->getSize();
@@ -376,16 +476,20 @@ class DataAbsenController extends Controller
                 }
             }
             unset($req['file_surat']);
-            $name = md5($req['id_sdm']);
+            $name = md5($req['id_sdm']).$req['id_alasan'].date('YmdHis');
             $req['file_bukti'] = $name.".pdf";
             $destinationPath = 'assets/file_bukti_absen/';
             $file->move($destinationPath, $req['file_bukti']);
         }
         $where['id_absen'] = $id_absen;
-        $tgl_awal    =new DateTime($req['tgl_awal']);
-        $tgl_akhir   =new DateTime($req['tgl_akhir']);
-        $jumlahabsen =$tgl_akhir->diff($tgl_awal);
-        $req['lama_hari'] = $jumlahabsen->d;
+        // cek unit kerjanya
+        $cekunit = $this->repotrabsenkehadiran->findId(['dt_pegawai'],$id_absen,"id_absen");
+        if($cekunit->dt_pegawai->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+            $jmlhabsen = Fungsi::hitung_absen_poli($req['tgl_awal'],$req['tgl_akhir']);
+        }else{
+            $jmlhabsen = Fungsi::hitung_absen($req['tgl_awal'],$req['tgl_akhir']);
+        }
+        $req['lama_hari'] = $jmlhabsen['jmabsen'];
         $this->repotrabsenkehadiran->update($where,$req);
         $notification = [
             'message' => 'Berhasil, Data absen pegawai berhasil diupdate.',

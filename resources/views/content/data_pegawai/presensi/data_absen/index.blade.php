@@ -72,7 +72,14 @@ $disabled = "";
                             </div>
                         </div>
                         <div class="col-md-3">
-
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">Status</span>
+                                </div>
+                                <select class="form-control" id="id_status" name="id_status">
+                                        {!!$status_persetujuan!!}
+                                </select>
+                            </div>
                         </div>
                         <div class="col-md-5">
                             <button class="btn btn-primary"><i class="fas fa-search"></i> Tampilkan Data</button>
@@ -165,8 +172,10 @@ $disabled = "";
                                             if($r->is_valid!=1){
                                                 $bisa = 0;
                                             }
-                                            if(Session::get('level')=="A"){
+                                            if(Session::get('level')=="A" || Session::get('level')=="SA"){
                                                 $bisa = 1;
+                                            }else{
+                                                $bisa = 0;
                                             }
                                             ?>
                                             @if($bisa==1)

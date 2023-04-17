@@ -105,13 +105,13 @@ class PresensiController extends Controller
         $masuk['id_sdm'] = $req['id_sdm'];
         $masuk['mesin'] = $req['mesin'];
         $masuk['tanggal_absen'] = $req['tgl_absen'];
-        $masuk['jam_absen'] = $req['jam_absen'];
+        $masuk['jam_absen'] = $req['jam_absen'].":00";
         $masuk['tanggal_scan'] = date('Y-m-d H:i:s');
         $this->reporiwayatpresensi->store($masuk);
         $pulang['id_sdm'] = $req['id_sdm'];
         $pulang['mesin'] = $req['mesin'];
         $pulang['tanggal_absen'] = $req['tgl_absen'];
-        $pulang['jam_absen'] = $req['jam_absen_pulang'];
+        $pulang['jam_absen'] = $req['jam_absen_pulang'].":00";
         $pulang['tanggal_scan'] = date('Y-m-d H:i:s');
         $this->reporiwayatpresensi->store($pulang);
         $notification = [

@@ -45,7 +45,7 @@ class Repomspegawai extends Repository
             })->orderBy('nm_sdm','asc')->get();
     }
 
-    public function getskp($with = null,$id_stat_aktif = null,$text_cari = null,$id_sdm_atasan = null)
+    public function getskp($with = null,$id_stat_aktif = null,$text_cari = null,$id_sdm_atasan = null,$id_jns_pegawai = null)
     {
         return $this->model
             ->when($with, function ($query) use ($with) {
@@ -56,6 +56,8 @@ class Repomspegawai extends Repository
                 return $query->where('id_stat_aktif', $id_stat_aktif);
             })->when($id_sdm_atasan, function ($query) use ($id_sdm_atasan) {
                  return $query->where('id_sdm_atasan',$id_sdm_atasan);
+            })->when($id_jns_pegawai, function ($query) use ($id_jns_pegawai) {
+                return $query->where('id_jns_sdm', $id_jns_pegawai);
             })->orderBy('nm_sdm','asc')->get();
     }
 

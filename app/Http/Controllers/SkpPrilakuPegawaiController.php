@@ -250,7 +250,7 @@ class SkpPrilakuPegawaiController extends Controller
     }
 
     public function reset_penilaian($id,$id_sdm){
-        $where['id_periode'] = Crypt::decrypt($id);
+        $where['idperiode'] = Crypt::decrypt($id);
         $where['id_sdm'] = Crypt::decrypt($id_sdm);
         $req['nilai_skp'] = null;
         $req['validasi'] = null;

@@ -58,6 +58,8 @@ class LaporanPresensiController extends Controller
         $rsDataKetApp = $this->reposettingapp->findId("","cb6020d6-e8a7-4240-ab2c-dffd30d31892","id_setting");
         $tgl_awal = $req['tgl_awal'];
         $tgl_akhir = $req['tgl_akhir'];
+        $data['tgl_awal'] = $tgl_awal;
+        $data['tgl_akhir'] = $tgl_akhir;
         $data['rsDataKetApp'] = $rsDataKetApp;
         $data['tipe'] = $req['tipe'];
         $data_bulan = Fungsi::hari_dalam_satu_bulan($tgl_awal,$tgl_akhir,1);
@@ -81,7 +83,7 @@ class LaporanPresensiController extends Controller
                 ];
                 return redirect()->route('laporan.presensi-kehadiran.index')->with($notification);
             }else{
-                $rsData = $this->repomspegawai->get("","",$req['satuan_kerja'],$req['id_sdm']);
+                $rsData = $this->repomspegawai->get("","1",$req['satuan_kerja'],$req['id_sdm']);
                 $arrIdSdm = array();
                 foreach($rsData as $rs=>$r){
                     $arrIdSdm[$r->id_sdm] = $r->id_sdm;
@@ -183,7 +185,7 @@ class LaporanPresensiController extends Controller
                 }
             }
         }else{
-            $rsData = $this->repomspegawai->get("","",$req['satuan_kerja'],$req['id_sdm']);
+            $rsData = $this->repomspegawai->get("","1",$req['satuan_kerja'],$req['id_sdm']);
             $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
             $arrIdSdm = array();
             foreach($rsData as $rs=>$r){
@@ -199,6 +201,7 @@ class LaporanPresensiController extends Controller
                 return redirect()->route('laporan.presensi-kehadiran.index')->with($notification);
             }else{
                 $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,$req['tipe']);
+
                 $getDataAbsen = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
                 foreach($rsData as $rsx=>$rx){
                     $arrData[$rx->id_sdm]['nm_sdm'] = $rx->nm_sdm;
@@ -206,6 +209,7 @@ class LaporanPresensiController extends Controller
                     $arrData[$rx->id_sdm]['dt_absen'] = $getDataAbsen[$rx->id_sdm];
                     $arrData[$rx->id_sdm]['data_presensi'] = $getRekapDataAbsen[$rx->id_sdm];
                 }
+
                 $dt_hari_libur = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_akhir);
                 $data['dt_hari_libur'] = $dt_hari_libur;
                 $data['arrData'] = $arrData;

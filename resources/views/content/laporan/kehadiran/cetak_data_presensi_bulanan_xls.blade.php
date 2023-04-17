@@ -57,15 +57,19 @@
         $dt_presensi = $dt_sdm['data_presensi'][$kode];
         $jmh_hari_kerja = count($dt_bln['list_tgl']) - count($data['dt_hari_libur'][$dt_bln['tahun']."-".$id_bulan]);
         $total_tidak_masuk = $dt_presensi['tidakmasuk']['total'];
+        $terlambuat = abs($dt_presensi['telat']['total'] - $data['arrjumlahjustifikasi'][$id_sdm]['jumlah_justifikasi']);
         ?>
         @if(count($dt_presensi)>0)
+        <?php
+
+        ?>
         <tr>
             <td>{{$no++}}</td>
             <td>&nbsp;{{$dt_sdm['nip']}}</td>
             <td>{{$dt_sdm['nm_sdm']}}</td>
             <td align="center">{{count($dt_bln['hari_kerja'])}}</td>
             <td align="center">{{(int)$dt_presensi['masuk']['total']}}</td>
-            <td align="center">{{(int)$dt_presensi['telat']['total'] - $data['arrjumlahjustifikasi'][$id_sdm]['jumlah_justifikasi']}}</td>
+            <td align="center">{{$terlambuat}}</td>
             <td align="center">{{(int)$dt_presensi['pulang_cepat']['total']}}</td>
             <td align="center">{{(int)$dt_presensi['absensekali']['total']}}</td>
             <td align="center">{{(int)$dt_presensi['dt_apel']['tidak_hadir']['total']}}</td>

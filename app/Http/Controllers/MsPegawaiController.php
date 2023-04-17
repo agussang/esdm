@@ -280,6 +280,10 @@ class MsPegawaiController extends Controller
         $tgl_terakhir = $tahun."-".$bln."-".$terakhir;
         $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
         $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
+        $arrtglramadhan = Fungsi::ramadhan($tahun);
+        $wakturamadhan = Fungsi::wakturamadhan_karem();
+        $data['wakturamadhan'] = $wakturamadhan;
+        $data['arrtglramadhan'] = $arrtglramadhan;
         if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
             $getRekapDataAbsen = Fungsi::getRekapDataAbsenPoli($tgl_awal,$tgl_terakhir,$arrIdSdm,1);
         }else{
@@ -291,7 +295,6 @@ class MsPegawaiController extends Controller
         $data['getajuan_justifikasi'] = $getajuan_justifikasi;
         $data['jam_kerja'] = $jam_kerja;
         $data['jamkerjashift'] = Fungsi::jamkerjashift();
-
         $data['kategoriwaktuabsen'] = Fungsi::kategoriwaktuabsen();
         $arrAbsen = array();$data_bul = array();
         $data['arrData'] = $getRekapDataAbsen[$rsData->id_sdm];
@@ -320,6 +323,9 @@ class MsPegawaiController extends Controller
                         ->orderBy('tanggal_absen','asc')
                         ->orderBy('jam_absen','asc')
                         ->get();
+        $tahun = date('Y',strtotime($tanggal));
+        $arrtglramadhan = Fungsi::ramadhan($tahun);
+        $wakturamadhan = Fungsi::wakturamadhan_karem();
         $arrData = array();
         foreach($data['rsDataAbsen'] as $rs=>$r){
             $tanggal_text = Fungsi::formatDate($r->tanggal_absen);
@@ -328,7 +334,12 @@ class MsPegawaiController extends Controller
         }
         foreach($arrData as $tgl=>$dttgl){
             $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
-            $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
+            $idwaktuabsen = Fungsi::jam_kerja($req['id_jam_kerja']);
+            if($arrtglramadhan[$tgl]){
+                $jam_kerja = $wakturamadhan;
+            }else{
+                $jam_kerja = $idwaktuabsen;
+            }
             $hariabsen = explode(',',$dttgl['tgl_text']);
             $jam_masuk = array_shift($dttgl['jam_absen']);
             $jam_keluar = end($dttgl['jam_absen']);
@@ -378,7 +389,16 @@ class MsPegawaiController extends Controller
         }
         foreach($arrData as $tgl=>$dttgl){
             $req['id_jam_kerja'] = "4e1ebf30-02fd-4948-87bb-c2992a822682";
-            $jam_kerja = Fungsi::jam_kerja($req['id_jam_kerja']);
+            $idwaktuabsen = Fungsi::jam_kerja($req['id_jam_kerja']);
+            $tahun = date('Y',strtotime($tanggal));
+            $arrtglramadhan = Fungsi::ramadhan($tahun);
+            $wakturamadhan = Fungsi::wakturamadhan_karem();
+            if($arrtglramadhan[$tgl]){
+                $jam_kerja = $wakturamadhan;
+            }else{
+                $jam_kerja = $idwaktuabsen;
+            }
+
             $hariabsen = explode(',',$dttgl['tgl_text']);
             $jam_masuk = array_shift($dttgl['jam_absen']);
             $jam_keluar = end($dttgl['jam_absen']);
@@ -419,7 +439,9 @@ class MsPegawaiController extends Controller
         if($cekdulu==null){
             unset($req['nm_sdm']);
             unset($req['nip']);
-            $req['justifikasi_atasan'] = 1;
+            if(Session::get('level')=="A"){
+                $req['justifikasi_atasan'] = 1;
+            }
             $req['durasi_justifikasi'] = $req['ajuan_durasi_justifikasi'];
             $req['tgl_justifikasi'] = date('Y-m-d H:i:s');
             $this->repotrjustifikasi->store($req);
@@ -428,7 +450,9 @@ class MsPegawaiController extends Controller
             unset($req['id_sdm']);
             unset($req['nm_sdm']);
             unset($req['nip']);
-            $req['justifikasi_atasan'] = 1;
+            if(Session::get('level')=="A"){
+                $req['justifikasi_atasan'] = 1;
+            }
             $req['durasi_justifikasi'] = $req['ajuan_durasi_justifikasi'];
             $req['tgl_justifikasi'] = date('Y-m-d H:i:s');
             $this->repotrjustifikasi->update($where,$req);

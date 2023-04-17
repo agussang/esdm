@@ -73,6 +73,19 @@
                             </div>
                         </div>
                         <div class="col-md-4">
+                            <div class="input-group mb-4">
+                                <div class="input-group-prepend">
+                                <span class="input-group-text" id="inputGroup-sizing-default">No Sk</span>
+                                </div>
+                                <input type="text" class="form-control" id="no_sk" name="no_sk" value="{{$rsData->no_sk}}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-8">
+
+                        </div>
+                        <div class="col-md-4">
                             <a href="{{URL::to('assets/file_bukti_absen')}}/{{$rsData->file_bukti}}" target="_blank" class="btn btn-danger"><i class="fas fa-file-pdf"></i> Lihat File</a>
                             <button class="btn btn-primary pull-right"><i class="fas fa-save"></i> Simpan</button>
                         </div>
