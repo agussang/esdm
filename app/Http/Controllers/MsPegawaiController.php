@@ -513,6 +513,7 @@ class MsPegawaiController extends Controller
         $req = $request->except('_token');
         $req['id_sdm'] = Session::get('id_sdm');
         $file = $request->file('file_surat');
+
         $tipe = $file->getClientOriginalExtension();
         $size = $file->getSize();
         if ($tipe != 'pdf') {
@@ -529,7 +530,10 @@ class MsPegawaiController extends Controller
             return redirect()->route('pegawai.riwayat-absen.tambah')->with($notification);
         }
         unset($req['file_surat']);
-        $name = md5($req['id_sdm']);
+        $date = date('Y-m-d H:i:s');
+        $oriname = $file->getClientOriginalName();
+        $nuamafile = $req['id_sdm'].$date.$oriname;
+        $name = md5($nuamafile);
         $req['file_bukti'] = $name.".pdf";
         $destinationPath = 'assets/file_bukti_absen/';
         $file->move($destinationPath, $req['file_bukti']);
