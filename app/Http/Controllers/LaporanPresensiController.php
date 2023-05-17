@@ -201,7 +201,7 @@ class LaporanPresensiController extends Controller
                 return redirect()->route('laporan.presensi-kehadiran.index')->with($notification);
             }else{
                 $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,$req['tipe']);
-
+                //dd($getRekapDataAbsen);
                 $getDataAbsen = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
                 foreach($rsData as $rsx=>$rx){
                     $arrData[$rx->id_sdm]['nm_sdm'] = $rx->nm_sdm;

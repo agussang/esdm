@@ -1644,6 +1644,7 @@ class Fungsi
                 }
             }
             $arrAbsensekali = array();
+
             foreach($arrAbsen as $id_sdm=>$absen){
                 foreach($absen as $tgl_presensi=>$dt_absen){
                     $hariabsen = explode(',',$dt_absen['ket_tgl']);
@@ -1656,7 +1657,7 @@ class Fungsi
                     $explode = explode('-',$tglpresensi);
                     $bln_presensi = sprintf("%02d", $explode[1]);
                     $tglpresensikehadiran = sprintf("%02d", $explode[2]);
-
+                    $bulanprei = $list_hari_libur[$thn."-".$bln_presensi];
                     // cek apa ada absen jika ada abaikan semua keterangan presensi
                     if($arrAbsenTanggal[$id_sdm][$bln_presensi][$tglpresensikehadiran]==null){
                         if($hariabsen[0]=="Jumat"){
@@ -1669,14 +1670,14 @@ class Fungsi
                         if($jam_pulang==null){
                             $jam_pulang = $jam_masuk;
                         }
-                        if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu" && $jam_masuk == $jam_pulang){
+                        if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu" && $jam_masuk == $jam_pulang && $bulanprei[$tglpresensi]==null){
                             $cekjustifikasiabsensekali = $arrJustifikasi[$id_sdm][$thn."-".$bln_presensi][$tglpresensikehadiran];
                             if($cekjustifikasiabsensekali['kode_justifikasi'] != "4"){
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['absensekali']['list_tgl'][$tglpresensikehadiran]=1;
                             }
                         }
 
-                        if($jam_masuk >= $jam_kerja['jam_masuk'] && $jam_masuk!=$jam_pulang){
+                        if($jam_masuk >= $jam_kerja['jam_masuk'] && $jam_masuk!=$jam_pulang && $bulanprei[$tglpresensi]==null){
                             if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
                                 $jam_masukex = explode(':',$jam_masuk);
                                 $jam_telatex = explode(':',$jam_kerja['jam_masuk']);

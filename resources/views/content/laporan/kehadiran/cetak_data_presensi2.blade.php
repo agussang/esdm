@@ -199,10 +199,11 @@
                         if($terlambat_durasi == 0){
                             //$ket = "";
                         }
-                        if($jamkerja['nm_shift']=="Libur"){
+                        if($jamkerja['nm_shift']=="Libur" || $dtgl['ket_nasional'] != null){
                             $ket = "";
                             $warna = "background-color: #F98686;";
                             $terlambat_durasi = 0;
+                            $hitungdurasi_pulang_cepat = 0;
                         }
                         ?>
                         <tr style="{{$warna}}">

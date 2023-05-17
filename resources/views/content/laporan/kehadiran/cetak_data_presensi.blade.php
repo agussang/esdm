@@ -260,15 +260,16 @@
                     if($terlambat_durasi == 0){
                         //$ket = "";
                     }
-                    if($jamkerja['nm_shift']=="Libur"){
+                    if($jamkerja['nm_shift']=="Libur" || $dtgl['ket_nasional'] != null){
                         $ket = "";
                         $warna = "background-color: #F98686;";
                         $terlambat_durasi = 0;
+                        $hitungdurasi_pulang_cepat = 0;
                     }
                     if($absenkehadiran!=null){
                         $ket = $absenkehadiran['kode_alasan'];
                         $warna = "background-color: #F1E780;";
-
+                        $hitungdurasi_pulang_cepat = 0;
                         $terlambat_durasi = 0;
                     }
                     ?>
@@ -278,7 +279,7 @@
                         <td>{{$jam_masuk}}</td>
                         <td>{{$jam_keluar}}</td>
                         <td>{{$durasikerja}}</td>
-                        <td>{{$durasikerjamenit}}</td>
+                        <td>{{$durasikerjamenit}} </td>
                         <td>{{$terlambat_durasi}}</td>
                         <td>{{$hitungdurasi_pulang_cepat}}</td>
                         <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>

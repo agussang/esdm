@@ -152,12 +152,7 @@
                     }
 
                     $absenkehadiran = $dt_sdm['dt_absen'][$tgl]['alasan_absen'];
-                        if($absenkehadiran!=null){
-                            $ket = $absenkehadiran['kode_alasan'];
-                            $warna = "background-color: #F1E780;";
-                            $hitungdurasi_terlambat = "0";
-                            $hitungdurasi_pulang_cepat = 0;
-                        }
+
                     $durasikerja = "00:00:00";$durasikerjamenit = "0";
                     if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
                         $jamawal = $tgl." ".$jam_masuk;
@@ -181,10 +176,17 @@
                     if($terlambat_durasi == 0){
                         //$ket = "";
                     }
-                    if($jamkerja['nm_shift']=="Libur"){
+                    if($jamkerja['nm_shift']=="Libur" || $dtgl['ket_nasional'] != null){
                         $ket = "";
                         $warna = "background-color: #F98686;";
                         $terlambat_durasi = 0;
+                        $hitungdurasi_pulang_cepat = 0;
+                    }
+                    if($absenkehadiran!=null){
+                        $ket = $absenkehadiran['kode_alasan'];
+                        $warna = "background-color: #F1E780;";
+                        $hitungdurasi_terlambat = "0";
+                        $hitungdurasi_pulang_cepat = 0;
                     }
                     ?>
                     <tr style="{{$warna}}">
