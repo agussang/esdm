@@ -76,9 +76,11 @@ class JadwalPresensiShiftController extends Controller
     }
 
 
-    public function edit($id)
+    public function edit(Request $request)
     {
-        //
+        $req = $request->except('_token');
+        $data['rsData'] = $this->repotrjadwalshift->findId("",$req,"id_jadwal_shift");
+        return view('content.master.bank.edit',$data);
     }
 
 

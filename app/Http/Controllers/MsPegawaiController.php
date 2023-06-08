@@ -310,9 +310,13 @@ class MsPegawaiController extends Controller
         $data['dt_hari_libur'] = Fungsi::jmlh_hari_libur($tgl_awal,$tgl_terakhir);
         $getajuan_justifikasiall = Fungsi::getajuan_justifikasiall($tgl_awal,$tgl_terakhir);
         $data['getajuan_justifikasiall'] = $getajuan_justifikasiall;
-
-
         $data['bulan'] = sprintf("%0d", $bln);
+
+        $durasibekerja = Fungsi::durasibekerja($req['id_jam_kerja']);
+        $durasibekerja_ramadhan = Fungsi::durasibekerja("347b23a9-8919-43ec-9b2d-a0c4b810b61d");
+        $data['durasibekerja'] = $durasibekerja;
+        $data['durasibekerja_ramadhan'] = $durasibekerja_ramadhan;
+        $data['ramadhan'] = Fungsi::ramadhan($tahun);
         return view('content.data_pegawai.riwayat.presensi_kehadiran.index',$data);
     }
 

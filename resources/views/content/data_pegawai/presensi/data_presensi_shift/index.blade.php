@@ -77,6 +77,26 @@
         </div>
     </div>
 </div>
+<div class="modal fade bd-example-modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modaledit">Form Edit Data Jadwal Presensi Shift</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form" id="formku" method="post">
+				{!! csrf_field() !!}
+                    <div id="form-edit">
+
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
@@ -91,5 +111,18 @@ $(function() {
     console.log("A new date selection was made: " + start.format('YYYY-MM-DD') + ' to ' + end.format('YYYY-MM-DD'));
   });
 });
+function edit(id)
+{
+    var request = $.ajax ({
+       url : "{{ route('data-pegawai.data-presensi.jadwal-presensi-shift.edit') }}",
+       data:"id="+id,
+       type : "get",
+       dataType: "html"
+   });
+   $('#form-edit').html('Sedang Melakukan Proses Pencarian Data...');
+   request.done(function(output) {
+       $('#form-edit').html(output);
+   });
+}
 </script>
 @stop

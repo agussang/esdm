@@ -122,7 +122,8 @@ class ApiController extends Controller
         $rsData = $this->repomspegawai->findId("",$nip,"nip");
 
         $arrIdSdm[$rsData->id_sdm] = $rsData->id_sdm;
-        $jam_kerja = Fungsi::jam_kerja_unit($rsData->id_satkernow);
+        $id_jam_kerja = "4e1ebf30-02fd-4948-87bb-c2992a822682";
+        $jam_kerja = Fungsi::jam_kerja($id_jam_kerja);
         $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,4);
         return json_encode($getRekapDataAbsen);
     }

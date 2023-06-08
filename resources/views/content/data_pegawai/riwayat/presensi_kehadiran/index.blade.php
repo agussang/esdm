@@ -296,9 +296,24 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     $idwaktuabsen = $jam_kerja;
                                                 }
                                                 if($hariabsen[0]=="Jumat"){
-                                                        $jamkerja = $idwaktuabsen[2];
+                                                    if($ramadhan[$tgl]){
+                                                        $jamkerja = $jam_kerja_ramadhan[2];
+                                                        $lama_kerja = $durasibekerja_ramadhan[2]['lama_kerja'];
+                                                    }else{
+                                                        $jamkerja = $jam_kerja[2];
+                                                        $lama_kerja = $durasibekerja[2]['lama_kerja'];
+                                                    }
+
                                                 }else{
-                                                        $jamkerja = $idwaktuabsen[1];
+
+                                                    if($ramadhan[$tgl]){
+                                                        $jamkerja = $jam_kerja_ramadhan[1];
+                                                        $lama_kerja = $durasibekerja_ramadhan[1]['lama_kerja'];
+                                                    }else{
+                                                        $jamkerja = $jam_kerja[1];
+                                                        $lama_kerja = $durasibekerja[1]['lama_kerja'];
+                                                    }
+
                                                 }
                                                 if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                                                     $jamkerja = $presensi['msjadwalshift'];
@@ -486,7 +501,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     @if($rsData->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
                                                     <td>
                                                         @if($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
-                                                            @if($ket!="Tidak Hadir")
+                                                            @if(str_replace(":","",$durasikerja) >= str_replace(":","",$lama_kerja) || $ket=="Absen 1x")
                                                                 @if($ketajuan)
                                                                     {{$arrStatusJustifikasi[$ketajuan['status']]}}
                                                                 @else

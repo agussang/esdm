@@ -99,7 +99,7 @@ class LaporanPresensiController extends Controller
                 }else{
                     $getRekapDataAbsenPoli = Fungsi::getRekapDataAbsenPoli($tgl_awal,$tgl_akhir,$arrIdSdm,$req['tipe']);
                     $getDataAbsen = Fungsi::gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir);
-
+                    //dd($getRekapDataAbsenPoli);
                     foreach($rsData as $rsx=>$rx){
                         $arrData[$rx->id_sdm]['nm_sdm'] = $rx->nm_sdm;
                         $arrData[$rx->id_sdm]['nip'] = $rx->nip;

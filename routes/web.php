@@ -286,6 +286,7 @@ Route::group(['middleware' => 'role:SA_A_PI_B'], function () {
                 Route::get('/',[JadwalPresensiShiftController::class,'index'])->name('data-pegawai.data-presensi.jadwal-presensi-shift.index');
                 Route::post('/cari',[JadwalPresensiShiftController::class,'cari'])->name('data-pegawai.data-presensi.jadwal-presensi-shift.search');
                 Route::get('/import-jadwal',[JadwalPresensiShiftController::class,'import'])->name('data-pegawai.data-presensi.jadwal-presensi-shift.import-jadwal');
+                Route::get('/edit',[JadwalPresensiShiftController::class,'edit'])->name('data-pegawai.data-presensi.jadwal-presensi-shift.edit');
             });
 
             Route::group(['prefix' => 'apel'], function () {

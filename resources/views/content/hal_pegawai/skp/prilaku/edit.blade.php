@@ -89,7 +89,7 @@ $induk = explode('/',request()->path());
     </div>
 </div>
 
-@if($cek_file==0 && Session::get('id_sdm_pengguna') != $dtpegawai->id_sdm_atasan)
+@if(($cek_file==0 && Session::get('id_sdm_pengguna') != $dtpegawai->id_sdm_atasan) || ($dtpegawai->id_jabatan_struktural_now=="f88b3352-108e-433c-9108-b3587258b06d" && Session::get('id_sdm_pengguna') == $dtpegawai->id_sdm_atasan) )
 <div class="row">
     <div class="col-md-12">
         <form class="form" action="{{route('skp-pegawai.skp.unggah_skp')}}" method="post" enctype="multipart/form-data">

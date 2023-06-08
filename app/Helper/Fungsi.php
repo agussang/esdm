@@ -1152,6 +1152,9 @@ class Fungsi
             // 1 setujui
             // 2 tidak disetujui
             // null belum diproses
+            if($r->justifikasi_atasan==null){
+                $r->justifikasi_atasan = 0;
+            }
             $arrRekap[$r->id_sdm][$r->justifikasi_atasan][$r->id_justifikasi] = $r->id_justifikasi;
             $arrData[$r->id_sdm][$r->tanggal_absen][$r->kategori_justifikasi]['status'] = $r->justifikasi_atasan;
             $arrData[$r->id_sdm][$r->tanggal_absen][$r->kategori_justifikasi]['ajuan_durasi_justifikasi'] = $r->ajuan_durasi_justifikasi;
@@ -1298,7 +1301,7 @@ class Fungsi
                     }
                 }
             }
-            $arrAbsensekali = array();
+            $arrAbsensekali = array();$ceklebor = array();
             foreach($arrAbsen as $id_sdm=>$absen){
                 foreach($absen as $tgl_presensi=>$dt_absen){
                     $hariabsen = explode(',',$dt_absen['ket_tgl']);
@@ -1320,6 +1323,7 @@ class Fungsi
                         //if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                             $jam_kerja = $dt_absen['msjadwalshift'];
                         //}
+                        $ceklebor[$tglpresensi] = $jam_kerja['nm_shift'];
                         $jam_pulang = end($dt_absen['jam_absen']);
                         $jam_masuk = array_shift($dt_absen['jam_absen']);
                         if($jam_pulang==null){
@@ -1349,10 +1353,11 @@ class Fungsi
                                 $gabung = $depan.":".$hasilx[1];
                                 $menit = ($gabung*60)+$hasilx[1];
                                 $menit = $menit/60;
-                                $durasi_terlambat = $menit;
-                                if($jam_masuk==$jam_pulang){
+                                if($jam_masuk==$jam_pulang || $jam_kerja['nm_shift']=="Libur"){
                                     $menit = 0;
                                 }
+                                $durasi_terlambat = $menit;
+
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tgl'][$tglpresensikehadiran] = $durasi_terlambat;
                                 if($justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran]){
                                     $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['justifikasi'] = $justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran];
@@ -1381,7 +1386,7 @@ class Fungsi
                                 $gabungcpt = $depancpt.":".$hasilcpt[1];
                                 $menitcpt = ($gabungcpt*60)+$hasilcpt[1];
                                 $menitcpt = $menitcpt/60;
-                                if($jam_masuk==$jam_pulang){
+                                if($jam_masuk==$jam_pulang || $jam_kerja['nm_shift']=="Libur"){
                                     $menitcpt = 0;
                                 }
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tgl'][$tglpresensikehadiran] = $menitcpt;
@@ -1605,7 +1610,7 @@ class Fungsi
                     }
                 }
             }
-            //return $data_bulan;
+            //return $list_hari_libur;
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
             $rsAlasan = DB::table('ms_alasan_absen')->get();
             foreach($rsAlasan as $rsa=>$ralasan){
@@ -1697,6 +1702,7 @@ class Fungsi
                                 $gabung = $depan.":".$hasilx[1];
                                 $menit = ($gabung*60)+$hasilx[1];
                                 $menit = $menit/60;
+                                $tglprei = $list_hari_libur[date('Y-m',strtotime($tgl_presensi))];
                                 if($jam_masuk==$jam_pulang){
                                     $menit = 0;
                                 }
@@ -1729,7 +1735,8 @@ class Fungsi
                                 $gabungcpt = $depancpt.":".$hasilcpt[1];
                                 $menitcpt = ($gabungcpt*60)+$hasilcpt[1];
                                 $menitcpt = $menitcpt/60;
-                                if($jam_masuk==$jam_pulang){
+                                $tglprei = $list_hari_libur[date('Y-m',strtotime($tgl_presensi))];
+                                if($jam_masuk==$jam_pulang || $tglprei!=null){
                                     $menitcpt = 0;
                                 }
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['pulang_cepat']['list_tgl'][$tglpresensikehadiran] = $menitcpt;
@@ -1851,9 +1858,7 @@ class Fungsi
                     $arrDataRekapNew[$id_sdmz][$tglnya]['absen'] = $absen;
 
                     $dt_apel = $arrDataRekap[$id_sdmz][$tglnya]['dt_apel'];
-                    // if(count($dt_apel)<1){
-                    //     $dt_apel = 0;
-                    // }
+
                     $arrDataRekapNew[$id_sdmz][$tglnya]['dt_apel'] = $dt_apel;
 
                     $masuk = $arrDataRekap[$id_sdmz][$tglnya]['masuk'];
