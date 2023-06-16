@@ -176,7 +176,7 @@
                     if($terlambat_durasi == 0){
                         //$ket = "";
                     }
-                    if($jamkerja['nm_shift']=="Libur" || $dtgl['ket_nasional'] != null){
+                    if($jamkerja['nm_shift']=="Libur" || ( $dtgl['ket_nasional'] != null && $dt_sdm['id_satker'] != "30c82828-d938-42c1-975e-bf8a1db2c7b0")){
                         $ket = "";
                         $warna = "background-color: #F98686;";
                         $terlambat_durasi = 0;

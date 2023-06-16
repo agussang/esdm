@@ -79,14 +79,26 @@ class JadwalPresensiShiftController extends Controller
     public function edit(Request $request)
     {
         $req = $request->except('_token');
-        $data['rsData'] = $this->repotrjadwalshift->findId("",$req,"id_jadwal_shift");
-        return view('content.master.bank.edit',$data);
+        $data['rsData'] = $this->repotrjadwalshift->findId(['dt_pegawai'],$req,"id_jadwal_shift");
+        //dd($data['rsData']->id_shift);
+        $data['pilihanjamkerjashift'] = Fungsi::pilihanjamkerjashift($data['rsData']->id_shift);
+        return view('content.data_pegawai.presensi.data_presensi_shift.edit',$data);
     }
 
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $req = $request->except('_token');
+        $cek = $this->repotrjadwalshift->findWhereRaw("","id_jadwal_shift = '$req[id_jadwal_shift]'");
+        $where['id_jadwal_shift'] = $req['id_jadwal_shift'];
+        unset($req['id_jadwal_shift']);
+        $this->repotrjadwalshift->update($where,$req);
+        echo '<script type="text/javascript">toastr.success("Data jadwal shift berhasil di update")</script>';
+        echo "<script>
+        setTimeout(function () {
+        location.reload();
+        }, 2000);
+        </script>";
     }
 
 

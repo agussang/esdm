@@ -66,6 +66,7 @@ class LaporanPresensiController extends Controller
         $data['data_bulan'] = $data_bulan;
         $getajuan_justifikasi = Fungsi::getajuan_justifikasiall($tgl_awal,$tgl_akhir);
         $data['getajuan_justifikasi'] = $getajuan_justifikasi;
+        //dd($getajuan_justifikasi);
         $arrjumlahjustifikasi = array();
         foreach($getajuan_justifikasi as $rsidsdm=>$rdata){
             foreach($rdata as $rsdtx=>$rxdt){
@@ -73,6 +74,8 @@ class LaporanPresensiController extends Controller
             }
         }
         $data['arrjumlahjustifikasi'] = $arrjumlahjustifikasi;
+        //dd($getajuan_justifikasi);
+        //dd($data['arrjumlahjustifikasi']['eb1323ff-e587-48e6-b070-395ba7b0d64b']);
         $data['arrkategorijustifikasi'] = Fungsi::arrkategorijustifikasi();
         $arrtipecetak = array('1'=>"Data Presensi Format Harian 1",'2'=>"Data Presensi Format Harian 2",'3'=>"Data Presensi Format Harian + Lembur",'4'=>"Data Presensi Format Rekap Bulanan");
         if($req['id_jam_kerja'] == '0726e0a0-22f3-421b-a0ac-339a35d15d04'){

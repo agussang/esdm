@@ -66,7 +66,7 @@
                                 <td>{{$r->dtwaktuabsen->kode_shift}}</td>
                                 <td>{{$r->dtwaktuabsen->nm_shift}}</td>
                                 <td>
-                                    <a onclick="edit('<?php echo $r->id_jadwal_shift;?>');" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary text-white"><i class="fas fa-pencil-ruler text-white"></i> Edit</a>
+                                    <a onclick="edit('<?php echo $r->id_jadwal_shift;?>');" data-toggle="modal" data-target="#editjadwalshift" class="btn btn-primary text-white"><i class="fas fa-pencil-ruler text-white"></i> Edit</a>
                                 </td>
                             </tr>
                             @endforeach
@@ -77,7 +77,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade bd-example-modal-xl" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
+<div class="modal fade bd-example-modal-xl" id="editjadwalshift" tabindex="-1" aria-labelledby="exampleModalLabel" style="display: none;" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -123,6 +123,20 @@ function edit(id)
    request.done(function(output) {
        $('#form-edit').html(output);
    });
+}
+
+function simpan_edit()
+{
+    var x=$('#formku').serialize();
+    var request = $.ajax ({
+           url : "{{ route('data-pegawai.data-presensi.jadwal-presensi-shift.simpan-edit') }}",
+           type : "post",
+           dataType: "html",
+           data: x
+       });
+       request.done(function(output) {
+        $('#balik').html(output);
+       });
 }
 </script>
 @stop

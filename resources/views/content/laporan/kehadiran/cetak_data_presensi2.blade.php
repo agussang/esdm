@@ -126,18 +126,30 @@
                                 }
                             }
 
-
-                            if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
-                                //if($gabung < $durasi){
+                            if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
+                                if($jam_masuk != $jam_keluar){
                                     $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
                                     if($hitungdurasi_terlambat>0){
                                         $ket = "Terlambat Datang";
                                     }
-                                    if($jam_masuk == $jam_keluar){
-                                        $ket = "Absen 1x";
-                                    }
-                                //}
+                                }
+                                if($jam_masuk == $jam_keluar){
+                                    $ket = "Absen 1x";
+                                }
+                            }else{
+                                if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
+                                    //if($gabung < $durasi){
+                                        $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                        if($hitungdurasi_terlambat>0){
+                                            $ket = "Terlambat Datang";
+                                        }
+                                        if($jam_masuk == $jam_keluar){
+                                            $ket = "Absen 1x";
+                                        }
+                                    //}
+                                }
                             }
+
 
                             //$menit = ($gabung*60)+$hasilx[1];
 
@@ -199,9 +211,13 @@
                         if($terlambat_durasi == 0){
                             //$ket = "";
                         }
-                        if($jamkerja['nm_shift']=="Libur" || $dtgl['ket_nasional'] != null){
+                        if($jamkerja['nm_shift']=="Libur" || ( $dtgl['ket_nasional'] != null && $dt_sdm['id_satker'] != "30c82828-d938-42c1-975e-bf8a1db2c7b0")){
                             $ket = "";
                             $warna = "background-color: #F98686;";
+                            $terlambat_durasi = 0;
+                            $hitungdurasi_pulang_cepat = 0;
+                        }
+                        if($ket=="DL"){
                             $terlambat_durasi = 0;
                             $hitungdurasi_pulang_cepat = 0;
                         }
