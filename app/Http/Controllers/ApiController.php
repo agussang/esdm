@@ -8,7 +8,7 @@ use App\Repositories\Repotrrekapskp;
 use App\Repositories\Repotrabsenkehadiran;
 use App\Repositories\Repotrprilakupegawai;
 use App\Repositories\Repotrpelanggaran;
-
+use Response;
 use Crypt;
 use Fungsi;
 use Session;
@@ -124,8 +124,28 @@ class ApiController extends Controller
         $arrIdSdm[$rsData->id_sdm] = $rsData->id_sdm;
         $id_jam_kerja = "4e1ebf30-02fd-4948-87bb-c2992a822682";
         $jam_kerja = Fungsi::jam_kerja($id_jam_kerja);
+        if($rsData['id_satkernow']=="30c82828-d938-42c1-975e-bf8a1db2c7b0")
+        { $getRekapDataAbsen = Fungsi::getRekapDataAbsenPoli($tgl_awal,$tgl_akhir,$arrIdSdm,4); //dd($getRekapDataAbsenPoli);
+          //$getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,4);
+        }
+        else{
         $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_akhir,$arrIdSdm,4);
-        return json_encode($getRekapDataAbsen);
+        }
+
+        $getajuan_justifikasi = Fungsi::getajuan_justifikasiall($tgl_awal,$tgl_akhir);
+        $data['getajuan_justifikasi'] = $getajuan_justifikasi;
+        //dd($getajuan_justifikasi);
+        $arrjumlahjustifikasi = array();
+        foreach($getajuan_justifikasi as $rsidsdm=>$rdata){
+            foreach($rdata as $rsdtx=>$rxdt){
+                if($rsidsdm==$rsData->id_sdm)
+                { $arrjumlahjustifikasi[$rsidsdm]['jumlah_justifikasi']+=$rxdt['durasi_justifikasi']; }
+            }
+        }
+        $getRekapDataAbsen[$rsData->id_sdm][date('Ym',strtotime($tgl_awal))]['telat']['total_justifikasi'] = $arrjumlahjustifikasi[$rsData->id_sdm]['jumlah_justifikasi'];
+        //dd($getRekapDataAbsen);
+
+        return Response::json($getRekapDataAbsen);
     }
 
     public function pelanggaran($nip,$bulan,$tahun){

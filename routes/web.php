@@ -55,7 +55,7 @@ use App\Http\Controllers\{
 |
 */
 
-Route::get('/', [LoginController::class, 'index'])->name('/');
+Route::get('/', [LoginController::class, 'index'])->name('/tezt');
 Route::post('/login', [LoginController::class, 'proses_login'])->name('login');
 Route::get('/logout', [LoginController::class, 'logout'])->name('logout');
 Route::get('/login-as/{id?}', [LoginController::class, 'loginas'])->name('loginas');

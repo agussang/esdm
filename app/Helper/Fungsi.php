@@ -638,7 +638,8 @@ class Fungsi
         return $jm_kerja;
     }
     public static function pilihan_role($id=null){
-        $rsData = MsRole::get();
+        //$rsData = MsRole::whereRaw("kode_role != 'P' and kode_role != 'PI'")->get();
+	$rsData = MsRole::get();
         $d = '<option value="">Pilih Role User</option>';
         foreach ($rsData as $rs => $r) {
             $sl = '';

@@ -156,6 +156,7 @@ class LaporanPresensiController extends Controller
                                 }
                             }
                             $data['arrjumlahabsen'] = $arrjumlahabsen;
+                            
                             return view('content.laporan.kehadiran.cetak_data_presensi_bulanan',$data);
                         }
                     }else{
@@ -226,6 +227,7 @@ class LaporanPresensiController extends Controller
 
                 if($req['format']==1){
                     if($req['tipe']==1){
+                        
                         return view('content.laporan.kehadiran.cetak_data_presensi',$data);
                     }
                     if($req['tipe']==2){

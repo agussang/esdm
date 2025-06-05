@@ -257,6 +257,11 @@
                         $durasijustifikasi = "";
                     }
                     $terlambat_durasi = abs($hitungdurasi_terlambat-$durasi_justifikasi);
+                    
+                    if($ketajuan['status']=="1"){
+                        $terlambat_durasi=0;
+                    }
+
                     if($terlambat_durasi == 0){
                         //$ket = "";
                     }

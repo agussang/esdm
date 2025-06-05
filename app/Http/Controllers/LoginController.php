@@ -7,12 +7,14 @@ use App\Repositories\Reposettingapp;
 use App\Repositories\Repouser;
 use App\Repositories\Repomspegawai;
 use App\Models\Iclocktransaction;
+use App\Models\User;
 use App\Repositories\Repotrloglogin;
 use App\Repositories\Reporiwayatpresensi;
 use App\Repositories\Repoclocktransaction;
 use Session;
 use Fungsi;
 use Crypt;
+use DB;
 
 class LoginController extends Controller
 {
@@ -43,6 +45,7 @@ class LoginController extends Controller
         }
         $tgl_saiki = date('Y-m-d');
         $sync = $this->repoclocktransaction->getsyncabsen($tgl_saiki,$arrNip);
+        
         foreach($sync as $empcode => $dt_tgl){
             $id_sdm = $arrIdSdm[$empcode];
             if($id_sdm){
@@ -63,13 +66,48 @@ class LoginController extends Controller
         }
     }
 
+    public function decrypt($string, $key = 'faiqmaharan')
+    {
+        $result = '';
+        if (strlen($key) > 0) {
+            $string = base64_decode($string);
+            for ($i = 0; $i < strlen($string); $i++) {
+            $char = substr($string, $i, 1);
+            $keychar = substr($key, ($i % strlen($key)) - 1, 1);
+            $char = chr(ord($char) - ord($keychar));
+            $result .= $char;
+            }
+        }
+        return $result;
+    }
+
     public function index(Request $request)
     {
-
+	//return response()->json(User::where("email","eremun@poltekbangsby.ac.id")->first());
+	//return response()->json(User::first());
         $rsData = $this->reposettingapp->findId("","cb6020d6-e8a7-4240-ab2c-dffd30d31892","id_setting");
         $request->session()->put('nama_aplikasi',$rsData->nama_aplikasi);
         $data['rsData'] = $rsData;
         $this->sync_semi_auto();
+        $sql= "UPDATE riwayat_finger r
+        SET deleted_at = NOW()
+        FROM tr_justifikasi t
+        WHERE t.justifikasi_atasan = '2'
+        AND t.id_sdm = r.id_sdm
+        AND t.tanggal_absen = r.tanggal_absen
+        AND sn = 'justifikasi'
+        AND (jam_absen::time = jam_masuk OR jam_absen::time = jam_pulang)
+        AND r.deleted_at IS NULL";
+        DB::statement($sql);
+
+        if ($_COOKIE['sesi_sso']) {
+            $cobasesi = json_decode($this->decrypt($_COOKIE['sesi_sso'], 'alimsumarno'), true);
+            if (is_array($cobasesi)) {
+                $dt = User::where('email',$cobasesi['email'])->first();
+                return $this->ceklogin($dt->username,$dt->hidden_password);
+            }
+        }
+        
         return view('login',$data);
     }
 
@@ -79,6 +117,7 @@ class LoginController extends Controller
             // catat log
             $getip = Fungsi::get_client_ip();
             $getbrowser = Fungsi::get_client_browser();
+            
 
             $reqlog['tgl_login'] = date('Y-m-d H:i:s');
             $reqlog['ip'] = $getip;
@@ -93,14 +132,19 @@ class LoginController extends Controller
             $this->request->session()->put('nama_pengguna',$dtUser->nama_user);
             $this->request->session()->put('userlevel',$dtUser->roleuser->nama_role);
             $this->request->session()->put('level',$dtUser->roleuser->kode_role);
+            
             $notification = [
                 'message' => 'Selamat Datang '.$dtUser->nama_user,
                 'alert-type' => 'success',
             ];
+            if (auth()->user()->ganti_pass == '1') {
+                //auth()->user()->update(['ganti_pass'=>null]);
+                return redirect()->route('ubahpassword')->with($notification);
+            }
             if($dtUser->roleuser->kode_role=="P"){
                 $this->request->session()->put('id_sdm',$dtUser->id_sdm);
                 $this->request->session()->put('id_sdm_pengguna',$dtUser->id_sdm);
-                $id_sdm = Session::get('id_sdm');
+                $id_sdm = $dtUser->id_sdm;
                 $cek_dt_bawahan = $this->repomspegawai->getWhereRaw(['nm_satker','nm_golongan','nm_jns_sdm','stat_kepegawaian','stat_aktif']," id_stat_aktif = '1' and (id_sdm_atasan = '$id_sdm' or id_sdm_pendamping = '$id_sdm') ","nm_sdm");
                 if(count($cek_dt_bawahan)>0){
                     $this->request->session()->put('atasan_penilai',1);
@@ -134,6 +178,7 @@ class LoginController extends Controller
         $id = Session::get('id_pengguna');
         $where['id_user'] = $id;
         $this->repouser->update($where,$req);
+        auth()->user()->update(['ganti_pass' => null]);
         $notification = [
             'message' => 'Data berhasil disimpan, silahkan login ulang.',
             'alert-type' => 'error',

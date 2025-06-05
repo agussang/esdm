@@ -63,7 +63,7 @@
                             <span>
                                 <ul>Ketentuan Disiplin Pengumpulan SKP Point Pengurang E-Remun:
                                     <li>Terlambat lebih dari 5 hari kerja point remun dikurangi 3% pada setiap periode pengisian skp</li>
-                                    <li>Terlambat lebih dari 10 hari kerja point remun dikurangi 100% pada setiap periode pengisian skp</li>
+                                    <li>Terlambat lebih dari 7 hari kerja point remun dikurangi 100% pada setiap periode pengisian skp</li>
                                     <li>Penentuan point pengurang e-remun dilihat berdasarkan tanggal pengumpulan skp dan batas tanggal pengumpulan</li>
                                 </ul>
                                 <ul>
