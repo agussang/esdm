@@ -142,7 +142,7 @@ class DataAbsenController extends Controller
         $data['arrkategorijustifikasi'] = Fungsi::arrkategorijustifikasi();
         $data['bulan'] = $bulan;
         $data['tahun'] = $tahun;
-        //dd($data['dt_pegawai']);
+        //dd($data['arrStatusJustifikasi']);
         return view('content.data_pegawai.history_ajuan_justifikasi_kehadiran.history',$data);
     }
 
@@ -160,6 +160,24 @@ class DataAbsenController extends Controller
         $req['justifikasi_atasan'] = "2";
         $where['id_justifikasi'] = Crypt::decrypt($id_justifikasi);
         $this->repotrjustifikasi->update($where,$req);
+
+        return redirect()->intended('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/history/'.Crypt::encrypt($rsData->id_sdm).'/'.$bulan.'/'.$tahun)->with($notification);
+    }
+
+    public function reset_justifikasi($id_justifikasi){
+        $notification = [
+            'message' => 'Justifikasi Berhasil di tolak oleh admin.',
+            'alert-type' => 'success',
+        ];
+        $rsData = $this->repotrjustifikasi->findId("",Crypt::decrypt($id_justifikasi),"id_justifikasi");
+
+        $bulan = date('m',strtotime($rsData->tanggal_absen));
+        $tahun = date('Y',strtotime($rsData->tanggal_absen));
+        $tgl_batal = date('Y-m-d H:i:s');
+        $req['ket_pembatalan_admin'] = null;
+        $req['justifikasi_atasan'] = '0';
+        $where['id_justifikasi'] = Crypt::decrypt($id_justifikasi);
+        $this->repotrjustifikasi->destroy(Crypt::decrypt($id_justifikasi),'id_justifikasi');
 
         return redirect()->intended('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/history/'.Crypt::encrypt($rsData->id_sdm).'/'.$bulan.'/'.$tahun)->with($notification);
     }

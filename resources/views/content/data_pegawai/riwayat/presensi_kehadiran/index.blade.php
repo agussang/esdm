@@ -507,6 +507,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                                 @else
                                                                     <a href="{{URL::to('pegawai/justifikasi-kehadiran-pegawai')}}/{{$rsData->id_sdm}}/{{$tgl}}/{{$kode_justifikasi}}" class="btn btn-primary">Justifikasi</a>
                                                                 @endif
+                                                            @elseif($hitungdurasi_pulang_cepat>0 and !$ketajuan)
+                                                                <a href="{{URL::to('pegawai/justifikasi-kehadiran-pegawai')}}/{{$rsData->id_sdm}}/{{$tgl}}/{{$kode_justifikasi}}" class="btn btn-primary">Justifikasi</a>
                                                             @else
                                                             Tidak bisa dijustifikasi
                                                             @endif

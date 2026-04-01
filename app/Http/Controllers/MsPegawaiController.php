@@ -289,6 +289,7 @@ class MsPegawaiController extends Controller
         }else{
             $getRekapDataAbsen = Fungsi::get_rekap_data_kehadiran($jam_kerja,$tgl_awal,$tgl_terakhir,$arrIdSdm,1);
         }
+        //dd($getRekapDataAbsen);
         $data['pilihan_tahun_presensi'] = Fungsi::pilihan_tahun_presensi($tahun);
         $data['pilihan_bulan_presensi'] = Fungsi::pilihan_bulan_presensi($bln);
         $getajuan_justifikasi = Fungsi::getajuan_justifikasi($id_sdm,$tgl_awal,$tgl_terakhir);
@@ -941,6 +942,22 @@ class MsPegawaiController extends Controller
             $reqinset2['jam_absen'] = $rsData->jam_pulang;
             $reqinset2['id_sdm'] = $rsData->id_sdm;
             $reqinset2['ket_justifikasi'] = "justifikasi 1x absen";
+            $reqinset2['mesin'] = "justifikasi";
+            $reqinset2['sn'] = "justifikasi";
+            $this->reporiwayatpresensi->store($reqinset2);
+        }
+        if($req['kode_kategori'] == "3"){
+            $reqinset['tanggal_absen'] = $rsData->tanggal_absen;
+            $reqinset['jam_absen'] = $rsData->jam_masuk;
+            $reqinset['id_sdm'] = $rsData->id_sdm;
+            $reqinset['ket_justifikasi'] = "justifikasi durasi kurang";
+            $reqinset['mesin'] = "justifikasi";
+            $reqinset['sn'] = "justifikasi";
+            $this->reporiwayatpresensi->store($reqinset);
+            $reqinset2['tanggal_absen'] = $rsData->tanggal_absen;
+            $reqinset2['jam_absen'] = $rsData->jam_pulang;
+            $reqinset2['id_sdm'] = $rsData->id_sdm;
+            $reqinset2['ket_justifikasi'] = "justifikasi justifikasi durasi kurang";
             $reqinset2['mesin'] = "justifikasi";
             $reqinset2['sn'] = "justifikasi";
             $this->reporiwayatpresensi->store($reqinset2);

@@ -8,6 +8,9 @@ use App\Repositories\Repomsperiodeskp;
 use App\Repositories\Reposettingramadhan;
 use Session;
 use Fungsi;
+use App\Repositories\Reporiwayatpresensi;
+use App\Repositories\Repoclocktransaction;
+use App\Models\Iclocktransaction;
 
 class IndexController extends Controller
 {
@@ -15,12 +18,46 @@ class IndexController extends Controller
         Request $request,
         Repomspegawai $repomspegawai,
         Repomsperiodeskp $repomsperiodeskp,
-        Reposettingramadhan $reposettingramadhan
+        Reposettingramadhan $reposettingramadhan,
+        Reporiwayatpresensi $reporiwayatpresensi,
+        Repoclocktransaction $repoclocktransaction
     ){
         $this->request = $request;
         $this->repomspegawai = $repomspegawai;
         $this->repomsperiodeskp = $repomsperiodeskp;
         $this->reposettingramadhan = $reposettingramadhan;
+        $this->reporiwayatpresensi = $reporiwayatpresensi;
+        $this->repoclocktransaction = $repoclocktransaction;
+    }
+
+    public function sync_semi_auto(){
+        $rsPeg = $this->repomspegawai->get();
+        $arrNip = array();$arrIdSdm = array();
+        foreach($rsPeg as $rs=>$r){
+            $arrNip[$r->nip] = $r->nip;
+            $arrIdSdm[$r->nip] = $r->id_sdm;
+        }
+        $tgl_saiki = date('Y-m-d');
+        $sync = $this->repoclocktransaction->getsyncabsen($tgl_saiki,$arrNip);
+        
+        foreach($sync as $empcode => $dt_tgl){
+            $id_sdm = $arrIdSdm[$empcode];
+            if($id_sdm){
+                foreach($dt_tgl as $tgl_absen => $dttglabsen){
+                    foreach($dttglabsen as $jam_absen => $dt_jam_absen){
+                        $id_finger = $dt_jam_absen['id'];
+                        unset($dt_jam_absen['emp_code']);
+                        unset($dt_jam_absen['id']);
+                        $dt_jam_absen['tanggal_scan'] = date('Y-m-d H:i:s');
+                        $dt_jam_absen['id_sdm'] = $id_sdm;
+                        $this->reporiwayatpresensi->store($dt_jam_absen);
+                        $upfinger['csf'] = "1";
+                        $where['id'] = $id_finger;
+                        $update_finger = Iclocktransaction::where('id',$id_finger)->update(['csf'=>1]);
+                    }
+                }
+            }
+        }
     }
 
     public function index()
@@ -108,6 +145,9 @@ class IndexController extends Controller
                 $data['jm_perpendidikan'][$r->nm_pendidikan->namapendidikan]+=1;
             }
             ksort($data['jm_by_pendidikan']);
+
+            $this->sync_semi_auto();
+            
             return view('content.home',$data);
         }
     }
