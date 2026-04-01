@@ -11,6 +11,7 @@ use Fungsi;
 use App\Repositories\Reporiwayatpresensi;
 use App\Repositories\Repoclocktransaction;
 use App\Models\Iclocktransaction;
+use Illuminate\Support\Facades\DB;
 
 class IndexController extends Controller
 {
@@ -126,6 +127,35 @@ class IndexController extends Controller
             // develop by masgus - pass jumlah justifikasi kat.4 per bulan ke view
             $data['justifikasiKat4Count'] = Fungsi::countAllJustifikasiKat4(Session::get('id_sdm'), $tgl_awal);
 
+            // Data ranking kehadiran hari ini untuk ucapan/penghargaan
+            $today = date('Y-m-d');
+            $rankingHariIni = DB::table('neosimpeg.riwayat_finger as rf')
+                ->join('neosimpeg.ms_pegawai as p', 'rf.id_sdm', '=', 'p.id_sdm')
+                ->where('rf.tanggal_absen', $today)
+                ->where('p.id_stat_aktif', '1')
+                ->whereNull('p.deleted_at')
+                ->select('rf.id_sdm', 'p.nm_sdm', DB::raw("MIN(rf.jam_absen) as jam_masuk"))
+                ->groupBy('rf.id_sdm', 'p.nm_sdm')
+                ->orderBy('jam_masuk', 'asc')
+                ->get();
+
+            $data['ranking_hari_ini'] = null;
+            $data['juara_top3'] = [];
+            foreach ($rankingHariIni as $idx => $rk) {
+                if ($idx < 3) {
+                    $data['juara_top3'][] = [
+                        'nama' => $rk->nm_sdm,
+                        'jam_masuk' => substr($rk->jam_masuk, 0, 5),
+                        'ranking' => $idx + 1,
+                    ];
+                }
+                if ($rk->id_sdm == $id_sdm) {
+                    $data['ranking_hari_ini'] = $idx + 1;
+                    $data['jam_masuk_hari_ini'] = substr($rk->jam_masuk, 0, 5);
+                }
+            }
+            $data['total_hadir_hari_ini'] = count($rankingHariIni);
+
             return view('content.hal_pegawai.home',$data);
         }else{
             $jns_kelamin = Fungsi::arrjenis_kelamin();
@@ -154,6 +184,94 @@ class IndexController extends Controller
         }
     }
 
+
+    public function live_kehadiran()
+    {
+        $today = date('Y-m-d');
+        $jam_masuk_batas = '08:15'; // toleransi 15 menit dari jam 08:00
+
+        // Total pegawai aktif
+        $total_pegawai = DB::table('neosimpeg.ms_pegawai')
+            ->where('id_stat_aktif', '1')
+            ->whereNull('deleted_at')
+            ->count();
+
+        // Data kehadiran hari ini - ambil jam pertama (masuk) dan terakhir (pulang) per pegawai
+        $kehadiran = DB::table('neosimpeg.riwayat_finger as rf')
+            ->join('neosimpeg.ms_pegawai as p', 'rf.id_sdm', '=', 'p.id_sdm')
+            ->leftJoin('neosimpeg.ms_satker as s', 'p.id_satkernow', '=', 's.id_sms')
+            ->where('rf.tanggal_absen', $today)
+            ->where('p.id_stat_aktif', '1')
+            ->whereNull('p.deleted_at')
+            ->select(
+                'rf.id_sdm',
+                'p.nm_sdm',
+                'p.nip',
+                's.nm_lemb as unit_kerja',
+                DB::raw("MIN(rf.jam_absen) as jam_masuk"),
+                DB::raw("MAX(rf.jam_absen) as jam_pulang"),
+                DB::raw("COUNT(rf.id_finger) as total_scan")
+            )
+            ->groupBy('rf.id_sdm', 'p.nm_sdm', 'p.nip', 's.nm_lemb')
+            ->orderBy('jam_masuk', 'asc')
+            ->get();
+
+        $hadir = 0;
+        $terlambat = 0;
+        $tepat_waktu = 0;
+        $sudah_pulang = 0;
+        $list_hadir = [];
+        $list_terlambat = [];
+
+        foreach ($kehadiran as $k) {
+            $hadir++;
+            $is_terlambat = ($k->jam_masuk > $jam_masuk_batas);
+            if ($is_terlambat) {
+                $terlambat++;
+            } else {
+                $tepat_waktu++;
+            }
+            if ($k->total_scan > 1 && $k->jam_masuk != $k->jam_pulang) {
+                $sudah_pulang++;
+            }
+
+            $ranking = $hadir; // karena $hadir sudah di-increment di atas
+            $item = [
+                'nama' => $k->nm_sdm,
+                'nip' => $k->nip,
+                'unit' => $k->unit_kerja,
+                'jam_masuk' => substr($k->jam_masuk, 0, 5),
+                'jam_pulang' => ($k->total_scan > 1 && $k->jam_masuk != $k->jam_pulang) ? substr($k->jam_pulang, 0, 5) : null,
+                'terlambat' => $is_terlambat,
+                'ranking' => $ranking,
+            ];
+            $list_hadir[] = $item;
+            if ($is_terlambat) {
+                $list_terlambat[] = $item;
+            }
+        }
+
+        $belum_hadir = $total_pegawai - $hadir;
+        $persen_hadir = $total_pegawai > 0 ? round(($hadir / $total_pegawai) * 100, 1) : 0;
+
+        // Top 3 datang paling awal
+        $juara = array_slice($list_hadir, 0, 3);
+
+        return response()->json([
+            'tanggal' => $today,
+            'waktu_update' => date('H:i:s'),
+            'total_pegawai' => $total_pegawai,
+            'hadir' => $hadir,
+            'belum_hadir' => $belum_hadir,
+            'terlambat' => $terlambat,
+            'tepat_waktu' => $tepat_waktu,
+            'sudah_pulang' => $sudah_pulang,
+            'persen_hadir' => $persen_hadir,
+            'juara' => $juara,
+            'list_hadir' => $list_hadir,
+            'list_terlambat' => $list_terlambat,
+        ]);
+    }
 
     public function create()
     {

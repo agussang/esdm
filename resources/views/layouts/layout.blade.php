@@ -10,6 +10,25 @@
     @include('layouts.css')
     @stack('css')
     <style type="text/css">
+        /* Dropdown submenu scrollable agar tidak melebihi layar */
+        .iq-submenu {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .iq-submenu::-webkit-scrollbar {
+            width: 5px;
+        }
+        .iq-submenu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .iq-submenu::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.15);
+            border-radius: 10px;
+        }
+        .iq-submenu::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.25);
+        }
+
         .pagination {
             display: flex;
             padding-left: 0;

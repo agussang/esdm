@@ -64,6 +64,7 @@ Route::post('/ubahpassword/simpan', [LoginController::class, 'simpan_ubah_passwo
 
 Route::group(['middleware' => 'role:SA_A_PI_B'], function () {
     Route::get('home',[IndexController::class,'index'])->name('home');
+    Route::get('api/live-kehadiran',[IndexController::class,'live_kehadiran'])->name('api.live-kehadiran');
     Route::group(['prefix' => 'data-master'], function () {
         Route::group(['prefix' => 'waktu-shift'], function () {
             Route::get('/',[MsWaktuShiftController::class,'index'])->name('data-master.waktu-shift');

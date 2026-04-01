@@ -3,135 +3,377 @@
 <?php
 $arrnmbulan = Fungsi::nm_bulan();
 $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Proses Persetujuan Atasan");
+$hour = date('H');
+if($hour < 12) $salam = 'Selamat Pagi';
+elseif($hour < 15) $salam = 'Selamat Siang';
+elseif($hour < 18) $salam = 'Selamat Sore';
+else $salam = 'Selamat Malam';
 ?>
-<div class="row">
-    <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
-        <div class="card-header d-flex justify-content-between">
-            <div class="header-title">
-                <h4 class="card-title">
-                    <i class="fas fa-list-alt" style="color:red;"></i> <span>Selamat Datang {{Session::get('nama_pengguna')}} di aplikasi E-SDM POLTEKBANG SURABAYA.</span>
-                </h4>
-            </div>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-6 col-lg-3">
-                    <div class="card card-block card-stretch card-height">
-                       <div class="card-body bg-primary-light rounded">
-                          <div class="d-flex align-items-center justify-content-between">
-                             <div class="rounded iq-card-icon bg-primary"><i class="ri-user-fill"></i>
-                             </div>
-                             <div class="text-right">
-                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="hadir"></div></span></h2>
-                                <h5 class="">Kehadiran</h5>
-                             </div>
-                          </div>
-                       </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-3">
-                    <div class="card card-block card-stretch card-height">
-                       <div class="card-body bg-warning-light rounded">
-                          <div class="d-flex align-items-center justify-content-between">
-                             <div class="rounded iq-card-icon bg-warning"><i class="ri-women-fill"></i>
-                             </div>
-                             <div class="text-right">
-                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="tidak_masuk"></div></span></h2>
-                                <h5 class="">Tidak Masuk</h5>
-                             </div>
-                          </div>
-                       </div>
-                    </div>
-                </div>
-                <div class="col-md-6 col-lg-6">
-                  <div class="card text-white bg-danger">
-                     <div class="card-body">
-                        <h4 class="card-title text-white">Periode SKP Aktif</h4>
-                        <hr/>
-                        <div class="row">
-                           <div class="col-md-3">
-                               <center><h4 class="mt-2"><span class="badge badge-primary">Bulan</span></h4><h4><hr/>{{$arrBulanPanjang[$periodeaktif->bulan]}}</h4></center>
-                           </div>
-                           <div class="col-md-3">
-                               <center><h4 class="mt-2"><span class="badge badge-primary">Tahun</span></h4><h4><hr/>{{$periodeaktif->tahun}}</h4></center>
-                           </div>
-                           <div class="col-md-6">
-                              <center><h4 class="mt-2"><span class="badge badge-warning">Batas Pengumpulan SKP</span></h4><h4><hr/>{{date('d-m-Y',strtotime($periodeaktif->tgl_batas_skp))}}</h4></center>
-                          </div>
-                       </div>
-                     </div>
-                  </div>
-                </div>
-            </div>
-            <div class="row">
-               <div class="col-md-6 col-lg-3">
-                  <div class="card card-block card-stretch card-height">
-                     <div class="card-body bg-info-light rounded">
-                        <div class="d-flex align-items-center justify-content-between">
-                           <div class="rounded iq-card-icon bg-info"><i class="ri-hospital-line"></i>
-                           </div>
-                           <div class="text-right">
-                              <h2 class="mb-0"><span class="counter" style="visibility: visible;">
-                                <div id="terlambat"></div>
 
-                                </span></h2>
-                                <font style="font-size:14px;"><div id="terlambatmenit"></div></font>
-                              <h5 class="">Terlambat</h5>
-                           </div>
-                        </div>
-                     </div>
-                  </div>
-              </div>
-               <div class="col-md-6 col-lg-3">
-                    <div class="card card-block card-stretch card-height">
-                       <div class="card-body bg-secondary-light rounded">
-                          <div class="d-flex align-items-center justify-content-between">
-                             <div class="rounded iq-card-icon bg-primary"><i class="ri-user-fill"></i>
-                             </div>
-                             <div class="text-right">
-                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="finger_sekali"></div></span></h2>
-                                <h5 class="">Finger 1 kali</h5>
-                             </div>
-                          </div>
-                       </div>
+<style>
+/* ===== Greeting Banner Pegawai ===== */
+.peg-greeting {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 16px;
+    padding: 24px 28px;
+    color: #fff;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.peg-greeting::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -15%;
+    width: 250px;
+    height: 250px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 50%;
+}
+.peg-greeting h3 {
+    font-size: 1.35rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+.peg-greeting p {
+    opacity: 0.85;
+    margin: 0;
+    font-size: 0.88rem;
+}
+
+/* ===== Award / Penghargaan ===== */
+.award-banner {
+    border: none;
+    border-radius: 14px;
+    overflow: hidden;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.award-banner .award-header {
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+.award-juara {
+    background: linear-gradient(135deg, #fef9c3 0%, #fde68a 100%);
+}
+.award-juara .award-header {
+    color: #92400e;
+}
+.award-juara .award-header i { font-size: 1.3rem; }
+.award-body {
+    padding: 20px 24px;
+}
+.award-rank-box {
+    text-align: center;
+    padding: 16px;
+}
+.award-rank-circle {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 10px;
+    font-size: 2rem;
+}
+.award-rank-1 { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; box-shadow: 0 4px 20px rgba(245,158,11,0.35); }
+.award-rank-2 { background: linear-gradient(135deg, #d1d5db, #9ca3af); color: #374151; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+.award-rank-3 { background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; box-shadow: 0 4px 15px rgba(180,83,9,0.3); }
+.award-rank-other { background: linear-gradient(135deg, #dbeafe, #93c5fd); color: #1e40af; box-shadow: 0 4px 15px rgba(59,130,246,0.2); }
+.award-rank-num {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 2px;
+}
+.award-rank-label {
+    font-size: 0.78rem;
+    color: #64748b;
+    font-weight: 600;
+}
+.award-jam {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 4px;
+}
+.award-jam i { color: #10b981; }
+.award-msg {
+    font-size: 0.92rem;
+    color: #334155;
+    line-height: 1.6;
+}
+.award-msg strong { color: #1e293b; }
+
+/* Top 3 mini podium */
+.mini-podium {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0,0,0,0.06);
+}
+.mini-podium-item {
+    text-align: center;
+    width: 120px;
+}
+.mini-podium-medal {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin: 0 auto 6px;
+}
+.mini-podium-medal.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); color: #78350f; }
+.mini-podium-medal.silver { background: linear-gradient(135deg, #d1d5db, #9ca3af); color: #374151; }
+.mini-podium-medal.bronze { background: linear-gradient(135deg, #f59e0b, #b45309); color: #fff; }
+.mini-podium-name {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #1e293b;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.mini-podium-time {
+    font-size: 0.68rem;
+    color: #64748b;
+}
+
+/* Stat cards pegawai */
+.peg-stat {
+    border: none;
+    border-radius: 12px;
+    padding: 18px 16px;
+    text-align: center;
+    transition: transform 0.2s;
+    min-height: 100px;
+}
+.peg-stat:hover { transform: translateY(-3px); }
+.peg-stat .peg-stat-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin: 0 auto 10px;
+    color: #fff;
+}
+.peg-stat .peg-stat-val {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 2px;
+}
+.peg-stat .peg-stat-sub {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 600;
+}
+.peg-stat .peg-stat-lbl {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 4px;
+}
+.bg-stat-hadir { background: #ecfdf5; } .bg-stat-hadir .peg-stat-icon { background: #10b981; } .bg-stat-hadir .peg-stat-val { color: #065f46; }
+.bg-stat-absent { background: #fef3c7; } .bg-stat-absent .peg-stat-icon { background: #f59e0b; } .bg-stat-absent .peg-stat-val { color: #92400e; }
+.bg-stat-late { background: #dbeafe; } .bg-stat-late .peg-stat-icon { background: #3b82f6; } .bg-stat-late .peg-stat-val { color: #1e40af; }
+.bg-stat-finger { background: #f3e8ff; } .bg-stat-finger .peg-stat-icon { background: #8b5cf6; } .bg-stat-finger .peg-stat-val { color: #5b21b6; }
+.bg-stat-early { background: #fce7f3; } .bg-stat-early .peg-stat-icon { background: #ec4899; } .bg-stat-early .peg-stat-val { color: #9d174d; }
+.bg-stat-absen { background: #fee2e2; } .bg-stat-absen .peg-stat-icon { background: #ef4444; } .bg-stat-absen .peg-stat-val { color: #991b1b; }
+
+/* SKP Card */
+.skp-card {
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: #fff;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(239,68,68,0.2);
+}
+.skp-card .skp-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 12px; }
+.skp-card .skp-item { text-align: center; }
+.skp-card .skp-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: rgba(255,255,255,0.2);
+    margin-bottom: 6px;
+}
+.skp-card .skp-val { font-size: 1.1rem; font-weight: 700; }
+
+@media (max-width: 768px) {
+    .peg-greeting { padding: 18px; }
+    .peg-greeting h3 { font-size: 1.1rem; }
+    .mini-podium { gap: 8px; }
+    .mini-podium-item { width: 90px; }
+    .peg-stat { padding: 14px 10px; min-height: auto; }
+    .peg-stat .peg-stat-val { font-size: 1.2rem; }
+}
+</style>
+
+{{-- ===== Greeting ===== --}}
+<div class="peg-greeting">
+    <h3><i class="ri-hand-heart-line" style="margin-right:8px;"></i>{{ $salam }}, {{ Session::get('nama_pengguna') }}</h3>
+    <p>Aplikasi E-SDM Poltekbang Surabaya &mdash; {{ date('l, d F Y') }}</p>
+</div>
+
+{{-- ===== Penghargaan Kehadiran Hari Ini ===== --}}
+@if($ranking_hari_ini !== null)
+<div class="award-banner award-juara">
+    <div class="award-header">
+        @if($ranking_hari_ini <= 3)
+            <i class="ri-trophy-fill" style="color:#f59e0b;"></i> Penghargaan Kehadiran Hari Ini
+        @else
+            <i class="ri-medal-fill" style="color:#3b82f6;"></i> Kehadiran Hari Ini
+        @endif
+    </div>
+    <div class="award-body">
+        <div class="row align-items-center">
+            <div class="col-auto">
+                <div class="award-rank-box">
+                    <div class="award-rank-circle {{ $ranking_hari_ini == 1 ? 'award-rank-1' : ($ranking_hari_ini == 2 ? 'award-rank-2' : ($ranking_hari_ini == 3 ? 'award-rank-3' : 'award-rank-other')) }}">
+                        @if($ranking_hari_ini <= 3)
+                            <i class="ri-trophy-fill"></i>
+                        @else
+                            <i class="ri-medal-fill"></i>
+                        @endif
                     </div>
-               </div>
-               <div class="col-md-6 col-lg-3">
-                    <div class="card card-block card-stretch card-height">
-                       <div class="card-body bg-success-light rounded">
-                          <div class="d-flex align-items-center justify-content-between">
-                             <div class="rounded iq-card-icon bg-primary"><i class="ri-user-fill"></i>
-                             </div>
-                             <div class="text-right">
-                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="pulang_cepat"></div></span></h2>
-                                <font style="font-size:14px;"><div id="pulangepatmenit"></div></font>
-                                <h5 class="">Pulang Cepat</h5>
-                             </div>
-                          </div>
-                       </div>
-                    </div>
-               </div>
-               <div class="col-md-6 col-lg-3">
-                    <div class="card card-block card-stretch card-height">
-                       <div class="card-body bg-danger-light rounded">
-                          <div class="d-flex align-items-center justify-content-between">
-                             <div class="rounded iq-card-icon bg-danger"><i class="ri-group-fill"></i>
-                             </div>
-                             <div class="text-right">
-                                <h2 class="mb-0"><span class="counter" style="visibility: visible;"><div id="absen_kehadiran"></div></span></h2>
-                                <h5 class="">Absen Kehadiran</h5>
-                             </div>
-                          </div>
-                       </div>
-                    </div>
+                    <div class="award-rank-num">#{{ $ranking_hari_ini }}</div>
+                    <div class="award-rank-label">dari {{ $total_hadir_hari_ini }} pegawai</div>
+                    <div class="award-jam"><i class="ri-time-line"></i> Masuk {{ $jam_masuk_hari_ini }}</div>
                 </div>
             </div>
+            <div class="col">
+                <div class="award-msg">
+                    @if($ranking_hari_ini == 1)
+                        <strong>Luar biasa! Anda datang paling awal hari ini!</strong><br/>
+                        Anda meraih posisi <strong>Juara 1</strong> kehadiran. Dedikasi dan kedisiplinan Anda patut menjadi teladan bagi seluruh pegawai. Tetap pertahankan semangat ini!
+                    @elseif($ranking_hari_ini == 2)
+                        <strong>Hebat! Anda datang kedua paling awal!</strong><br/>
+                        Posisi <strong>Juara 2</strong> hari ini. Kedisiplinan Anda sangat diapresiasi. Terus semangat untuk meraih posisi pertama!
+                    @elseif($ranking_hari_ini == 3)
+                        <strong>Keren! Anda masuk 3 besar paling awal!</strong><br/>
+                        Posisi <strong>Juara 3</strong> hari ini. Konsistensi kehadiran Anda sangat baik. Pertahankan semangat dan kedisiplinan Anda!
+                    @elseif($ranking_hari_ini <= 10)
+                        <strong>Bagus! Anda termasuk 10 besar yang datang lebih awal.</strong><br/>
+                        Posisi ke-<strong>{{ $ranking_hari_ini }}</strong> hari ini. Terus tingkatkan kedisiplinan Anda untuk meraih posisi yang lebih baik!
+                    @else
+                        <strong>Terima kasih sudah hadir hari ini!</strong><br/>
+                        Anda berada di posisi ke-<strong>{{ $ranking_hari_ini }}</strong>. Setiap kehadiran Anda sangat berarti. Semangat bekerja hari ini!
+                    @endif
+                </div>
+                {{-- Mini podium top 3 --}}
+                @if(count($juara_top3) > 0)
+                <div class="mini-podium">
+                    @foreach($juara_top3 as $jt)
+                    <div class="mini-podium-item">
+                        <div class="mini-podium-medal {{ $jt['ranking'] == 1 ? 'gold' : ($jt['ranking'] == 2 ? 'silver' : 'bronze') }}">
+                            <i class="{{ $jt['ranking'] == 1 ? 'ri-trophy-fill' : 'ri-medal-fill' }}"></i>
+                        </div>
+                        <div class="mini-podium-name" title="{{ $jt['nama'] }}">{{ $jt['nama'] }}</div>
+                        <div class="mini-podium-time"><i class="ri-time-line"></i> {{ $jt['jam_masuk'] }}</div>
+                    </div>
+                    @endforeach
+                </div>
+                @endif
+            </div>
+        </div>
+    </div>
+</div>
+@endif
+
+{{-- ===== Stat Cards ===== --}}
+<div class="row mb-3">
+    <div class="col-6 col-lg-2 mb-3">
+        <div class="peg-stat bg-stat-hadir">
+            <div class="peg-stat-icon"><i class="ri-user-follow-line"></i></div>
+            <div class="peg-stat-val"><span id="hadir">0</span></div>
+            <div class="peg-stat-lbl">Kehadiran</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 mb-3">
+        <div class="peg-stat bg-stat-absent">
+            <div class="peg-stat-icon"><i class="ri-user-unfollow-line"></i></div>
+            <div class="peg-stat-val"><span id="tidak_masuk">0</span></div>
+            <div class="peg-stat-lbl">Tidak Masuk</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 mb-3">
+        <div class="peg-stat bg-stat-late">
+            <div class="peg-stat-icon"><i class="ri-alarm-warning-line"></i></div>
+            <div class="peg-stat-val"><span id="terlambat">0</span></div>
+            <div class="peg-stat-sub"><span id="terlambatmenit"></span></div>
+            <div class="peg-stat-lbl">Terlambat</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 mb-3">
+        <div class="peg-stat bg-stat-finger">
+            <div class="peg-stat-icon"><i class="ri-fingerprint-line"></i></div>
+            <div class="peg-stat-val"><span id="finger_sekali">0</span></div>
+            <div class="peg-stat-lbl">Finger 1x</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 mb-3">
+        <div class="peg-stat bg-stat-early">
+            <div class="peg-stat-icon"><i class="ri-run-line"></i></div>
+            <div class="peg-stat-val"><span id="pulang_cepat">0</span></div>
+            <div class="peg-stat-sub"><span id="pulangepatmenit"></span></div>
+            <div class="peg-stat-lbl">Pulang Cepat</div>
+        </div>
+    </div>
+    <div class="col-6 col-lg-2 mb-3">
+        <div class="peg-stat bg-stat-absen">
+            <div class="peg-stat-icon"><i class="ri-calendar-close-line"></i></div>
+            <div class="peg-stat-val"><span id="absen_kehadiran">0</span></div>
+            <div class="peg-stat-lbl">Absen Kehadiran</div>
+        </div>
+    </div>
+</div>
+
+{{-- ===== SKP Periode Aktif ===== --}}
+<div class="row mb-3">
+    <div class="col-lg-12">
+        <div class="skp-card p-3">
+            <div class="skp-title"><i class="ri-file-list-3-line mr-1"></i> Periode SKP Aktif</div>
             <div class="row">
-                <div class="col-md-12">
-                    <span><i class="text-dark">*Nb: Rekap presensi kehadiran yang ditampilkan di halaman ini dimulai dari tanggal 1 {{$arrnmbulan[date('m')]}} {{date('Y')}} Sampai {{$tanggal_terakhir}} {{$arrnmbulan[date('m')]}} {{date('Y')}}</i></span>
+                <div class="col-4 skp-item">
+                    <div class="skp-badge">Bulan</div>
+                    <div class="skp-val">{{$arrBulanPanjang[$periodeaktif->bulan]}}</div>
+                </div>
+                <div class="col-4 skp-item">
+                    <div class="skp-badge">Tahun</div>
+                    <div class="skp-val">{{$periodeaktif->tahun}}</div>
+                </div>
+                <div class="col-4 skp-item">
+                    <div class="skp-badge">Batas Pengumpulan</div>
+                    <div class="skp-val">{{date('d-m-Y',strtotime($periodeaktif->tgl_batas_skp))}}</div>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div class="row mb-2">
+    <div class="col-md-12">
+        <small class="text-muted"><i class="ri-information-line"></i> Rekap presensi: 1 {{$arrnmbulan[date('m')]}} {{date('Y')}} s/d {{$tanggal_terakhir}} {{$arrnmbulan[date('m')]}} {{date('Y')}}</small>
     </div>
 </div>
 @if($info_pegawai->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
@@ -523,14 +765,13 @@ $textpulangcepat = $pulang_cepatmenit." ( Menit ) ";
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <meta name="csrf_token" content="{{ csrf_token() }}" />
 <script type="text/javascript">
-document.getElementById("tidak_masuk").innerHTML = "{{$tidak_hadir}}";
-document.getElementById("hadir").innerHTML = "{{$hadir}}";
-document.getElementById("finger_sekali").innerHTML = "{{$finger_sekali}}";
-document.getElementById("terlambat").innerHTML = "{{$jterlambat}}";
-
-document.getElementById("pulang_cepat").innerHTML = "{{$pulang_cepat}}";
-document.getElementById("terlambatmenit").innerHTML = "{{$textterlambat}}";
-document.getElementById("pulangepatmenit").innerHTML = "{{$textpulangcepat}}";
-document.getElementById("absen_kehadiran").innerHTML = "{{$absen_kehadiran}}";
+document.getElementById("tidak_masuk").textContent = "{{$tidak_hadir}}";
+document.getElementById("hadir").textContent = "{{$hadir}}";
+document.getElementById("finger_sekali").textContent = "{{$finger_sekali}}";
+document.getElementById("terlambat").textContent = "{{$jterlambat}}";
+document.getElementById("pulang_cepat").textContent = "{{$pulang_cepat}}";
+document.getElementById("terlambatmenit").textContent = "{{$textterlambat}}";
+document.getElementById("pulangepatmenit").textContent = "{{$textpulangcepat}}";
+document.getElementById("absen_kehadiran").textContent = "{{$absen_kehadiran}}";
 </script>
 @stop
