@@ -345,7 +345,7 @@ function jam_kerjaunit($id_satker){
 
 function gettanggalabsenkehadiran_sdm($arrIdSdm,$tgl_awal,$tgl_akhir){
     $arrData = array();$arrAlasan = array();
-    $rsAlasan = DB::table('ms_alasan_absen')->get();
+    $rsAlasan = DB::table('ms_alasan_absen')->whereNull('deleted_at')->get(); // develop by masgus
     foreach($rsAlasan as $rsa=>$ralasan){
         $arrAlasan[$ralasan->id_alasan]['nm_alasan'] = $ralasan->alasan;
         $arrAlasan[$ralasan->id_alasan]['kode_alasan'] = $ralasan->kode_lokal;
@@ -774,9 +774,10 @@ class Fungsi
         return $ket;
     }
 
+    // develop by masgus - hapus kategori 2 (Terlambat) dari justifikasi
     public static function arrkategorijustifikasi(){
-        // 1. lupa finger, 2. terlambat, 3. pulang cepat, 4.finger 1 kali
-        $arrData = array("1"=>"Lupa Finger / Tidak Masuk","2"=>"Terlambat","3"=>"Pulang Cepat","4"=>"Finger 1 Kali");
+        // 1. lupa finger, 3. pulang cepat, 4.finger 1 kali
+        $arrData = array("1"=>"Lupa Finger / Tidak Masuk","3"=>"Pulang Cepat","4"=>"Finger 1 Kali");
         return $arrData;
     }
 
@@ -872,45 +873,90 @@ class Fungsi
         return $kerjagabung;
     }
 
-    public static function hitungdurasiterlambat($jm_kerja_masuk,$jam_absen){
-        $jam_masukex = explode(':',$jam_absen);
-        $jam_telatex = explode(':',$jm_kerja_masuk);
+    // develop by masgus - aturan keterlambatan baru:
+    // - Terlambat <= 15 menit + jam kerja terpenuhi (pulang mundur) = TIDAK terlambat
+    // - Terlambat > 15 menit = SELALU terlambat
+    // - Terlambat <= 15 menit + jam kerja TIDAK terpenuhi = kekurangan dihitung terlambat
+    public static function hitungdurasiterlambat($jm_kerja_masuk, $jam_absen, $jm_kerja_pulang = null, $jam_pulang_actual = null){
+        $jam_masukex = explode(':', $jam_absen);
+        $jam_telatex = explode(':', $jm_kerja_masuk);
 
-        $j_masuk_start = $jam_masukex[0];
-        $menit_masuk = $jam_masukex[1];
+        $actual_masuk_menit = intVal($jam_masukex[0]) * 60 + intVal($jam_masukex[1]);
+        $scheduled_masuk_menit = intVal($jam_telatex[0]) * 60 + intVal($jam_telatex[1]);
 
-        $j_telat_masuk = $jam_telatex[0];
-        $menit_telat_masuk = $jam_telatex[1];
-
-        $jmkerja = str_replace(':','',$jam_absen);
-        $jmmkerja = str_replace(':','',$jm_kerja_masuk);
-        $menit = 0;
-        if($jmkerja > $jmmkerja){
-            $hasil = (intVal($j_telat_masuk) - intVal($j_masuk_start)) * 60 + (intVal($menit_telat_masuk) - intVal($menit_masuk));
-            $hasil = abs($hasil);
-            $hasil = number_format($hasil,2);
-            $hasilx = explode(".",$hasil);
-            $depan = sprintf("%02d", $hasilx[0]);
-            $gabung = $depan.":".$hasilx[1];
-            $menit = ($gabung*60)+$hasilx[1];
-            $menit = $menit/60;
+        // Tidak terlambat jika datang tepat waktu atau lebih awal
+        if ($actual_masuk_menit <= $scheduled_masuk_menit) {
+            return 0;
         }
 
-        return $menit;
+        // Hitung keterlambatan mentah (menit)
+        $raw_late = $actual_masuk_menit - $scheduled_masuk_menit;
+
+        // Jika terlambat > 15 menit: SELALU dianggap terlambat
+        if ($raw_late > 15) {
+            return $raw_late;
+        }
+
+        // Jika terlambat <= 15 menit: cek apakah jam kerja terpenuhi dengan mundur pulang
+        if ($jm_kerja_pulang !== null && $jam_pulang_actual !== null) {
+            $kerja_pulangex = explode(':', $jm_kerja_pulang);
+            $actual_pulangex = explode(':', $jam_pulang_actual);
+
+            // Jam pulang yang diharuskan = jam pulang normal + menit terlambat
+            $required_pulang = intVal($kerja_pulangex[0]) * 60 + intVal($kerja_pulangex[1]) + $raw_late;
+            $actual_pulang = intVal($actual_pulangex[0]) * 60 + intVal($actual_pulangex[1]);
+
+            if ($actual_pulang >= $required_pulang) {
+                // Jam kerja terpenuhi, TIDAK dianggap terlambat
+                return 0;
+            } else {
+                // Kekurangan jam kerja dihitung sebagai keterlambatan
+                $shortfall = $required_pulang - $actual_pulang;
+                return $shortfall;
+            }
+        }
+
+        // Fallback: jika tidak ada data pulang, kembalikan keterlambatan mentah
+        return $raw_late;
     }
+    // develop by masgus - hitung jumlah justifikasi lupa absen (kat.4) yang disetujui per bulan
+    public static function countApprovedJustifikasiKat4($id_sdm, $tanggal_referensi){
+        $tahunbulan = date('Y-m', strtotime($tanggal_referensi));
+        $count = TrJustifikasi::where('id_sdm', $id_sdm)
+            ->where('kategori_justifikasi', '4')
+            ->where('justifikasi_atasan', '1')
+            ->whereRaw("SUBSTRING(CAST(tanggal_absen AS VARCHAR(19)), 0, 8) = '$tahunbulan'")
+            ->whereNull('deleted_at')
+            ->count();
+        return $count;
+    }
+
+    // develop by masgus - hitung total justifikasi lupa absen (kat.4) termasuk pending per bulan
+    public static function countAllJustifikasiKat4($id_sdm, $tanggal_referensi){
+        $tahunbulan = date('Y-m', strtotime($tanggal_referensi));
+        $count = TrJustifikasi::where('id_sdm', $id_sdm)
+            ->where('kategori_justifikasi', '4')
+            ->whereIn('justifikasi_atasan', ['0', '1'])
+            ->whereRaw("SUBSTRING(CAST(tanggal_absen AS VARCHAR(19)), 0, 8) = '$tahunbulan'")
+            ->whereNull('deleted_at')
+            ->count();
+        return $count;
+    }
+
+    // develop by masgus - format HH:MM tanpa detik
     public static function durasikerja($jamawal,$jamakhir){
-        $datetime1 = new DateTime($jamawal);//start time
-        $datetime2 = new DateTime($jamakhir);//end time
+        $datetime1 = new DateTime($jamawal);
+        $datetime2 = new DateTime($jamakhir);
         $durasiker = $datetime1->diff($datetime2);
-        $durasikerja = sprintf("%02d",$durasiker->h).":".sprintf("%02d",$durasiker->i).":".sprintf("%02d",$durasiker->s);
+        $durasikerja = sprintf("%02d",$durasiker->h).":".sprintf("%02d",$durasiker->i);
         return $durasikerja;
     }
+    // develop by masgus - konversi HH:MM ke total menit
     public static function konversiwaktu($waktu){
         $rsData = explode(':',$waktu);
-        $jam = $rsData[0]*60;
-        $menit = ($rsData[1].":".$rsData[2])*60;
-        $jumlahkan = $jam+$menit/60;
-        return $jumlahkan;
+        $jam = intval($rsData[0]) * 60;
+        $menit = intval($rsData[1]);
+        return $jam + $menit;
     }
 
     public static function get_rekap_data_kehadiran_by_unit($tgl_awal,$tgl_akhir,$arrIdSdm,$tipe){
@@ -949,7 +995,7 @@ class Fungsi
                 }
             }
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
-            $rsAlasan = DB::table('ms_alasan_absen')->get();
+            $rsAlasan = DB::table('ms_alasan_absen')->whereNull('deleted_at')->get(); // develop by masgus
             foreach($rsAlasan as $rsa=>$ralasan){
                 $arrAlasan[$ralasan->id_alasan] = $ralasan->alasan;
             }
@@ -1108,7 +1154,7 @@ class Fungsi
     }
     public static function gettanggalabsenkehadiran($arrIdSdm,$tgl_awal,$tgl_akhir){
         $arrData = array();$arrAlasan = array();
-        $rsAlasan = DB::table('ms_alasan_absen')->get();
+        $rsAlasan = DB::table('ms_alasan_absen')->whereNull('deleted_at')->get(); // develop by masgus
         foreach($rsAlasan as $rsa=>$ralasan){
             $arrAlasan[$ralasan->id_alasan]['nm_alasan'] = $ralasan->alasan;
             $arrAlasan[$ralasan->id_alasan]['kode_alasan'] = $ralasan->kode_lokal;
@@ -1330,7 +1376,7 @@ class Fungsi
                 }
             }
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
-            $rsAlasan = DB::table('ms_alasan_absen')->get();
+            $rsAlasan = DB::table('ms_alasan_absen')->whereNull('deleted_at')->get(); // develop by masgus
             foreach($rsAlasan as $rsa=>$ralasan){
                 $arrAlasan[$ralasan->id_alasan] = $ralasan->alasan;
             }
@@ -1683,7 +1729,7 @@ class Fungsi
             }
             //return $list_hari_libur;
             $arrAlasan = array();$arrAbsenBul = array();$arrTelaat = array();$arrDataRekap = array();$arrAlasanabsen = array();$arrDtApel = array();
-            $rsAlasan = DB::table('ms_alasan_absen')->get();
+            $rsAlasan = DB::table('ms_alasan_absen')->whereNull('deleted_at')->get(); // develop by masgus
             foreach($rsAlasan as $rsa=>$ralasan){
                 $arrAlasan[$ralasan->id_alasan] = $ralasan->alasan;
             }
@@ -1753,31 +1799,10 @@ class Fungsi
                             }
                         }
 
+                        // develop by masgus - gunakan fungsi hitungdurasiterlambat dengan aturan 15 menit
                         if($jam_masuk >= $jam_kerja['jam_masuk'] && $jam_masuk!=$jam_pulang && $bulanprei[$tglpresensi]==null){
                             if($hariabsen[0]!="Sabtu" && $hariabsen[0]!="Minggu"){
-                                $jam_masukex = explode(':',$jam_masuk);
-                                $jam_telatex = explode(':',$jam_kerja['jam_masuk']);
-
-                                $j_masuk_start = $jam_masukex[0];
-                                $menit_masuk = $jam_masukex[1];
-
-                                $j_telat_masuk = $jam_telatex[0];
-                                $menit_telat_masuk = $jam_telatex[1];
-
-                                $hasil = (intVal($j_telat_masuk) - intVal($j_masuk_start)) * 60 + (intVal($menit_telat_masuk) - intVal($menit_masuk));
-                                $hasil = abs($hasil);
-
-                                $hasil = number_format($hasil,2);
-                                $hasilx = explode(".",$hasil);
-                                $depan = sprintf("%02d", $hasilx[0]);
-                                $gabung = $depan.":".$hasilx[1];
-                                $menit = ($gabung*60)+$hasilx[1];
-                                $menit = $menit/60;
-                                $tglprei = $list_hari_libur[date('Y-m',strtotime($tgl_presensi))];
-                                if($jam_masuk==$jam_pulang){
-                                    $menit = 0;
-                                }
-                                $durasi_terlambat = $menit;
+                                $durasi_terlambat = Fungsi::hitungdurasiterlambat($jam_kerja['jam_masuk'], $jam_masuk, $jam_kerja['jam_pulang'], $jam_pulang);
                                 $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tgl'][$tglpresensikehadiran] = $durasi_terlambat;
                                 if($justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran]){
                                     $arrDataRekap[$id_sdm][$thn.$bln_presensi]['telat']['list_tglwaktuabsen'][$tglpresensikehadiran]['justifikasi'] = $justifikasi[$id_sdm][$thn."-".$bln_presensi."-".$tglpresensikehadiran];

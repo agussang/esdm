@@ -318,6 +318,8 @@ class MsPegawaiController extends Controller
         $data['durasibekerja'] = $durasibekerja;
         $data['durasibekerja_ramadhan'] = $durasibekerja_ramadhan;
         $data['ramadhan'] = Fungsi::ramadhan($tahun);
+        // develop by masgus - pass jumlah justifikasi kat.4 per bulan ke view
+        $data['justifikasiKat4Count'] = Fungsi::countAllJustifikasiKat4($rsData->id_sdm, $tgl_awal);
         return view('content.data_pegawai.riwayat.presensi_kehadiran.index',$data);
     }
 
@@ -440,6 +442,25 @@ class MsPegawaiController extends Controller
     public function simpan_justifikasi_by_admin(Request $request){
         $req = $request->except('_token');
         $req = $request->except('_token');
+        // develop by masgus - block justifikasi keterlambatan (kategori 2)
+        if ($req['kategori_justifikasi'] == '2') {
+            $notification = [
+                'message' => 'Justifikasi keterlambatan sudah tidak berlaku. Sesuai kebijakan baru, keterlambatan tidak dapat dijustifikasi.',
+                'alert-type' => 'error',
+            ];
+            return redirect()->back()->with($notification);
+        }
+        // develop by masgus - limit justifikasi lupa absen (kat.4) max 2x per bulan
+        if ($req['kategori_justifikasi'] == '4') {
+            $countKat4 = Fungsi::countApprovedJustifikasiKat4($req['id_sdm'], $req['tanggal_absen']);
+            if ($countKat4 >= 2) {
+                $notification = [
+                    'message' => 'Justifikasi lupa absen sudah mencapai batas maksimal 2 kali per bulan. Tidak dapat menambah justifikasi lagi.',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->back()->with($notification);
+            }
+        }
         $cekdulu = $this->repotrjustifikasi->findWhereRaw("","id_sdm = '$req[id_sdm]' and tanggal_absen = '$req[tanggal_absen]' and kategori_justifikasi='$req[kategori_justifikasi]' ");
         if($cekdulu==null){
             unset($req['nm_sdm']);
@@ -470,6 +491,25 @@ class MsPegawaiController extends Controller
     }
     public function simpan_pengajuan(Request $request){
         $req = $request->except('_token');
+        // develop by masgus - block justifikasi keterlambatan (kategori 2)
+        if ($req['kategori_justifikasi'] == '2') {
+            $notification = [
+                'message' => 'Justifikasi keterlambatan sudah tidak berlaku. Sesuai kebijakan baru, keterlambatan tidak dapat dijustifikasi.',
+                'alert-type' => 'error',
+            ];
+            return redirect()->route('beranda')->with($notification);
+        }
+        // develop by masgus - limit justifikasi lupa absen (kat.4) max 2x per bulan
+        if ($req['kategori_justifikasi'] == '4') {
+            $countKat4 = Fungsi::countAllJustifikasiKat4($req['id_sdm'], $req['tanggal_absen']);
+            if ($countKat4 >= 2) {
+                $notification = [
+                    'message' => 'Justifikasi lupa absen sudah mencapai batas maksimal 2 kali per bulan. Tidak dapat mengajukan justifikasi lagi.',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->route('beranda')->with($notification);
+            }
+        }
         $cekdulu = $this->repotrjustifikasi->findWhereRaw("","id_sdm = '$req[id_sdm]' and tanggal_absen = '$req[tanggal_absen]' and kategori_justifikasi='$req[kategori_justifikasi]' ");
         if($cekdulu==null){
             unset($req['nm_sdm']);
@@ -930,6 +970,19 @@ class MsPegawaiController extends Controller
         $req = $request->except('_token');
         $where['id_justifikasi'] = $req['id_justifikasi'];
         $rsData = $this->repotrjustifikasi->findId(['dt_pegawai'],$req['id_justifikasi'],"id_justifikasi");
+        // develop by masgus - cek limit kat.4 sebelum approve
+        if($req['kode_kategori'] == "4" && $req['justifikasi_atasan'] == "1"){
+            $countKat4 = Fungsi::countApprovedJustifikasiKat4($rsData->id_sdm, $rsData->tanggal_absen);
+            if ($countKat4 >= 2) {
+                $bulan = date('m',strtotime($rsData->tanggal_absen));
+                $tahun = date('Y',strtotime($rsData->tanggal_absen));
+                $notification = [
+                    'message' => 'Tidak dapat menyetujui. Justifikasi lupa absen pegawai ini sudah mencapai batas maksimal 2 kali per bulan.',
+                    'alert-type' => 'error',
+                ];
+                return redirect()->intended('/pegawai-bawahan/approve-justifikasi/'.Crypt::encrypt($rsData->id_sdm)."/".$bulan."/".$tahun)->with($notification);
+            }
+        }
         if($req['kode_kategori'] == "4"){
             $reqinset['tanggal_absen'] = $rsData->tanggal_absen;
             $reqinset['jam_absen'] = $rsData->jam_masuk;

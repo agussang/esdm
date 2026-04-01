@@ -85,7 +85,12 @@ class SkpPrilakuPegawaiController extends Controller
         //dd($arrRekapskp);
         $data['arrRekapskp'] = $arrRekapskp;
         $data['dtpegawai'] = $this->repomspegawai->findId(['nm_atasan_pendamping','nm_atasan','nm_satker'],$id_sdm,"id_sdm");
-        return view('content.hal_pegawai.skp.prilaku.index',$data);
+        // develop by masgus - no-cache headers agar data SKP selalu fresh
+        return response()
+            ->view('content.hal_pegawai.skp.prilaku.index',$data)
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function form_justifikasi(Request $request){

@@ -73,7 +73,7 @@
                     // if($gabung < $durasi){
                     //     $warna = "background-color: #F78282;";
                     // }
-                    $durasikerja = "00:00:00";$durasikerjamenit = "0";
+                    $durasikerja = "00:00";$durasikerjamenit = "0";
                     if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
                         $jamawal = $tgl." ".$jam_masuk;
                         $jamakhir = $tgl." ".$jam_keluar;

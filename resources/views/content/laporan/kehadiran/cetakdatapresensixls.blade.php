@@ -115,7 +115,7 @@
                             if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
                                 $hadir++;
                                 if($ket!="Absen 1x"){
-                                    $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                    $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                     if($hitungdurasi_terlambat>0){
                                         $ket = " Terlambat Datang";
                                         $terlambat++;
@@ -153,7 +153,7 @@
 
                     $absenkehadiran = $dt_sdm['dt_absen'][$tgl]['alasan_absen'];
 
-                    $durasikerja = "00:00:00";$durasikerjamenit = "0";
+                    $durasikerja = "00:00";$durasikerjamenit = "0";
                     if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
                         $jamawal = $tgl." ".$jam_masuk;
                         $jamakhir = $tgl." ".$jam_keluar;

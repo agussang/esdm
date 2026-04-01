@@ -123,6 +123,8 @@ class IndexController extends Controller
 
             $data['periodeaktif'] = $this->repomsperiodeskp->findWhereRaw("","status = '1'");
             $data['arrBulanPanjang'] = Fungsi::nm_bulan();
+            // develop by masgus - pass jumlah justifikasi kat.4 per bulan ke view
+            $data['justifikasiKat4Count'] = Fungsi::countAllJustifikasiKat4(Session::get('id_sdm'), $tgl_awal);
 
             return view('content.hal_pegawai.home',$data);
         }else{

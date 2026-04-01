@@ -83,7 +83,7 @@
                     }
 
                     if($dt_sdm['id_satker'] == "30c82828-d938-42c1-975e-bf8a1db2c7b0"){
-                        $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                        $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                 if($hitungdurasi_terlambat>0){
                                     $ket = "Terlambat Datang";
                                 }
@@ -93,7 +93,7 @@
                     }else{
                         if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
                             //if($gabung < $durasi){
-                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                 if($hitungdurasi_terlambat>0){
                                     $ket = "Terlambat Datang";
                                 }
@@ -138,7 +138,7 @@
                     $hitungdurasi_terlambat = "0";
                     $hitungdurasi_pulang_cepat = 0;
                 }
-                $durasikerja = "00:00:00";$durasikerjamenit = "0";
+                $durasikerja = "00:00";$durasikerjamenit = "0";
                 if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
                     $jamawal = $tgl." ".$jam_masuk;
                     $jamakhir = $tgl." ".$jam_keluar;

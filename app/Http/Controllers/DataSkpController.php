@@ -103,7 +103,12 @@ class DataSkpController extends Controller
         $data['tahun'] = $tahun;
         $data['bulan'] = $bulan;
         $data['arrrekapnilai'] = $arrrekapnilai;
-        return view('content.skp.data_skp.index',$data);
+        // develop by masgus - no-cache headers agar data SKP selalu fresh
+        return response()
+            ->view('content.skp.data_skp.index',$data)
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     public function validasi_skp(Request $request){

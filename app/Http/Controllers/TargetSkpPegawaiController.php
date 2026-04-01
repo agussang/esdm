@@ -36,7 +36,12 @@ class TargetSkpPegawaiController extends Controller
         $data['tahun'] = $tahun;
         $data['arrBulanPanjang'] = Fungsi::nm_bulan();
         $data['dtpegawai'] = $this->repomspegawai->findId(['nm_atasan_pendamping','nm_atasan','nm_satker'],$id_sdm,"id_sdm");
-        return view('content.hal_pegawai.skp.skp-tahunan.index',$data);
+        // develop by masgus - no-cache headers agar data SKP selalu fresh
+        return response()
+            ->view('content.hal_pegawai.skp.skp-tahunan.index',$data)
+            ->header('Cache-Control', 'no-cache, no-store, must-revalidate')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
 
     

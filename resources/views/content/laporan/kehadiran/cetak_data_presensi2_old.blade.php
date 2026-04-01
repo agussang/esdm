@@ -115,7 +115,7 @@
                         if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
                             if($gabung < $durasi){
                                 $warna = "background-color: #F78282;";
-                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                 if($hitungdurasi_terlambat>0){
                                     $ket = "Terlambat";
                                 }

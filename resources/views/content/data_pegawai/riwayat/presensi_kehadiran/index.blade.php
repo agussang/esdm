@@ -357,10 +357,11 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     //   $depan = sprintf("%02d", $hasilx[0]);
                                                     //   $gabung = $depan.":".$hasilx[1];
 
+                                                        <?php // develop by masgus - aturan terlambat baru dengan toleransi 15 menit ?>
                                                         if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $rsData->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                                                             $hadir++;
                                                             if($ket!="Absen 1x"){
-                                                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                                                 if($hitungdurasi_terlambat>0){
                                                                     $ket = "Terlambat Datang";
                                                                     $kode_justifikasi = 2;
@@ -371,7 +372,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0" && $jamkerja['kode_jadwal']!="5"){
                                                             $hadir++;
                                                             if($ket!="Absen 1x"){
-                                                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'],$jam_masuk);
+                                                                $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                                                 if($hitungdurasi_terlambat>0){
                                                                     $ket = "Terlambat Datang";
                                                                     $kode_justifikasi = 2;
@@ -434,7 +435,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     $hitungdurasi_pulang_cepat = 0;
                                                 }
 
-                                                $durasikerja = "00:00:00";$durasikerjamenit = "0";
+                                                $durasikerja = "00:00";$durasikerjamenit = "0"; // develop by masgus - tanpa detik
                                                 if($jam_masuk!="--:--" && $jam_keluar!="--:--"){
                                                     $jamawal = $tgl." ".$jam_masuk;
                                                     $jamakhir = $tgl." ".$jam_keluar;
@@ -453,19 +454,14 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         if($ketajuan['ket_justifikasi']=="jam_pulang"){
                                                             $ket_keluar = "ajuan justifikasi";
                                                         }
-                                                    }elseif($ketajuan['kategori_justifikasi']=="2"){
-                                                        $menitjustifikasi = $ketajuan['durasi_justifikasi'];
-                                                        $terlambat = $hitungdurasi_terlambat-$menitjustifikasi;
-                                                        if($terlambat==0){
-                                                            $ket="";
-                                                        }
                                                     }
+                                                    // develop by masgus - justifikasi keterlambatan (kategori 2) dihapus
                                                 }
 
                                                 if($ket=="Terlambat Datang"){
                                                     $jterlambat++;
                                                 }
-                                                $terlambat = abs($hitungdurasi_terlambat-$menitjustifikasi);
+                                                $terlambat = abs($hitungdurasi_terlambat); // develop by masgus - tanpa justifikasi terlambat
                                                 $terlambuatmenit+=$terlambat;
                                                 $pulang_cepatmenit+=$hitungdurasi_pulang_cepat;
 
@@ -481,14 +477,9 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     </td>
                                                     <td>{{$durasikerja}}</td>
                                                     <td>{{$durasikerjamenit}}</td>
+                                                    {{-- develop by masgus - hapus info justifikasi terlambat dari kolom --}}
                                                     <td>
                                                         {{$terlambat}}
-                                                        @if($ketajuan['status']==1)
-                                                            @if($ketajuan['kategori_justifikasi']=="2")
-                                                                <li style="font-size:10px;color:green">Durasi Terlambat : {{$hitungdurasi_terlambat}}</li>
-                                                                <li style="font-size:10px;color:green">Durasi Justifikasi : {{$menitjustifikasi}}</li>
-                                                            @endif
-                                                        @endif
                                                     </td>
                                                     <td>{{$hitungdurasi_pulang_cepat}}</td>
                                                     <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
@@ -500,12 +491,24 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     @endif
                                                     @if($rsData->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0")
                                                     <td>
-                                                        @if($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
+                                                        {{-- develop by masgus - hide justifikasi untuk keterlambatan (kode 2) --}}
+                                                        @if($kode_justifikasi == 2)
+                                                            {{-- Keterlambatan tidak dapat dijustifikasi --}}
+                                                        @elseif($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
                                                             @if(str_replace(":","",$durasikerja) >= str_replace(":","",$lama_kerja) || $ket=="Absen 1x")
                                                                 @if($ketajuan)
                                                                     {{$arrStatusJustifikasi[$ketajuan['status']]}}
+                                                                    {{-- develop by masgus - tampilkan kuota kat.4 --}}
+                                                                    @if($ketajuan['kategori_justifikasi']=="4")
+                                                                        <br/><small class="text-muted">({{$justifikasiKat4Count}}/2 kuota bulan ini)</small>
+                                                                    @endif
                                                                 @else
-                                                                    <a href="{{URL::to('pegawai/justifikasi-kehadiran-pegawai')}}/{{$rsData->id_sdm}}/{{$tgl}}/{{$kode_justifikasi}}" class="btn btn-primary">Justifikasi</a>
+                                                                    {{-- develop by masgus - cek kuota kat.4 sebelum tampilkan tombol --}}
+                                                                    @if($kode_justifikasi == 4 && $justifikasiKat4Count >= 2)
+                                                                        <span class="btn btn-secondary disabled" title="Kuota justifikasi lupa absen bulan ini sudah habis (2/2)">Kuota Habis ({{$justifikasiKat4Count}}/2)</span>
+                                                                    @else
+                                                                        <a href="{{URL::to('pegawai/justifikasi-kehadiran-pegawai')}}/{{$rsData->id_sdm}}/{{$tgl}}/{{$kode_justifikasi}}" class="btn btn-primary">Justifikasi @if($kode_justifikasi == 4)({{$justifikasiKat4Count}}/2)@endif</a>
+                                                                    @endif
                                                                 @endif
                                                             @elseif($hitungdurasi_pulang_cepat>0 and !$ketajuan)
                                                                 <a href="{{URL::to('pegawai/justifikasi-kehadiran-pegawai')}}/{{$rsData->id_sdm}}/{{$tgl}}/{{$kode_justifikasi}}" class="btn btn-primary">Justifikasi</a>

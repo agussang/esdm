@@ -15,6 +15,7 @@ use Crypt;
 use DateTime;
 use Excel;
 use Illuminate\Support\Str;
+use App\Models\RiwayatPresensi; // develop by masgus
 
 class DataAbsenController extends Controller
 {
@@ -164,19 +165,26 @@ class DataAbsenController extends Controller
         return redirect()->intended('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/history/'.Crypt::encrypt($rsData->id_sdm).'/'.$bulan.'/'.$tahun)->with($notification);
     }
 
+    // develop by masgus - fix reset justifikasi: hapus juga riwayat_finger yang dibuat saat approval
     public function reset_justifikasi($id_justifikasi){
         $notification = [
-            'message' => 'Justifikasi Berhasil di tolak oleh admin.',
+            'message' => 'Justifikasi berhasil di-reset oleh admin. Data presensi terkait telah dikembalikan.',
             'alert-type' => 'success',
         ];
         $rsData = $this->repotrjustifikasi->findId("",Crypt::decrypt($id_justifikasi),"id_justifikasi");
 
         $bulan = date('m',strtotime($rsData->tanggal_absen));
         $tahun = date('Y',strtotime($rsData->tanggal_absen));
-        $tgl_batal = date('Y-m-d H:i:s');
-        $req['ket_pembatalan_admin'] = null;
-        $req['justifikasi_atasan'] = '0';
-        $where['id_justifikasi'] = Crypt::decrypt($id_justifikasi);
+
+        // develop by masgus - hapus record riwayat_finger yang dibuat saat approval justifikasi
+        if ($rsData->kategori_justifikasi == '4' || $rsData->kategori_justifikasi == '3') {
+            RiwayatPresensi::where('id_sdm', $rsData->id_sdm)
+                ->where('tanggal_absen', $rsData->tanggal_absen)
+                ->where('mesin', 'justifikasi')
+                ->delete();
+        }
+
+        // Hapus record justifikasi
         $this->repotrjustifikasi->destroy(Crypt::decrypt($id_justifikasi),'id_justifikasi');
 
         return redirect()->intended('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/history/'.Crypt::encrypt($rsData->id_sdm).'/'.$bulan.'/'.$tahun)->with($notification);
