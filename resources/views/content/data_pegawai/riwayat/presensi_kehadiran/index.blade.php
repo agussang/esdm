@@ -357,7 +357,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     //   $depan = sprintf("%02d", $hasilx[0]);
                                                     //   $gabung = $depan.":".$hasilx[1];
 
-                                                        <?php // develop by masgus - aturan terlambat baru dengan toleransi 15 menit ?>
+                                                        // develop by masgus - aturan terlambat baru dengan toleransi 15 menit
                                                         if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $rsData->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                                                             $hadir++;
                                                             if($ket!="Absen 1x"){
