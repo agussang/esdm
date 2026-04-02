@@ -4,15 +4,22 @@ $expanded = "false";
 $expanded2 = "false";
 $expanded3 = "false";
 $expanded4 = "false";
+$expanded5 = "false";
 $collapse = "";
 $collapse2 = "";
 $collapse3 = "";
 $collapse4 = "";
+$collapse5 = "";
 $aktifexpand="";
 $aktifexpand2="";
 $aktifexpand3="";
 $aktifexpand4="";
+$aktifexpand5="";
 $menu_aktif="";
+$expandPresensi = "false";
+$collapsePresensi = "";
+$expandMasterSkp = "false";
+$collapseMasterSkp = "";
 $induk = explode('/',request()->path());
 
 if($induk[0]=="data-master"){
@@ -24,11 +31,19 @@ if($induk[0]=="data-pegawai"){
     $expanded2 = "true";
     $collapse2 = "show";
     $aktifexpand2="active";
+    if(isset($induk[1]) && $induk[1]=="data-presensi"){
+        $expandPresensi = "true";
+        $collapsePresensi = "show";
+    }
 }
 if($induk[0]=="skp"){
     $expanded3 = "true";
     $collapse3 = "show";
     $aktifexpand3="active";
+    if(isset($induk[1]) && $induk[1]=="master-skp"){
+        $expandMasterSkp = "true";
+        $collapseMasterSkp = "show";
+    }
 }
 if($induk[0]=="laporan"){
     $expanded4 = "true";
@@ -111,12 +126,12 @@ if($induk[0]=="setting"){
     </ul>
 </li>
 <li class="{{$aktifexpand2}}">
-    <a href="#master" class="collapsed" data-toggle="collapse" aria-expanded="{{$expanded2}}">
+    <a href="#pegawai" class="collapsed" data-toggle="collapse" aria-expanded="{{$expanded2}}">
         <i class="fa fa-swatchbook"></i><span> Data Pegawai</span>
         <i class="las la-angle-right iq-arrow-right arrow-active"></i>
         <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
     </a>
-    <ul id="master" class="iq-submenu collapse {{$collapse2}}" data-parent="#iq-sidebar-toggle">
+    <ul id="pegawai" class="iq-submenu collapse {{$collapse2}}" data-parent="#iq-sidebar-toggle">
         <li class="{{ $induk[1]=="master-pegawai" ? 'active' : '' }}">
             <a href="{{route('data-pegawai.master-pegawai.index')}}">  <i class="fa fa-list-alt"></i><span> Master Pegawai</span> </a>
         </li>
@@ -127,31 +142,31 @@ if($induk[0]=="setting"){
             <a href="{{route('data-pegawai.atasan-pegawai.index')}}">  <i class="fas fa-pencil-ruler"></i><span> Setting Atasan Pegawai</span> </a>
         </li>
         <li class="{{ $induk[1]=="data-presensi" ? 'active' : '' }}">
-            <a href="#form-controls" class="collapsed" data-toggle="collapse" aria-expanded="false">
+            <a href="#data-presensi" class="collapsed" data-toggle="collapse" aria-expanded="{{$expandPresensi}}">
                 <i class="lab la-wpforms"></i><span>Data Presensi</span>
                 <i class="las la-angle-right iq-arrow-right arrow-active"></i>
                 <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
             </a>
-            <ul id="form-controls" class="iq-submenu collapse" data-parent="#form" style="">
-                <li class="{{ $induk[1]=="pengajuan-justifikasi-kehadiran" ? 'active' : '' }}">
+            <ul id="data-presensi" class="iq-submenu collapse {{$collapsePresensi}}">
+                <li class="{{ isset($induk[1]) && $induk[1]=="pengajuan-justifikasi-kehadiran" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.index')}}"><i class="fa fa-tag"></i><span> Ajuan Justifikasi</span> </a>
                 </li>
-                <li class="{{ $induk[2]=="upload-presensi" ? 'active' : '' }}">
+                <li class="{{ isset($induk[2]) && $induk[2]=="upload-presensi" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.upload-presensi.index')}}">
                         <i class="las la-book"></i><span>Upload / Sync Presensi</span>
                     </a>
                 </li>
-                <li class="{{ $induk[2]=="jadwal-presensi-shift" ? 'active' : '' }}">
+                <li class="{{ isset($induk[2]) && $induk[2]=="jadwal-presensi-shift" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.jadwal-presensi-shift.index')}}">
                         <i class="las la-book"></i><span>Jadwal Presensi Shift</span>
                     </a>
                 </li>
-                <li class="{{ $induk[2]=="apel" ? 'active' : '' }}">
+                <li class="{{ isset($induk[2]) && $induk[2]=="apel" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.apel.index')}}">
                         <i class="las la-upload"></i><span>Upload Apel</span>
                     </a>
                 </li>
-                <li class="{{ $induk[2]=="data-absen" ? 'active' : '' }}">
+                <li class="{{ isset($induk[2]) && $induk[2]=="data-absen" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.data-absen.index')}}">
                         <i class="las la-keyboard"></i><span>Data Absen</span>
                     </a>
@@ -166,7 +181,7 @@ if($induk[0]=="setting"){
         <i class="las la-angle-right iq-arrow-right arrow-active"></i>
         <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
     </a>
-    <ul id="skp" class="iq-submenu collapse {{$collapse3}}" data-parent="#form" style="">
+    <ul id="skp" class="iq-submenu collapse {{$collapse3}}" data-parent="#iq-sidebar-toggle">
         <li class="{{ $induk[1]=="setting-skp" ? 'active' : '' }}">
             <a href="{{route('skp.setting-skp.index')}}">
                 <i class="fas fa-cogs"></i><span>Setting Periode SKP</span>
@@ -178,13 +193,13 @@ if($induk[0]=="setting"){
             </a>
         </li>
         <li class="{{ $induk[1]=="master-skp" ? 'active' : '' }}">
-            <a href="#form-controls" class="collapsed" data-toggle="collapse" aria-expanded="false">
+            <a href="#master-skp" class="collapsed" data-toggle="collapse" aria-expanded="{{$expandMasterSkp}}">
                 <i class="lab la-wpforms"></i><span>Master Skp</span>
                 <i class="las la-angle-right iq-arrow-right arrow-active"></i>
                 <i class="las la-angle-down iq-arrow-right arrow-hover"></i>
             </a>
-            <ul id="form-controls" class="iq-submenu collapse" data-parent="#form" style="">
-                <li class="{{ $induk[2]=="prilaku" ? 'active' : '' }}">
+            <ul id="master-skp" class="iq-submenu collapse {{$collapseMasterSkp}}">
+                <li class="{{ isset($induk[2]) && $induk[2]=="prilaku" ? 'active' : '' }}">
                     <a href="{{route('skp.master-skp.prilaku.index')}}">
                         <i class="las la-book"></i><span>Master Prilaku</span>
                     </a>
