@@ -1315,6 +1315,10 @@ class Fungsi
             $tgl = Fungsi::formatDate($rA->tanggal_absen);
             $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['ket_tgl'] = $tgl;
             $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['jam_absen'][] = $rA->jam_absen;
+            // develop by masgus - simpan keterangan dari bulk upload (WFH, Finger Error, dll)
+            if($rA->keterangan){
+                $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['keterangan'] = $rA->keterangan;
+            }
             if((int)$rA->justifikasi_atasan>0){
                 $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['alasan'] = $rA->alasan;
                 $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['tgl_justifikasi'] = $rA->tgl_justifikasi;
@@ -1670,6 +1674,10 @@ class Fungsi
             $tgl = Fungsi::formatDate($rA->tanggal_absen);
             $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['ket_tgl'] = $tgl;
             $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['jam_absen'][] = $rA->jam_absen;
+            // develop by masgus - simpan keterangan dari bulk upload (WFH, Finger Error, dll)
+            if($rA->keterangan){
+                $arrAbsen[$rA->id_sdm][$rA->tanggal_absen]['keterangan'] = $rA->keterangan;
+            }
             if((int)$rA->justifikasi_atasan>0){
                 $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['alasan'] = $rA->alasan;
                 $justifikasi[$rA->id_sdm][$rA->tanggal_absen]['tgl_justifikasi'] = $rA->tgl_justifikasi;

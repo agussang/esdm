@@ -281,6 +281,9 @@ Route::group(['middleware' => 'role:SA_A_PI_B'], function () {
                 Route::post('/simpan',[PresensiController::class,'store'])->name('data-pegawai.data-presensi.upload-presensi.simpan');
                 Route::post('/upload',[PresensiController::class,'upload'])->name('data-pegawai.data-presensi.upload-presensi.upload');
                 Route::post('/sync-finger',[PresensiController::class,'sync_finger'])->name('data-pegawai.data-presensi.upload-presensi.sync-finger');
+                Route::get('/bulk-upload',[PresensiController::class,'bulkUploadForm'])->name('data-pegawai.data-presensi.upload-presensi.bulk-upload');
+                Route::post('/bulk-upload',[PresensiController::class,'bulkUploadProcess'])->name('data-pegawai.data-presensi.upload-presensi.bulk-upload-process');
+                Route::get('/bulk-upload/template',[PresensiController::class,'bulkUploadTemplate'])->name('data-pegawai.data-presensi.upload-presensi.bulk-upload-template');
             });
 
             Route::group(['prefix' => 'jadwal-presensi-shift'], function () {

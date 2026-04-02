@@ -191,6 +191,9 @@
                                 $menitjustifikasi = $presensi['justifikasi']['durasi_justifikasi'];
                             }
                     }
+                    // develop by masgus - tampilkan keterangan dari bulk upload
+                    $ket_upload = $presensi['keterangan'] ?? '';
+
                     $absenkehadiran = $dt_sdm['dt_absen'][$tgl]['alasan_absen'];
                     if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
                             if($ket == null && $jam_masuk==null && $jam_keluar==null){
@@ -288,7 +291,7 @@
                         <td>{{$terlambat_durasi}}</td>
                         <td>{{$hitungdurasi_pulang_cepat}}</td>
                         <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
-                        <td>{{$ket}}</td>
+                        <td>{{$ket}}@if($ket_upload) <br/><small style="color:#1565C0;">{{$ket_upload}}</small>@endif</td>
                         <td>
                             {{$kategori}}
                         </td>

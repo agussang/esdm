@@ -7,8 +7,13 @@
             <div class="card-header">
                 <div class="card-title">
                     <div class="row">
-                        <div class="col-md-9">
+                        <div class="col-md-6">
                             <h5 class="card-label"><i class="fa fa-upload"></i> Form Upload Data Presensi</h5>
+                        </div>
+                        <div class="col-md-6 text-right">
+                            <a href="{{route('data-pegawai.data-presensi.upload-presensi.bulk-upload')}}" class="btn btn-sm btn-info">
+                                <i class="fas fa-file-excel"></i> Bulk Upload Excel (WFH / Finger Error)
+                            </a>
                         </div>
                     </div>
                 </div>

@@ -13,6 +13,8 @@ use Fungsi;
 use Session;
 use Excel;
 use App\Imports\RiwayatPresensiImport;
+use App\Imports\BulkPresensiImport;
+use App\Exports\BulkPresensiTemplateExport;
 
 class PresensiController extends Controller
 {
@@ -221,5 +223,139 @@ class PresensiController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function bulkUploadForm()
+    {
+        $data['pilihan_mesin_finger'] = Fungsi::pilihan_mesin_finger();
+        return view('content.data_pegawai.presensi.upload_presensi.bulk_upload', $data);
+    }
+
+    public function bulkUploadTemplate()
+    {
+        return Excel::download(new BulkPresensiTemplateExport(), 'template_bulk_upload_presensi.xlsx');
+    }
+
+    public function bulkUploadProcess(Request $request)
+    {
+        try {
+            $file = $request->file('file_excel');
+            if (!$file || $file->extension() != 'xlsx') {
+                return redirect()->route('data-pegawai.data-presensi.upload-presensi.bulk-upload')->with([
+                    'message' => 'Gagal, file harus berformat .xlsx',
+                    'alert-type' => 'error',
+                ]);
+            }
+
+            $mesin = $request->input('mesin', 'MANUAL');
+            $array = Excel::toArray(new BulkPresensiImport(), $file);
+            unset($array[0][0]); // hapus header row
+            $rows = $array[0];
+
+            $rsPeg = $this->repomspegawai->get();
+            $arrNipToId = [];
+            foreach ($rsPeg as $r) {
+                $arrNipToId[trim($r->nip)] = $r->id_sdm;
+            }
+
+            $berhasil = 0;
+            $gagal = [];
+            $duplikat = 0;
+
+            foreach ($rows as $row) {
+                $nip = trim($row[0] ?? '');
+                $nama = trim($row[1] ?? '');
+                $tgl_raw = $row[2] ?? '';
+                $jam_masuk = trim($row[3] ?? '');
+                $jam_pulang = trim($row[4] ?? '');
+                $keterangan = trim($row[5] ?? '');
+
+                if (empty($nip) || empty($tgl_raw) || empty($jam_masuk)) {
+                    continue;
+                }
+
+                $tgl_absen = date('Y-m-d', strtotime($tgl_raw));
+                if ($tgl_absen == '1970-01-01') {
+                    $tgl_absen = Fungsi::inttodate($tgl_raw);
+                }
+
+                $id_sdm = $arrNipToId[$nip] ?? null;
+                if (!$id_sdm) {
+                    $gagal[] = $nip . ' - ' . $nama;
+                    continue;
+                }
+
+                // Format jam (tambah :00 jika belum ada detik)
+                if (strlen($jam_masuk) == 5) $jam_masuk .= ':00';
+                if (strlen($jam_pulang) == 5) $jam_pulang .= ':00';
+
+                // Cek duplikat: jam masuk sudah ada?
+                $cekMasuk = \App\Models\RiwayatPresensi::where('id_sdm', $id_sdm)
+                    ->where('tanggal_absen', $tgl_absen)
+                    ->where('jam_absen', $jam_masuk)
+                    ->first();
+
+                if (!$cekMasuk) {
+                    $this->reporiwayatpresensi->store([
+                        'id_sdm' => $id_sdm,
+                        'tanggal_absen' => $tgl_absen,
+                        'jam_absen' => $jam_masuk,
+                        'mesin' => $mesin,
+                        'tanggal_scan' => date('Y-m-d H:i:s'),
+                        'keterangan' => $keterangan,
+                    ]);
+                } else {
+                    $duplikat++;
+                }
+
+                // Simpan jam pulang jika ada dan berbeda dari jam masuk
+                if (!empty($jam_pulang) && $jam_pulang != $jam_masuk) {
+                    $cekPulang = \App\Models\RiwayatPresensi::where('id_sdm', $id_sdm)
+                        ->where('tanggal_absen', $tgl_absen)
+                        ->where('jam_absen', $jam_pulang)
+                        ->first();
+
+                    if (!$cekPulang) {
+                        $this->reporiwayatpresensi->store([
+                            'id_sdm' => $id_sdm,
+                            'tanggal_absen' => $tgl_absen,
+                            'jam_absen' => $jam_pulang,
+                            'mesin' => $mesin,
+                            'tanggal_scan' => date('Y-m-d H:i:s'),
+                            'keterangan' => $keterangan,
+                        ]);
+                    } else {
+                        $duplikat++;
+                    }
+                }
+
+                $berhasil++;
+            }
+
+            $text = "Berhasil upload {$berhasil} data presensi pegawai.";
+            if ($duplikat > 0) {
+                $text .= " ({$duplikat} data duplikat dilewati)";
+            }
+            $alertType = 'success';
+
+            if (count($gagal) > 0) {
+                $text .= " Data gagal: " . implode(', ', array_slice($gagal, 0, 10));
+                if (count($gagal) > 10) {
+                    $text .= " dan " . (count($gagal) - 10) . " lainnya";
+                }
+                $alertType = 'warning';
+            }
+
+            return redirect()->route('data-pegawai.data-presensi.upload-presensi.bulk-upload')->with([
+                'message' => $text,
+                'alert-type' => $alertType,
+            ]);
+
+        } catch (\Exception $e) {
+            return redirect()->route('data-pegawai.data-presensi.upload-presensi.bulk-upload')->with([
+                'message' => 'Gagal memproses file: ' . $e->getMessage(),
+                'alert-type' => 'error',
+            ]);
+        }
     }
 }

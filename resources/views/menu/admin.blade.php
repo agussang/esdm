@@ -151,9 +151,14 @@ if($induk[0]=="setting"){
                 <li class="{{ isset($induk[1]) && $induk[1]=="pengajuan-justifikasi-kehadiran" ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.index')}}"><i class="fa fa-tag"></i><span> Ajuan Justifikasi</span> </a>
                 </li>
-                <li class="{{ isset($induk[2]) && $induk[2]=="upload-presensi" ? 'active' : '' }}">
+                <li class="{{ isset($induk[2]) && $induk[2]=="upload-presensi" && !request()->is('*/bulk-upload') ? 'active' : '' }}">
                     <a href="{{route('data-pegawai.data-presensi.upload-presensi.index')}}">
                         <i class="las la-book"></i><span>Upload / Sync Presensi</span>
+                    </a>
+                </li>
+                <li class="{{ request()->is('*/bulk-upload') ? 'active' : '' }}">
+                    <a href="{{route('data-pegawai.data-presensi.upload-presensi.bulk-upload')}}">
+                        <i class="las la-file-excel"></i><span>Bulk Upload Presensi</span>
                     </a>
                 </li>
                 <li class="{{ isset($induk[2]) && $induk[2]=="jadwal-presensi-shift" ? 'active' : '' }}">

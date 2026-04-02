@@ -131,6 +131,9 @@
                 if($jam_keluar == null){
                     $jam_keluar = "--:--";
                 }
+                // develop by masgus - tampilkan keterangan dari bulk upload
+                $ket_upload = $presensi['keterangan'] ?? '';
+
                 $absenkehadiran = $dt_sdm['dt_absen'][$tgl]['alasan_absen'];
                 if($absenkehadiran!=null){
                     $ket = $absenkehadiran['kode_alasan'];
@@ -184,7 +187,7 @@
                     <td>{{$terlambat_durasi}}</td>
                     <td>{{$hitungdurasi_pulang_cepat}}</td>
                     <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
-                    <td>{{$ket}}</td>
+                    <td>{{$ket}}@if($ket_upload) ({{$ket_upload}})@endif</td>
                     <td>
                         {{$kategori}}
                     </td>

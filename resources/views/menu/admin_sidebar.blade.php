@@ -117,8 +117,11 @@ $seg3 = $induk[2] ?? '';
             <li class="{{ $seg2 == 'pengajuan-justifikasi-kehadiran' || $seg3 == 'pengajuan-justifikasi-kehadiran' ? 'active' : '' }}">
                 <a href="{{route('data-pegawai.data-presensi.pengajuan-justifikasi-kehadiran.index')}}">Ajuan Justifikasi</a>
             </li>
-            <li class="{{ $seg3 == 'upload-presensi' ? 'active' : '' }}">
+            <li class="{{ $seg3 == 'upload-presensi' && !request()->is('*/bulk-upload') ? 'active' : '' }}">
                 <a href="{{route('data-pegawai.data-presensi.upload-presensi.index')}}">Upload / Sync Presensi</a>
+            </li>
+            <li class="{{ request()->is('*/bulk-upload') ? 'active' : '' }}">
+                <a href="{{route('data-pegawai.data-presensi.upload-presensi.bulk-upload')}}">Bulk Upload Presensi</a>
             </li>
             <li class="{{ $seg3 == 'jadwal-presensi-shift' ? 'active' : '' }}">
                 <a href="{{route('data-pegawai.data-presensi.jadwal-presensi-shift.index')}}">Jadwal Presensi Shift</a>
