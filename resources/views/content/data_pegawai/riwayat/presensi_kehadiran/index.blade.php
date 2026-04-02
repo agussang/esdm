@@ -346,7 +346,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                             }
                                                         }
                                                         if($jam_masuk == $jam_keluar && $hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu"){
-                                                            $ket = "Absen 1x";
+                                                            $ket_upload = $presensi['keterangan'] ?? '';
+                                                            $ket = "Absen 1x" . ($ket_upload ? " ({$ket_upload})" : "");
                                                             $finger_sekali++;
                                                             $kode_justifikasi = 4;
                                                         }
@@ -360,7 +361,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         // develop by masgus - aturan terlambat baru dengan toleransi 15 menit
                                                         if($hariabsen[0]!="Minggu" && $hariabsen[0]!="Sabtu" && $rsData->id_satkernow!="30c82828-d938-42c1-975e-bf8a1db2c7b0"){
                                                             $hadir++;
-                                                            if($ket!="Absen 1x"){
+                                                            if(strpos($ket,"Absen 1x")===false){
                                                                 $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                                                 if($hitungdurasi_terlambat>0){
                                                                     $ket = "Terlambat Datang";
@@ -371,7 +372,7 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
 
                                                         if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0" && $jamkerja['kode_jadwal']!="5"){
                                                             $hadir++;
-                                                            if($ket!="Absen 1x"){
+                                                            if(strpos($ket,"Absen 1x")===false){
                                                                 $hitungdurasi_terlambat = Fungsi::hitungdurasiterlambat($jamkerja['jam_masuk'], $jam_masuk, $jamkerja['jam_pulang'], $jam_keluar);
                                                                 if($hitungdurasi_terlambat>0){
                                                                     $ket = "Terlambat Datang";
@@ -483,7 +484,12 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                     </td>
                                                     <td>{{$hitungdurasi_pulang_cepat}}</td>
                                                     <td style="font-size:11px;">{{$dtgl['ket_nasional']}}</td>
-                                                    <td>{{$ket}}</td>
+                                                    <td>{{$ket}}<?php
+                                                        $ket_bulk = $presensi['keterangan'] ?? '';
+                                                        if($ket_bulk && strpos($ket, $ket_bulk) === false){
+                                                            echo '<br/><small style="color:#1565C0;">'.$ket_bulk.'</small>';
+                                                        }
+                                                    ?></td>
                                                     @if($rsData->id_satkernow=="30c82828-d938-42c1-975e-bf8a1db2c7b0")
                                                         <td>
                                                             {{$jamkerja['nm_shift']}}
@@ -494,8 +500,8 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak Disetuji","0"=>"Prose
                                                         {{-- develop by masgus - hide justifikasi untuk keterlambatan (kode 2) --}}
                                                         @if($kode_justifikasi == 2)
                                                             {{-- Keterlambatan tidak dapat dijustifikasi --}}
-                                                        @elseif($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
-                                                            @if(str_replace(":","",$durasikerja) >= str_replace(":","",$lama_kerja) || $ket=="Absen 1x")
+                                                        @elseif($absenkehadiran == null && $ket!=null)
+                                                            @if(str_replace(":","",$durasikerja) >= str_replace(":","",$lama_kerja) || strpos($ket,"Absen 1x")!==false)
                                                                 @if($ketajuan)
                                                                     {{$arrStatusJustifikasi[$ketajuan['status']]}}
                                                                     {{-- develop by masgus - tampilkan kuota kat.4 --}}
