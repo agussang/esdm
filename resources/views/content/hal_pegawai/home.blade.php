@@ -734,7 +734,7 @@ else $salam = 'Selamat Malam';
                               {{-- develop by masgus - hide justifikasi untuk keterlambatan (kode 2) --}}
                               @if($kode_justifikasi == 2)
                                  {{-- Keterlambatan tidak dapat dijustifikasi --}}
-                              @elseif($absenkehadiran == null && $ket!=null)
+                              @elseif($absenkehadiran == null && $ket!=null && date('Ymd')>=date('Ymd',strtotime($tgl)))
                                  @if(str_replace(":","",$durasikerja) >= str_replace(":","",$lama_kerja) || strpos($ket,"Absen 1x")!==false)
                                     @if($ketajuan)
                                         {{$arrStatusJustifikasi[$ketajuan['status']]}}
