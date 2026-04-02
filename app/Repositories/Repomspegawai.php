@@ -27,7 +27,8 @@ class Repomspegawai extends Repository
             })->when($id_jns_sdm, function ($query) use ($id_jns_sdm) {
                 return $query->where('id_jns_sdm', $id_jns_sdm);
             })->when($nama_pegawai, function ($query) use ($nama_pegawai) {
-                return $query->whereRaw(" trim(lower(nm_sdm)) like '%$nama_pegawai%' ");
+                $keyword = strtolower(trim($nama_pegawai));
+                return $query->whereRaw("trim(lower(nm_sdm)) like ?", ["%{$keyword}%"]);
             })->orderBy('nm_sdm','asc')->paginate(25);
     }
 
