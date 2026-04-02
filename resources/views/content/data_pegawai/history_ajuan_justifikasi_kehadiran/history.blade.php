@@ -133,10 +133,10 @@ $arrStatusJustifikasi = array("1"=>"Disetujui","2"=>"Tidak disetuji","0"=>"Belum
                                         <td>{{$r->ajuan_durasi_justifikasi}}</td>
                                         <td>{{$r->durasi_justifikasi}}</td>
                                         <td>
-
-                                            <a href="{{URL::to('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/tolak')}}/{{Crypt::encrypt($r->id_justifikasi)}}" class="btn btn-warning btn-sm"><i class="fas fa-pencil-ruler"></i> Tolak Ajuan Justifikasi</a>
-                                            <a href="{{URL::to('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/reset')}}/{{Crypt::encrypt($r->id_justifikasi)}}" class="btn btn-info btn-sm"><i class="fas fa-pencil-ruler"></i> Reset Justifikasi</a>
-                                             
+                                            <div class="d-flex flex-wrap" style="gap: 4px;">
+                                                <a href="{{URL::to('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/tolak')}}/{{Crypt::encrypt($r->id_justifikasi)}}" class="btn btn-warning btn-sm"><i class="fas fa-pencil-ruler"></i> Tolak</a>
+                                                <a href="{{URL::to('/data-pegawai/data-presensi/pengajuan-justifikasi-kehadiran/reset')}}/{{Crypt::encrypt($r->id_justifikasi)}}" class="btn btn-info btn-sm"><i class="fas fa-pencil-ruler"></i> Reset</a>
+                                            </div>
                                         </td>
                                     </tr>
                                     @endforeach

@@ -26,11 +26,7 @@
         .fa-check-double{
             color:green;
         }
-    @media (min-width: 1200px) {
-        .pull-right {
-            float: right;
-        }
-    }
+    /* pull-right dipindah ke layout.blade.php agar responsive */
     .bolden{font-family:"Arial Black"}
         #toast-container > div {
             opacity: 1;

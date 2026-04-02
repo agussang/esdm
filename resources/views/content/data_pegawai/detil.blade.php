@@ -43,41 +43,22 @@ if($rsData->file_foto){
                 </div>
             </div>
             <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-
-                    </div>
+                <div class="d-flex flex-wrap justify-content-end mb-3" style="gap: 8px;">
                     @if(Session::get('level')!='P')
-                    <div class="col-md-2">
-                        <center><a href="{{URL::to('skp-pegawai/skp/')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-warning">Riwayat Skp & Prilaku</a></center>
-                    </div>
-                    @else
-                    <div class="col-md-2">
-                    </div>
+                    <a href="{{URL::to('skp-pegawai/skp/')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-sm btn-warning"><i class="fas fa-chart-line"></i> Riwayat SKP & Perilaku</a>
                     @endif
 
                     @if($induk[0]=="pegawai-bawahan")
-                    <div class="col-md-2">
-                        <center><a href="{{URL::to('pegawai-bawahan/riwayat-apel')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-purple">Riwayat Peserta Apel</a></center>
-                    </div>
-                    <div class="col-md-2">
-                        <center><a href="{{URL::to('pegawai-bawahan/riwayat-kehadiran')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-primary">Riwayat Presensi</a></center>
-                    </div>
-                    <div class="col-md-2">
-                        <center><a href="{{URL::to('pegawai-bawahan/riwayat-absen')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-success">Riwayat Data Absen</a></center>
-                    </div>
+                    <a href="{{URL::to('pegawai-bawahan/riwayat-apel')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-sm btn-purple"><i class="fas fa-flag"></i> Riwayat Apel</a>
+                    <a href="{{URL::to('pegawai-bawahan/riwayat-kehadiran')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-sm btn-primary"><i class="fas fa-fingerprint"></i> Riwayat Presensi</a>
+                    <a href="{{URL::to('pegawai-bawahan/riwayat-absen')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-sm btn-success"><i class="fas fa-calendar-check"></i> Riwayat Absen</a>
                     @else
-                    <div class="col-md-2">
-                        <center><a href="{{URL::to('pegawai/riwayat-apel')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-purple">Riwayat Peserta Apel</a></center>
-                    </div>
-                    <div class="col-md-2">
-                        <center><a href="{{URL::to('pegawai/riwayat-kehadiran')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-primary">Riwayat Presensi</a></center>
-                    </div>
-                    <div class="col-md-2">
-                        <center><a href="{{URL::to('pegawai/riwayat-absen')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-success">Riwayat Data Absen</a></center>
-                    </div>
+                    <a href="{{URL::to('pegawai/riwayat-apel')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-sm btn-purple"><i class="fas fa-flag"></i> Riwayat Apel</a>
+                    <a href="{{URL::to('pegawai/riwayat-kehadiran')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-sm btn-primary"><i class="fas fa-fingerprint"></i> Riwayat Presensi</a>
+                    <a href="{{URL::to('pegawai/riwayat-absen')}}/{{Crypt::encrypt($rsData->id_sdm)}}" class="btn btn-sm btn-success"><i class="fas fa-calendar-check"></i> Riwayat Absen</a>
                     @endif
-                </div><hr/>
+                </div>
+                <hr/>
                 <div class="row">
                     <div class="col-md-3">
                         <img src="{{URL::to($file_photo)}}" class="img-thumbnail w-60 img-fluid rounded" alt="Responsive image">

@@ -541,6 +541,161 @@
         }
 
         /* ============================================
+           GLOBAL BUTTON & LAYOUT FIXES
+           ============================================ */
+
+        /* Fix pull-right agar bekerja di semua screen size */
+        .pull-right {
+            float: right !important;
+        }
+
+        /* btn-xs deprecated di Bootstrap 4, tambahkan kembali */
+        .btn-xs {
+            padding: 4px 10px;
+            font-size: 12px;
+            line-height: 1.5;
+            border-radius: 4px;
+        }
+
+        /* Card header: title + buttons responsive */
+        .card-header .card-title .row {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* Table action buttons: wrap & gap */
+        td .btn + .btn,
+        th .btn + .btn {
+            margin-left: 4px;
+        }
+
+        td > .btn,
+        td > a.btn {
+            margin-bottom: 4px;
+        }
+
+        /* Fix buttons in col-md-4 at card-header */
+        .card-header .col-md-4 {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Responsive card header on small screens */
+        @media (max-width: 767px) {
+            .card-header .card-title .row,
+            .card-header .card-title .d-flex {
+                flex-direction: column;
+                align-items: flex-start !important;
+                gap: 10px;
+            }
+
+            .card-header .col-md-4,
+            .card-header .col-md-8 {
+                width: 100%;
+                max-width: 100%;
+                flex: 0 0 100%;
+            }
+
+            .card-header .col-md-4 {
+                justify-content: flex-start;
+            }
+
+            .card-header .col-md-4 .pull-right {
+                float: none !important;
+            }
+
+            /* Buttons stack nicely on mobile */
+            .card-header .btn {
+                font-size: 12px;
+                padding: 6px 12px;
+            }
+
+            /* Filter form responsive */
+            .input-group {
+                flex-wrap: nowrap;
+            }
+
+            .input-group .input-group-prepend .input-group-text {
+                font-size: 11px;
+                padding: 6px 8px;
+                white-space: nowrap;
+            }
+
+            /* Table horizontal scroll with touch */
+            .table-responsive {
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -12px;
+                padding: 0 12px;
+            }
+
+            /* Pagination responsive */
+            .pagination {
+                float: none !important;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            /* Modal responsive */
+            .modal-dialog {
+                margin: 10px;
+            }
+
+            /* Form buttons full width on mobile */
+            .card-body .col-md-4 > .btn.pull-right,
+            .card-body .col-md-4 > button.pull-right {
+                float: none !important;
+                width: 100%;
+                margin-top: 8px;
+            }
+        }
+
+        /* Smaller phones */
+        @media (max-width: 430px) {
+            .card-header h5.card-label {
+                font-size: 14px;
+            }
+
+            .card-header .btn {
+                font-size: 11px;
+                padding: 5px 10px;
+            }
+
+            .btn-xs {
+                padding: 3px 8px;
+                font-size: 11px;
+            }
+
+            /* Stack filter inputs */
+            .input-group {
+                margin-bottom: 8px !important;
+            }
+
+            .input-group .input-group-prepend .input-group-text {
+                font-size: 10px;
+                padding: 4px 6px;
+                min-width: 80px;
+            }
+
+            .form-control, .custom-select {
+                font-size: 13px;
+            }
+
+            /* Tables compact on phone */
+            .table td, .table th {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+
+            .table .btn-sm, .table .btn-xs {
+                padding: 3px 8px;
+                font-size: 11px;
+            }
+        }
+
+        /* ============================================
            MOBILE BOTTOM NAVIGATION
            ============================================ */
         .mobile-bottom-nav {

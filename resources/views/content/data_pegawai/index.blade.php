@@ -4,14 +4,12 @@
     <div class="col-md-12">
         <div class="card card-block card-stretch card-height iq-border-box iq-border-box-1 text-primary">
             <div class="card-header">
-                <div class="card-title">
-                    <div class="row">
-                        <div class="col-md-8">
-                            <h5 class="card-label"><i class="fa fa-list"></i> Data Master Pegawai</h5>
-                        </div>
-                        <div class="col-md-4">
-                            <a href="{{route('data-pegawai.master-pegawai.import')}}" class="btn btn-danger"><i class="fas fa-upload"></i> Import Data Pegawai</a>
-                            <a href="{{route('data-pegawai.master-pegawai.tambah')}}" class="btn btn-warning pull-right"><i class="fas fa-plus"></i> Tambah Data</a>
+                <div class="card-title w-100">
+                    <div class="d-flex flex-wrap align-items-center justify-content-between" style="gap: 10px;">
+                        <h5 class="card-label mb-0"><i class="fa fa-list"></i> Data Master Pegawai</h5>
+                        <div class="d-flex flex-wrap" style="gap: 8px;">
+                            <a href="{{route('data-pegawai.master-pegawai.import')}}" class="btn btn-sm btn-danger"><i class="fas fa-upload"></i> Import Pegawai</a>
+                            <a href="{{route('data-pegawai.master-pegawai.tambah')}}" class="btn btn-sm btn-warning"><i class="fas fa-plus"></i> Tambah Data</a>
                         </div>
                     </div>
                 </div>
@@ -71,8 +69,10 @@
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <a href="{{route('data-pegawai.master-pegawai.import-rekening')}}" class="btn btn-success"><i class="fas fa-upload"></i> Import No Rekening</a>
-                        <button class="btn btn-primary pull-right"><i class="fas fa-search"></i> Tampilkan Data</button>
+                        <div class="d-flex flex-wrap" style="gap: 8px;">
+                            <a href="{{route('data-pegawai.master-pegawai.import-rekening')}}" class="btn btn-sm btn-success"><i class="fas fa-upload"></i> Import Rekening</a>
+                            <button class="btn btn-sm btn-primary ml-auto"><i class="fas fa-search"></i> Tampilkan Data</button>
+                        </div>
                     </div>
                 </div>
                 </form>
@@ -141,9 +141,9 @@
                                 <td>
                                     {{$grade}}
                                 </td>
-                                <th>
-                                    <a href="{{URL::to('/data-pegawai/master-pegawai/detil-data')}}/{{Crypt::encrypt($r->id_sdm)}}" class="btn btn-primary btn-xs" style="margin-bottom: 70px;"><i class="fas fa-eye"></i> Lihat</a>
-                                </th>
+                                <td>
+                                    <a href="{{URL::to('/data-pegawai/master-pegawai/detil-data')}}/{{Crypt::encrypt($r->id_sdm)}}" class="btn btn-primary btn-sm"><i class="fas fa-eye"></i> Lihat</a>
+                                </td>
                             </tr>
                             @endforeach
                         </tbody>
